@@ -1,2 +1,3 @@
 create_subdirectory_options(CLANG TOOL)
 add_clang_subdirectory(driver)
+add_clang_subdirectory(compile)

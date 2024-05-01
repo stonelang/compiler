@@ -33,6 +33,15 @@ std::unique_ptr<FrontendAction> CreateFrontendAction(CompilerInstance &CI);
 /// \return - True on success.
 bool Compile(CompilerInstance& instance);
 
+
+/// Compile - Execute the given actions described by the
+///
+/// \return - 1 on success.
+
+int Compile(int argc, char **args);
+
+int Compile(ArrayRef<const char *> Argv, const char *Argv0, void *MainAddr);
+
 }  // end namespace clang
 
 #endif
