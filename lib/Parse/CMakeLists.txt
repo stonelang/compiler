@@ -7,23 +7,17 @@ set(LLVM_LINK_COMPONENTS
   )
 
 add_clang_library(clangParse
-  ParseAST.cpp
-  ParseCXXInlineMethods.cpp
+  
+  CollectDeclSpec.cpp
+  IdentifierInfoCache.cpp
   ParseDecl.cpp
-  ParseDeclCXX.cpp
   ParseExpr.cpp
-  ParseExprCXX.cpp
-  ParseHLSL.cpp
-  ParseInit.cpp
-  ParseObjc.cpp
-  ParseOpenMP.cpp
-  ParsePragma.cpp
-  ParseStmt.cpp
-  ParseStmtAsm.cpp
-  ParseTemplate.cpp
-  ParseTentative.cpp
   Parser.cpp
-  ParseOpenACC.cpp
+  ParseAST.cpp
+  ParseStmt.cpp
+  ParseTemplate.cpp
+  ParseType.cpp
+  ParseDeclarator.cpp
 
   LINK_LIBS
   clangAST
@@ -33,5 +27,4 @@ add_clang_library(clangParse
 
   DEPENDS
   omp_gen
-  ClangDriverOptions
   )

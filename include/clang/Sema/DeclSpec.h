@@ -372,6 +372,7 @@ private:
   unsigned TypeQualifiers : 5;  // Bitwise OR of TQ.
 
   // function-specifier
+  unsigned FS_fun_specified : 1 ;
   unsigned FS_inline_specified : 1;
   unsigned FS_forceinline_specified: 1;
   unsigned FS_virtual_specified : 1;
@@ -382,6 +383,18 @@ private:
 
   // constexpr-specifier
   unsigned ConstexprSpecifier : 2;
+
+
+  /// Acesss specifier 
+
+   // acccess-specifier 
+  unsigned AS_public_specified : 1;
+  unsigned AS_protected_specified : 1;
+  unsigned AS_private_specified : 1;
+
+  SourceLocation AS_publicLoc, AS_protectedLoc, AS_privateLoc;
+
+
 
   union {
     UnionParsedType TypeRep;
@@ -414,7 +427,7 @@ private:
   SourceRange TypeofParensRange;
   SourceLocation TQ_constLoc, TQ_restrictLoc, TQ_volatileLoc, TQ_atomicLoc,
       TQ_unalignedLoc;
-  SourceLocation FS_inlineLoc, FS_virtualLoc, FS_explicitLoc, FS_noreturnLoc;
+  SourceLocation FS_funLoc, FS_inlineLoc, FS_virtualLoc, FS_explicitLoc, FS_noreturnLoc;
   SourceLocation FS_explicitCloseParenLoc;
   SourceLocation FS_forceinlineLoc;
   SourceLocation FriendLoc, ModulePrivateLoc, ConstexprLoc;
@@ -464,7 +477,7 @@ public:
         TypeSpecType(TST_unspecified), TypeAltiVecVector(false),
         TypeAltiVecPixel(false), TypeAltiVecBool(false), TypeSpecOwned(false),
         TypeSpecPipe(false), TypeSpecSat(false), ConstrainedAuto(false),
-        TypeQualifiers(TQ_unspecified), FS_inline_specified(false),
+        TypeQualifiers(TQ_unspecified), FS_inline_specified(false),FS_fun_specified(false),
         FS_forceinline_specified(false), FS_virtual_specified(false),
         FS_noreturn_specified(false), Friend_specified(false),
         ConstexprSpecifier(
@@ -499,6 +512,33 @@ public:
     TypeSpecOwned = false;
     TSTLoc = SourceLocation();
   }
+
+  void ClearAccessSpecifiers(){
+    AS_public_specified = false;
+    AS_publicLoc = SourceLocation();
+
+
+  } 
+
+  bool isPublicSpecified() const {
+    return AS_public_specified;
+  }
+  SourceLocation getPublicSpecLoc() const {
+    return AS_publicLoc;
+  }
+  bool isProtectedSpecified() const {
+    return AS_protected_specified;
+  }
+  SourceLocation getProtectedSpecLoc() const {
+    return AS_protectedLoc;
+  }
+  bool isPrivateSpecified() const {
+    return AS_public_specified;
+  }
+  SourceLocation getPrivateSpecLoc() const {
+    return AS_publicLoc;
+  }
+
 
   // type-specifier
   TypeSpecifierWidth getTypeSpecWidth() const {
@@ -600,6 +640,13 @@ public:
   }
 
   // function-specifier
+  bool isFunSpecified() const {
+    return FS_fun_specified;
+  }
+
+  SourceLocation getFunSpecLoc() {
+    return FS_inlineLoc;
+  }
   bool isInlineSpecified() const {
     return FS_inline_specified | FS_forceinline_specified;
   }
@@ -628,6 +675,8 @@ public:
   SourceLocation getNoreturnSpecLoc() const { return FS_noreturnLoc; }
 
   void ClearFunctionSpecs() {
+    FS_fun_specified = false;
+    FS_funLoc = SourceLocation();
     FS_inline_specified = false;
     FS_inlineLoc = SourceLocation();
     FS_forceinline_specified = false;
@@ -653,7 +702,6 @@ public:
   void forEachQualifier(
       llvm::function_ref<void(TQ, StringRef, SourceLocation)> Handle);
 
-  /// Return true if any type-specifier has been found.
   bool hasTypeSpecifier() const {
     return getTypeSpecType() != DeclSpec::TST_unspecified ||
            getTypeSpecWidth() != TypeSpecifierWidth::Unspecified ||
@@ -661,6 +709,16 @@ public:
            getTypeSpecSign() != TypeSpecifierSign::Unspecified;
   }
 
+  bool hasStructSpecifier() const {
+    return getTypeSpecType() == DeclSpec::TST_struct;
+  }
+  bool hasEnumSpecifier() const {
+    return getTypeSpecType() == DeclSpec::TST_enum;
+  }
+  bool hasClassSpecifier() const {
+    return getTypeSpecType() == DeclSpec::TST_class;
+  }
+  
   /// Return a bitmask of which flavors of specifiers this
   /// DeclSpec includes.
   unsigned getParsedSpecifiers() const;
@@ -761,6 +819,20 @@ public:
 
   bool SetTypeQual(TQ T, SourceLocation Loc, const char *&PrevSpec,
                    unsigned &DiagID, const LangOptions &Lang);
+
+  bool setImportSpec(SourceLocation Loc, const char *&PrevSpec,
+                             unsigned &DiagID);
+
+   bool setPublicSpec(SourceLocation Loc, const char *&PrevSpec,
+                             unsigned &DiagID);
+   bool setProtectedSpec(SourceLocation Loc, const char *&PrevSpec,
+                             unsigned &DiagID);
+   bool setPrivateSpec(SourceLocation Loc, const char *&PrevSpec,
+                             unsigned &DiagID);
+
+
+  bool setFunctionSpec(SourceLocation Loc, const char *&PrevSpec,
+                             unsigned &DiagID);
 
   bool setFunctionSpecInline(SourceLocation Loc, const char *&PrevSpec,
                              unsigned &DiagID);

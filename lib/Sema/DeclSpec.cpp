@@ -1004,6 +1004,58 @@ bool DeclSpec::SetTypeQual(TQ T, SourceLocation Loc) {
   llvm_unreachable("Unknown type qualifier!");
 }
 
+
+bool DeclSpec::setPublicSpec(SourceLocation Loc, const char *&PrevSpec,
+                             unsigned &DiagID) {
+  if (AS_public_specified) {
+    DiagID = diag::warn_duplicate_declspec;
+    PrevSpec = "public";
+    return true;
+  }
+  AS_public_specified = true;
+  AS_publicLoc = Loc;
+  return false;
+
+}
+bool DeclSpec::setProtectedSpec(SourceLocation Loc, const char *&PrevSpec,
+                             unsigned &DiagID) {
+  if (AS_protected_specified) {
+    DiagID = diag::warn_duplicate_declspec;
+    PrevSpec = "public";
+    return true;
+  }
+  AS_protected_specified = true;
+  AS_protectedLoc = Loc;
+  return false;
+
+}
+
+bool DeclSpec::setPrivateSpec(SourceLocation Loc, const char *&PrevSpec,
+                             unsigned &DiagID) {
+  if (AS_private_specified) {
+    DiagID = diag::warn_duplicate_declspec;
+    PrevSpec = "private";
+    return true;
+  }
+  AS_private_specified = true;
+  AS_privateLoc = Loc;
+  return false;
+}
+
+bool DeclSpec::setFunctionSpec(SourceLocation Loc,
+                                      const char *&PrevSpec,
+                                      unsigned &DiagID) {
+  if (FS_fun_specified) {
+    DiagID = diag::warn_duplicate_declspec;
+    PrevSpec = "fun";
+    return true;
+  }
+  FS_fun_specified = true;
+  FS_funLoc = Loc;
+  return false;
+}
+
+
 bool DeclSpec::setFunctionSpecInline(SourceLocation Loc, const char *&PrevSpec,
                                      unsigned &DiagID) {
   // 'inline inline' is ok.  However, since this is likely not what the user

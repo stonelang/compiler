@@ -315,6 +315,33 @@ public:
   /// represented as characters between '<#' and '#>' in the source code. The
   /// lexer uses identifier tokens to represent placeholders.
   bool isEditorPlaceholder() const { return getFlag(IsEditorPlaceholder); }
+
+  // Helpers 
+  bool IsStar() const{ return is(tok::star); }
+  bool IsAmp() const{ return is(tok::amp); }
+  bool IsArrow() const{ return is(tok::arrow); }
+  bool IsFun() const{ return is(tok::kw_fun); }
+  bool IsEnum() const{ return is(tok::kw_enum); }
+  bool IsStruct() const{ return is(tok::kw_struct); }
+  bool IsInterface() const{ return is(tok::kw_interface); }
+  bool IsClass() const{ return is(tok::kw_class); }
+  bool IsAuto() const{ return is(tok::kw_auto); }
+  bool IsPublic() const{ return is(tok::kw_public); }
+  bool IsPrivate() const{ return is(tok::kw_private); }
+  bool IsProtected() const{ return is(tok::kw_protected); }
+  bool IsImport() const{ return is(tok::kw_import); }
+  bool IsModule() const{ return is(tok::kw_module); }
+  bool IsLParen() const{ return is(tok::l_paren); }
+  bool IsRParen() const{ return is(tok::r_paren); }
+  bool IsLBrace() const{ return is(tok::l_brace); }
+  bool IsRBrace() const{ return is(tok::r_brace); }
+  bool IsLSquare() const{ return is(tok::l_square); }
+  bool IsRSquare() const{ return is(tok::r_square); }
+  bool IsLess() const{ return is(tok::less); }
+  bool IsGreater()const{ return is(tok::greater); }
+  bool IsCodeCompletion()const{ return is(tok::code_completion); }
+  bool IsIdentifier()const{ return is(tok::identifier); }
+
 };
 
 /// Information about the conditional stack (\#if directives)

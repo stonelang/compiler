@@ -6,18 +6,18 @@
 //
 //===----------------------------------------------------------------------===//
 
-#ifndef LLVM_CLANG_PARSE_LOOPHINT_H
-#define LLVM_CLANG_PARSE_LOOPHINT_H
+#ifndef LLVM_CLANG_PARSER_LOOPHINT_H
+#define LLVM_CLANG_PARSER_LOOPHINT_H
 
+#include "clang/Basic/IdentifierTable.h"
 #include "clang/Basic/SourceLocation.h"
+#include "clang/Sema/Ownership.h"
+#include "clang/Sema/ParsedAttr.h"
 
 namespace clang {
 
-class Expr;
-struct IdentifierLoc;
-
 /// Loop optimization hint for loop and unroll pragmas.
-struct LoopHint {
+struct ParserLoopHint {
   // Source range of the directive.
   SourceRange Range;
   // Identifier corresponding to the name of the pragma.  "loop" for
@@ -34,9 +34,9 @@ struct LoopHint {
   // Expression for the hint argument if it exists, null otherwise.
   Expr *ValueExpr = nullptr;
 
-  LoopHint() = default;
+  ParserLoopHint() = default;
 };
 
 } // end namespace clang
 
-#endif // LLVM_CLANG_PARSE_LOOPHINT_H
+#endif // LLVM_CLANG_PARSER_LOOPHINT_H
