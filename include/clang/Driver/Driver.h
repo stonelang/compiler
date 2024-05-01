@@ -581,7 +581,7 @@ public:
   /// PrintHelp - Print the help text.
   ///
   /// \param ShowHidden - Show hidden options.
-  void PrintHelp(bool ShowHidden) const;
+  void PrintHelp(bool ShowHidden = false) const;
 
   /// PrintVersion - Print the driver version.
   void PrintVersion(const Compilation &C, raw_ostream &OS) const;

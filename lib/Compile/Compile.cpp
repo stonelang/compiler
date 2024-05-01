@@ -1,15 +1,3 @@
-//===--- ExecuteCompilerInvocation.cpp ------------------------------------===//
-//
-// Part of the LLVM Project, under the Apache License v2.0 with LLVM Exceptions.
-// See https://llvm.org/LICENSE.txt for license information.
-// SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
-//
-//===----------------------------------------------------------------------===//
-//
-// This file holds ExecuteCompilerInvocation(). It is split into its own file to
-// minimize the impact of pulling in essentially everything else in Clang.
-//
-//===----------------------------------------------------------------------===//
 
 #include "clang/ARCMigrate/ARCMTActions.h"
 #include "clang/CodeGen/CodeGenAction.h"
@@ -31,14 +19,67 @@
 #include "llvm/Support/BuryPointer.h"
 #include "llvm/Support/DynamicLibrary.h"
 #include "llvm/Support/ErrorHandling.h"
+
+
 using namespace clang;
 using namespace llvm::opt;
 
-namespace clang {
-  
-bool clang::Compile(CompilerInstance& instance) {
-  return false;
 
-} // namespace clang
-
+static void PrintCompilerHelp() {
+  driver::getDriverOptTable().printHelp(
+        llvm::outs(), "clang -compile [options] file...",
+        "LLVM 'Clang' Compiler: http://clang.llvm.org",
+        /*Include=*/driver::options::CC1Option,
+        /*Exclude=*/0, /*ShowAllAliases=*/false);
 }
+std::unique_ptr<FrontendAction> clang::CreateFrontendAction(CompilerInstance &clangInstance) {
+switch (clangInstance.getFrontendOpts().ProgramAction) {
+  case frontend::ASTDeclList:            return std::make_unique<ASTDeclListAction>();
+  case frontend::ASTDump:                return std::make_unique<ASTDumpAction>();
+  case frontend::ASTPrint:               return std::make_unique<ASTPrintAction>();
+  case frontend::ASTView:                return std::make_unique<ASTViewAction>();
+  case frontend::DumpCompilerOptions:
+    return std::make_unique<DumpCompilerOptionsAction>();
+  case frontend::EmitAssembly:           return std::make_unique<EmitAssemblyAction>();
+  case frontend::EmitBC:                 return std::make_unique<EmitBCAction>();
+  case frontend::EmitLLVM:               return std::make_unique<EmitLLVMAction>();
+  case frontend::EmitLLVMOnly:           return std::make_unique<EmitLLVMOnlyAction>();
+  case frontend::EmitCodeGenOnly:        return std::make_unique<EmitCodeGenOnlyAction>();
+  case frontend::EmitObj:                return std::make_unique<EmitObjAction>();
+  case frontend::FixIt:                  return std::make_unique<FixItAction>();
+  case frontend::GenerateModule:
+    return std::make_unique<GenerateModuleFromModuleMapAction>();
+  case frontend::GenerateModuleInterface:
+    return std::make_unique<GenerateModuleInterfaceAction>();
+  case frontend::GenerateHeaderUnit:
+    return std::make_unique<GenerateHeaderUnitAction>();
+  case frontend::GeneratePCH:            return std::make_unique<GeneratePCHAction>();
+  case frontend::InitOnly:               return std::make_unique<InitOnlyAction>();
+  case frontend::ParseSyntaxOnly:        return std::make_unique<SyntaxOnlyAction>();
+  case frontend::ModuleFileInfo:         return std::make_unique<DumpModuleInfoAction>();
+  case frontend::VerifyPCH:              return std::make_unique<VerifyPCHAction>();
+  default:
+    llvm_unreachable("Invalid compiler action!");
+  }
+}
+
+bool clang::Compile(CompilerInstance& clangInstance) {
+
+  if(clangInstance.getFrontendOpts().ShowHelp){
+    PrintCompilerHelp();
+    return true;
+  }
+
+  clangInstance.LoadRequestedPlugins();
+  if (clangInstance.getDiagnostics().hasErrorOccurred()){
+    return false;
+  }
+  auto frontendAction = clang::CreateFrontendAction(clangInstance);
+  bool success = clangInstance.ExecuteAction(*frontendAction);
+
+  if (clangInstance.getFrontendOpts().DisableFree){
+    llvm::BuryPointer(std::move(frontendAction));
+  }
+  return success; 
+}
+

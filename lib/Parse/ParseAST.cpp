@@ -2,7 +2,7 @@
 #include "clang/AST/ASTContext.h"
 #include "clang/AST/ExternalASTSource.h"
 #include "clang/AST/Stmt.h"
-#include "clang/Parse/ParseSourceFile.h"
+#include "clang/Parse/ParseAST.h"
 #include "clang/Parse/Parser.h"
 #include "clang/Sema/CodeCompleteConsumer.h"
 #include "clang/Sema/EnterExpressionEvaluationContext.h"
