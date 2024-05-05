@@ -1,5 +1,5 @@
 #include "clang/Parse/Parser.h"
-#include "clang/Parse/ParserRAII.h"
+#include "clang/Parse/Parsing.h"
 
 using namespace clang;
 

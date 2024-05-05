@@ -1,5 +1,5 @@
-#ifndef LLVM_CLANG_FRONTEND_PARSERRAII_H
-#define LLVM_CLANG_FRONTEND_PARSERRAII_H
+#ifndef LLVM_CLANG_FRONTEND_PARSING_H
+#define LLVM_CLANG_FRONTEND_PARSING_H
 
 #include "clang/Parse/Parser.h"
 #include "clang/Sema/DelayedDiagnostic.h"
@@ -122,6 +122,7 @@ public:
 public:
   void Complete(Decl *D) { parsingRAII.complete(D); }
   void Abort() { parsingRAII.abort(); }
+  bool HasAnySpec();
 };
 
 /// A class for parsing a declarator.
