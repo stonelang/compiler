@@ -91,47 +91,8 @@ private:
   }
 };
 
-/// Move to DeclSpec
-enum class DeclSpecKind {
-  Fun = 0,
-  Class,
-  Auto,
-  Void,
-  Any,
-  Bool,
-  Char,
-  String,
-  Float,
-  Float16,
-  Float32,
-  Float64,
-  Enum,
-  Interface,
-  Struct,
-  Int,
-  Int8,
-  Int16,
-  Int32,
-  Int64,
-  UInt,
-  UInt8,
-  Byte,
-  UInt16,
-  UInt32,
-  UInt64,
-  Complex32,
-  Complex64,
-  Imaginary32,
-  Imaginary64
-
-};
-
 class ParsingDeclSpec final : public DeclSpec {
   ParsingDeclRAII parsingRAII;
-
-  /// Every DeclSpec can only have one kind.
-  DeclSpecKind kind;
-
 public:
   const char *prevSpec = nullptr;
   unsigned diagID = 0;
@@ -146,41 +107,16 @@ public:
       : DeclSpec(parser.GetAttrFactory()), parsingRAII(parser, RAII) {}
 
 public:
-  DeclSpecKind GetKind() { return kind; }
   const sema::DelayedDiagnosticPool &getDelayedDiagnosticPool() const {
     return parsingRAII.getDelayedDiagnosticPool();
   }
 
 public:
   // High level wrappers
-  void SetFunSpec(SourceLocation loc);
-  void ClearFunSpec();
-  bool HasFunSpec();
-
-  void SetStructSpec(SourceLocation loc);
-  void ClearStructSpec();
-  bool HasStructSpec();
 
   void SetIntSpec(SourceLocation loc);
   void ClearIntSpec();
   bool HasIntSpec();
-
-  void SetAutoSpec(SourceLocation loc);
-  void ClearAutoSpec();
-  bool HasAutoSpec();
-
-  void SetVoidSpec(SourceLocation loc);
-  void ClearVoidSpec();
-  bool HasVoidSpec();
-
-  void SetBoolSpec(SourceLocation loc);
-  bool HasBoolSpec();
-
-  void SetCharSpec(SourceLocation loc);
-  bool HasCharSpec();
-
-  void SetConstSpec(SourceLocation loc);
-  bool HasConst();
 
 public:
   void Complete(Decl *D) { parsingRAII.complete(D); }

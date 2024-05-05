@@ -134,15 +134,3 @@ ParserStatus Parser::CollectNominalTypeSpec(ParsingDeclSpec &spec) {
   }
   return clang::MakeParserSuccess();
 }
-
-void ParsingDeclSpec::SetFunSpec(SourceLocation loc) {}
-
-void ParsingDeclSpec::SetStructSpec(SourceLocation loc) {}
-
-void ParsingDeclSpec::SetIntSpec(SourceLocation loc) {}
-
-void ParsingDeclSpec::SetVoidSpec(SourceLocation loc) {}
-
-void ParsingDeclSpec::SetBoolSpec(SourceLocation loc) {}
-
-void ParsingDeclSpec::SetCharSpec(SourceLocation loc) {}

@@ -14,6 +14,7 @@
 #include "clang/Rewrite/Frontend/FrontendActions.h"
 #include "clang/StaticAnalyzer/Frontend/AnalyzerHelpFlags.h"
 #include "clang/StaticAnalyzer/Frontend/FrontendActions.h"
+
 #include "llvm/Option/OptTable.h"
 #include "llvm/Option/Option.h"
 #include "llvm/Support/BuryPointer.h"
@@ -22,6 +23,8 @@
 
 using namespace clang;
 using namespace llvm::opt;
+
+// using namespace clang::codegen;
 
 static void PrintCompilerHelp() {
   driver::getDriverOptTable().printHelp(
@@ -33,8 +36,6 @@ static void PrintCompilerHelp() {
 std::unique_ptr<FrontendAction>
 clang::CreateFrontendAction(CompilerInstance &clangInstance) {
   switch (clangInstance.getFrontendOpts().ProgramAction) {
-  case frontend::ASTDeclList:
-    return std::make_unique<ASTDeclListAction>();
   case frontend::ASTDump:
     return std::make_unique<ASTDumpAction>();
   case frontend::ASTPrint:
@@ -57,22 +58,10 @@ clang::CreateFrontendAction(CompilerInstance &clangInstance) {
     return std::make_unique<EmitObjAction>();
   case frontend::FixIt:
     return std::make_unique<FixItAction>();
-  case frontend::GenerateModule:
-    return std::make_unique<GenerateModuleFromModuleMapAction>();
-  case frontend::GenerateModuleInterface:
-    return std::make_unique<GenerateModuleInterfaceAction>();
-  case frontend::GenerateHeaderUnit:
-    return std::make_unique<GenerateHeaderUnitAction>();
   case frontend::GeneratePCH:
     return std::make_unique<GeneratePCHAction>();
-  case frontend::InitOnly:
-    return std::make_unique<InitOnlyAction>();
   case frontend::ParseSyntaxOnly:
     return std::make_unique<SyntaxOnlyAction>();
-  case frontend::ModuleFileInfo:
-    return std::make_unique<DumpModuleInfoAction>();
-  case frontend::VerifyPCH:
-    return std::make_unique<VerifyPCHAction>();
   default:
     llvm_unreachable("Invalid compiler action!");
   }

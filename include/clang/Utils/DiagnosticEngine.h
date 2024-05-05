@@ -30,8 +30,10 @@ class raw_ostream;
 } // namespace llvm
 
 namespace clang {
-namespace diag {
+namespace diags {
 	class DiagnosticEngine final {
+		public:
+			//DiagnosticEngine(src::SourceManager& srcMgr)
 
 	};
 }

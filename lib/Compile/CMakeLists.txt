@@ -25,6 +25,7 @@ if(CLANG_ENABLE_STATIC_ANALYZER)
 endif()
 
 add_clang_library(clangCompile
+  Backend.cpp
   CodeGen.cpp
   Compile.cpp
 

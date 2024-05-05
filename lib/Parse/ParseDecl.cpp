@@ -46,6 +46,7 @@ ParserResult<Decl> Parser::ParseTopLevelDecl(ParsingDeclSpec &spec) {
   spec.takeAttributesFrom(declSpecAttrs);
 
   while (result.IsNull() && IsParsing() && IsTopLevelDeclSpec()) {
+  
     if (CollectDeclSpec(spec).HasCodeCompletion()) {
       // This is an empty file -- stop parsing.
       return result;
@@ -75,24 +76,24 @@ ParserResult<Decl> Parser::ParseDecl(DeclaratorContext declaratorContext,
     return ParserResult<Decl>();
   }
 
-  switch (spec.GetKind()) {
-  case DeclSpecKind::Fun: {
-    assert(spec.isFunSpecified());
-    return ParseFunDecl(declarator);
-  }
-  case DeclSpecKind::Struct: {
-    assert(spec.hasStructSpecifier());
-    return ParseStructDecl(declarator);
-  }
-  case DeclSpecKind::Enum: {
-    assert(spec.hasEnumSpecifier());
-    return ParseEnumDecl(declarator);
-  }
-  case DeclSpecKind::Class: {
-    assert(spec.hasStructSpecifier());
-    return ParseClassDecl(declarator);
-  }
-  }
+  // switch (spec.GetKind()) {
+  // case DeclSpecKind::Fun: {
+  //   assert(spec.isFunSpecified());
+  //   return ParseFunDecl(declarator);
+  // }
+  // case DeclSpecKind::Struct: {
+  //   assert(spec.hasStructSpecifier());
+  //   return ParseStructDecl(declarator);
+  // }
+  // case DeclSpecKind::Enum: {
+  //   assert(spec.hasEnumSpecifier());
+  //   return ParseEnumDecl(declarator);
+  // }
+  // case DeclSpecKind::Class: {
+  //   assert(spec.hasStructSpecifier());
+  //   return ParseClassDecl(declarator);
+  // }
+  // }
 
   return ParserResult<Decl>();
 }

@@ -1,13 +1,30 @@
-
-
 #ifndef LLVM_CLANG_CODEGEN_CODEGEN_H
 #define LLVM_CLANG_CODEGEN_CODEGEN_H
 
+#include "llvm/IR/LegacyPassManager.h"
+#include "llvm/IR/PassManager.h"
+#include "llvm/Passes/PassBuilder.h"
+#include "llvm/Target/TargetMachine.h"
+
 #include "llvm/ADT/ArrayRef.h"
+
+#include "clang/Frontend/FrontendAction.h"
+
+#include "clang/Frontend/CompilerInstance.h"
+
 #include <memory>
 
 namespace clang {
+
+class SourceFile;
+class ModuleDecl;
+
+class CompilerInstance;
+
 namespace codegen {
+
+class CodeGenAction;
+class CodeGenModule;
 
 enum class CodeGenKind : unsigned {
   EmitBC,       ///< Emit LLVM bitcode files
@@ -20,39 +37,58 @@ class CodeGenModule final {
 
   CodeGenAction &codeGenAction;
 
+  CodeGenPassManager codeGenPassMgr; 
+
+  // std::unique_ptr<clang::CodeGenerator> clangCodeGen;
+
 public:
-  CodeGenModule(CodeGenAction &instance);
+  CodeGenModule(CodeGenAction &codeGenAction);
 
 public:
   CodeGenAction &GetCodeGenAction() { return codeGenAction; }
+  CodeGenPassManager& GetCodeGenPassMgr() { return codeGenPassMgr;}
 };
 
-class CodeGenASTConsumer : public ASTConsumer {
+class CodeGenExecution final : public ASTConsumer {
 
-  CodeGenAction &codeGenAction;
+  CodeGenModule &codeGenModule;
 
 public:
-  CodeGenASTConsumer(CodeGenAction &instance);
+  CodeGenExecution(CodeGenModule &codeGenModule);
 
 public:
   void HandleSourceFile(SourceFile *sourceFile) override;
   void HandleModuleDecl(ModuleDecl *sourceFile) override;
+
+private:
+  void GenerateIR(SourceFile *sourceFile);
+  void EmitIR(SourceFile *sourceFile);
+
+  void EmitBC();
+  void OptimizeIR();
+  void EmitNativeOutput();
+  void WriteNativeOutput();
 };
 
-class CodeGenAction : public ASTFrontendAction, public ASTConsumer {
+class CodeGenAction : public ASTFrontendAction {
 
   CodeGenKind kind;
   CodeGenModule codeGenModule;
 
 public:
-  CodeGenAction(CodeGenActionKind kind);
+  CodeGenAction(CodeGenKind kind);
+
 public:
   std::unique_ptr<ASTConsumer> CreateASTConsumer(CompilerInstance &CI,
-                                                 StringRef InFile) override
+                                                 StringRef InFile) override;
+
+  CodeGenKind GetKind();
+
+public:
+  CodeGenModule &GetCodeGenModule() { return codeGenModule; }
 };
 
 class CodeGenPassManager final {
-
   llvm::PassBuilder pb;
   llvm::LoopAnalysisManager lam;
   llvm::FunctionAnalysisManager fam;
@@ -62,16 +98,16 @@ class CodeGenPassManager final {
   llvm::legacy::PassManager lpm;
   llvm::legacy::FunctionPassManager lfpm;
   llvm::FunctionPassManager fpm;
+  llvm::Module *llvmModule = nullptr;
+public:
+  CodeGenPassManager(const CodeGenPassManager &) = delete;
+  void operator=(const CodeGenPassManager &) = delete;
+  CodeGenPassManager(CodeGenPassManager &&) = delete;
+  void operator=(CodeGenPassManager &&) = delete;
 
 public:
-  IRGenPassManager(const IRGenPassManager &) = delete;
-  void operator=(const IRGenPassManager &) = delete;
-  IRGenPassManager(IRGenPassManager &&) = delete;
-  void operator=(IRGenPassManager &&) = delete;
-
-public:
-  IRGenPassManager();
-  ~IRGenPassManager();
+  explicit CodeGenPassManager(llvm::Module *llvmModule);
+  ~CodeGenPassManager() = delete;
 
 public:
   llvm::PassBuilder &GetPassBuilder() { return pb; }
@@ -85,8 +121,10 @@ public:
     return lfpm;
   }
   llvm::FunctionPassManager &GetFunctionPassManager() { return fpm; }
+  llvm::Module *GetLLVMModule() { return llvmModule; }
 };
 
-}
+} // namespace codegen
+} // namespace clang
 
 #endif

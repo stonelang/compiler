@@ -27,6 +27,9 @@ namespace clang {
   class FunctionDecl;
   class ImportDecl;
 
+  class SourceFile;
+  class ModuleDecl;
+
 /// ASTConsumer - This is an abstract interface that should be implemented by
 /// clients that read ASTs.  This abstraction layer allows the client to be
 /// independent of the AST producer (e.g. parser vs AST dump file reader, etc).
