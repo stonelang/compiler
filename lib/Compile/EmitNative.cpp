@@ -3,6 +3,6 @@
 using namespace clang;
 using namespace clang::codegen;
 
-void CodeGenExecution::EmitNativeOutput() {}
+void NativeEmitter::EmitOutputFile() {}
 
-void CodeGenExecution::WriteNativeOutput() {}
+void NativeEmitter::WriteOutputFile() {}

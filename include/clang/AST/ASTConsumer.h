@@ -53,13 +53,13 @@ public:
   /// called by the parser to process every SourceFile
   ///
   /// \returns true to continue parsing, or false to abort parsing.
-   virtual void HandleSourceFile(SourceFile* sourceFile) {}
+   virtual bool HandleSourceFile(SourceFile* sourceFile) {}
 
   /// HandleModuleDecl - Handle the specified module to be built.  This is
   /// called by the parser to process the module.
   ///
   /// \returns true to continue parsing, or false to abort parsing.
-   virtual void HandleModuleDecl(ModuleDecl* moduleDecl) {}
+   virtual bool HandleModuleDecl(ModuleDecl* moduleDecl) {}
 
   /// HandleTopLevelDecl - Handle the specified top-level declaration.  This is
   /// called by the parser to process every top-level Decl*.

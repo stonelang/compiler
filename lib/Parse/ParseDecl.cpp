@@ -46,7 +46,7 @@ ParserResult<Decl> Parser::ParseTopLevelDecl(ParsingDeclSpec &spec) {
   spec.takeAttributesFrom(declSpecAttrs);
 
   while (result.IsNull() && IsParsing() && IsTopLevelDeclSpec()) {
-  
+
     if (CollectDeclSpec(spec).HasCodeCompletion()) {
       // This is an empty file -- stop parsing.
       return result;

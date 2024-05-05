@@ -93,6 +93,7 @@ private:
 
 class ParsingDeclSpec final : public DeclSpec {
   ParsingDeclRAII parsingRAII;
+
 public:
   const char *prevSpec = nullptr;
   unsigned diagID = 0;

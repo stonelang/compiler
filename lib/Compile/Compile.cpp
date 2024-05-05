@@ -2,6 +2,7 @@
 #include "clang/Compile/Compile.h"
 #include "clang/ARCMigrate/ARCMTActions.h"
 #include "clang/CodeGen/CodeGenAction.h"
+#include "clang/Compile/CodeGen.h"
 #include "clang/Config/config.h"
 #include "clang/Driver/Options.h"
 #include "clang/ExtractAPI/FrontendActions.h"
@@ -36,16 +37,12 @@ static void PrintCompilerHelp() {
 std::unique_ptr<FrontendAction>
 clang::CreateFrontendAction(CompilerInstance &clangInstance) {
   switch (clangInstance.getFrontendOpts().ProgramAction) {
-  case frontend::ASTDump:
-    return std::make_unique<ASTDumpAction>();
-  case frontend::ASTPrint:
-    return std::make_unique<ASTPrintAction>();
-  case frontend::ASTView:
-    return std::make_unique<ASTViewAction>();
-  case frontend::DumpCompilerOptions:
-    return std::make_unique<DumpCompilerOptionsAction>();
+
+  case frontend::ParseSyntaxOnly:
+    return std::make_unique<SyntaxOnlyAction>();
   case frontend::EmitAssembly:
-    return std::make_unique<EmitAssemblyAction>();
+    return std::make_unique<codegen::CodeGenAction>(
+        codegen::CodeGenKind::EmitAssembly);
   case frontend::EmitBC:
     return std::make_unique<EmitBCAction>();
   case frontend::EmitLLVM:
@@ -56,12 +53,7 @@ clang::CreateFrontendAction(CompilerInstance &clangInstance) {
     return std::make_unique<EmitCodeGenOnlyAction>();
   case frontend::EmitObj:
     return std::make_unique<EmitObjAction>();
-  case frontend::FixIt:
-    return std::make_unique<FixItAction>();
-  case frontend::GeneratePCH:
-    return std::make_unique<GeneratePCHAction>();
-  case frontend::ParseSyntaxOnly:
-    return std::make_unique<SyntaxOnlyAction>();
+
   default:
     llvm_unreachable("Invalid compiler action!");
   }
