@@ -41,8 +41,7 @@ clang::CreateFrontendAction(CompilerInstance &clangInstance) {
   case frontend::ParseSyntaxOnly:
     return std::make_unique<SyntaxOnlyAction>();
   case frontend::EmitAssembly:
-    return std::make_unique<codegen::CodeGenAction>(
-        codegen::CodeGenKind::EmitAssembly);
+    return std::make_unique<EmitAssemblyAction>();
   case frontend::EmitBC:
     return std::make_unique<EmitBCAction>();
   case frontend::EmitLLVM:
