@@ -43,18 +43,14 @@
 //   Int64PtrTy = Int16Ty->getPointerTo();
 // }
 
-
-
-
-
 // void CodeGenExecution::GenerateIR() {
 
 //}
 
 // void CodeGenExecution::EmitIR() {}
 
-codegen::CodeGenExecution::CodeGenExecution(codegen::CodeGenModule &codeGenModule)
-    : codeGenModule(codeGenModule) {}
+// codegen::CodeGenExecution::CodeGenExecution(codegen::CodeGenModule &codeGenModule)
+//     : codeGenModule(codeGenModule) {}
 
 // void codegen::CodeGenExecution::EmitBC() {}
 
