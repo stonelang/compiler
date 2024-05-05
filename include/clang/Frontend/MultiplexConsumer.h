@@ -85,6 +85,6 @@ private:
   std::unique_ptr<MultiplexASTDeserializationListener> DeserializationListener;
 };
 
-}  // end namespace clang
+} // end namespace clang
 
 #endif

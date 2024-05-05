@@ -1,8 +1,8 @@
+#include "clang/Parse/ParseAST.h"
 #include "clang/AST/ASTConsumer.h"
 #include "clang/AST/ASTContext.h"
 #include "clang/AST/ExternalASTSource.h"
 #include "clang/AST/Stmt.h"
-#include "clang/Parse/ParseAST.h"
 #include "clang/Parse/Parser.h"
 #include "clang/Sema/CodeCompleteConsumer.h"
 #include "clang/Sema/EnterExpressionEvaluationContext.h"
@@ -19,10 +19,10 @@
 using namespace clang;
 
 void clang::ParseAST(Preprocessor &lexer, ASTConsumer *astConsumer,
-                              ASTContext &astContext, bool PrintStats,
-                              TranslationUnitKind TUKind,
-                              CodeCompleteConsumer *CompletionConsumer,
-                              bool SkipFunctionBodies) {
+                     ASTContext &astContext, bool PrintStats,
+                     TranslationUnitKind TUKind,
+                     CodeCompleteConsumer *CompletionConsumer,
+                     bool SkipFunctionBodies) {
 
   std::unique_ptr<Sema> sema(
       new Sema(lexer, astContext, *astConsumer, TUKind, CompletionConsumer));
@@ -32,8 +32,7 @@ void clang::ParseAST(Preprocessor &lexer, ASTConsumer *astConsumer,
   clang::ParseAST(*sema.get(), PrintStats, SkipFunctionBodies);
 }
 
-void clang::ParseAST(Sema &sema, bool printStats,
-                              bool skipFunctionBodies) {
+void clang::ParseAST(Sema &sema, bool printStats, bool skipFunctionBodies) {
 
   // Collect global stats on Decls/Stmts (until we have a module streamer).
   if (printStats) {
@@ -76,5 +75,5 @@ void clang::ParseAST(Sema &sema, bool printStats,
 
 /// Parse the main file known to the preprocessor, producing an
 /// abstract syntax tree.
-void clang::ParseAST(SourceFile &sourceFile, Sema &sem,
-                              bool printStats, bool skipFunctionBodies) {}
+void clang::ParseAST(SourceFile &sourceFile, Sema &sem, bool printStats,
+                     bool skipFunctionBodies) {}

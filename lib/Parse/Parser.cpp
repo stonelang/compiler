@@ -7,7 +7,8 @@ Parser::Parser(Sema &sema, bool skipFunctionBodies)
     : lexer(sema.getPreprocessor()), sema(sema),
       PreferredType(lexer.isCodeCompletionEnabled()),
       diags(lexer.getDiagnostics()), GreaterThanIsOperator(true),
-      ColonIsSacred(false), TemplateParameterDepth(0), identifierInfoCache(*this) {
+      ColonIsSacred(false), TemplateParameterDepth(0),
+      identifierInfoCache(*this) {
 
   skipFunctionBodies = lexer.isCodeCompletionEnabled() || skipFunctionBodies;
 

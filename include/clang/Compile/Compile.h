@@ -14,6 +14,7 @@
 #ifndef LLVM_CLANG_COMPILE_COMPILE_H
 #define LLVM_CLANG_COMPILE_COMPILE_H
 
+#include "llvm/ADT/ArrayRef.h"
 #include <memory>
 
 namespace clang {
@@ -31,8 +32,7 @@ std::unique_ptr<FrontendAction> CreateFrontendAction(CompilerInstance &CI);
 /// compiler invocation object in the given compiler instance.
 ///
 /// \return - True on success.
-bool Compile(CompilerInstance& instance);
-
+bool Compile(CompilerInstance &instance);
 
 /// Compile - Execute the given actions described by the
 ///
@@ -40,8 +40,9 @@ bool Compile(CompilerInstance& instance);
 
 int Compile(int argc, char **args);
 
-int Compile(ArrayRef<const char *> Argv, const char *Argv0, void *MainAddr);
+int Compile(llvm::ArrayRef<const char *> Argv, const char *Argv0,
+            void *MainAddr);
 
-}  // end namespace clang
+} // end namespace clang
 
 #endif

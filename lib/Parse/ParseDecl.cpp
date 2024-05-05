@@ -23,7 +23,7 @@ void Parser::ParseTopLevelDecls(
   };
   while (IsParsing() && IsTopLevelDeclSpec()) {
     ParsingDeclSpec spec(*this);
-    spec.isTopLevelDecl = true; 
+    spec.isTopLevelDecl = true;
     auto result = ParseTopLevelDecl(spec);
     if (!Success(result)) {
       return;
@@ -75,15 +75,25 @@ ParserResult<Decl> Parser::ParseDecl(DeclaratorContext declaratorContext,
     return ParserResult<Decl>();
   }
 
-  if (spec.isFunSpecified()) {
+  switch (spec.GetKind()) {
+  case DeclSpecKind::Fun: {
+    assert(spec.isFunSpecified());
     return ParseFunDecl(declarator);
-  } else if (spec.hasStructSpecifier()) {
+  }
+  case DeclSpecKind::Struct: {
+    assert(spec.hasStructSpecifier());
     return ParseStructDecl(declarator);
-  } else if (spec.hasEnumSpecifier()) {
+  }
+  case DeclSpecKind::Enum: {
+    assert(spec.hasEnumSpecifier());
     return ParseEnumDecl(declarator);
-  } else if (spec.hasClassSpecifier()) {
+  }
+  case DeclSpecKind::Class: {
+    assert(spec.hasStructSpecifier());
     return ParseClassDecl(declarator);
   }
+  }
+
   return ParserResult<Decl>();
 }
 

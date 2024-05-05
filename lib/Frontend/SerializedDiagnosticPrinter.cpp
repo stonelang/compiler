@@ -33,6 +33,7 @@ namespace {
 
 class AbbreviationMap {
   llvm::DenseMap<unsigned, unsigned> Abbrevs;
+
 public:
   AbbreviationMap() {}
 
@@ -55,10 +56,11 @@ class SDiagsWriter;
 
 class SDiagsRenderer : public DiagnosticNoteRenderer {
   SDiagsWriter &Writer;
+
 public:
   SDiagsRenderer(SDiagsWriter &Writer, const LangOptions &LangOpts,
                  DiagnosticOptions *DiagOpts)
-    : DiagnosticNoteRenderer(LangOpts, DiagOpts), Writer(Writer) {}
+      : DiagnosticNoteRenderer(LangOpts, DiagOpts), Writer(Writer) {}
 
   ~SDiagsRenderer() override {}
 
@@ -191,8 +193,7 @@ private:
 
   /// Emit FIXIT and SOURCE_RANGE records for a diagnostic.
   void EmitCodeContext(SmallVectorImpl<CharSourceRange> &Ranges,
-                       ArrayRef<FixItHint> Hints,
-                       const SourceManager &SM);
+                       ArrayRef<FixItHint> Hints, const SourceManager &SM);
 
   /// Emit a record for a CharSourceRange.
   void EmitCharSourceRange(CharSourceRange R, const SourceManager &SM);
@@ -273,15 +274,15 @@ private:
     /// The collection of files used.
     llvm::DenseMap<const char *, unsigned> Files;
 
-    typedef llvm::DenseMap<const void *, std::pair<unsigned, StringRef> >
-    DiagFlagsTy;
+    typedef llvm::DenseMap<const void *, std::pair<unsigned, StringRef>>
+        DiagFlagsTy;
 
     /// Map for uniquing strings.
     DiagFlagsTy DiagFlags;
 
     /// Whether we have already started emission of any DIAG blocks. Once
-    /// this becomes \c true, we never close a DIAG block until we know that we're
-    /// starting another one or we're done.
+    /// this becomes \c true, we never close a DIAG block until we know that
+    /// we're starting another one or we're done.
     bool EmittedAnyDiagBlocks;
 
     /// Engine for emitting diagnostics about the diagnostics.
@@ -309,8 +310,7 @@ create(StringRef OutputFile, DiagnosticOptions *Diags, bool MergeChildRecords) {
 
 /// Emits a block ID in the BLOCKINFO block.
 static void EmitBlockID(unsigned ID, const char *Name,
-                        llvm::BitstreamWriter &Stream,
-                        RecordDataImpl &Record) {
+                        llvm::BitstreamWriter &Stream, RecordDataImpl &Record) {
   Record.clear();
   Record.push_back(ID);
   Stream.EmitRecord(llvm::bitc::BLOCKINFO_CODE_SETBID, Record);
@@ -330,7 +330,7 @@ static void EmitBlockID(unsigned ID, const char *Name,
 /// Emits a record ID in the BLOCKINFO block.
 static void EmitRecordID(unsigned ID, const char *Name,
                          llvm::BitstreamWriter &Stream,
-                         RecordDataImpl &Record){
+                         RecordDataImpl &Record) {
   Record.clear();
   Record.push_back(ID);
 
@@ -353,7 +353,7 @@ void SDiagsWriter::AddLocToRecord(FullSourceLoc Loc, PresumedLoc PLoc,
 
   Record.push_back(getEmitFile(PLoc.getFilename()));
   Record.push_back(PLoc.getLine());
-  Record.push_back(PLoc.getColumn()+TokSize);
+  Record.push_back(PLoc.getColumn() + TokSize);
   Record.push_back(Loc.getFileOffset());
 }
 
@@ -363,13 +363,12 @@ void SDiagsWriter::AddCharSourceRangeToRecord(CharSourceRange Range,
   AddLocToRecord(FullSourceLoc(Range.getBegin(), SM), Record);
   unsigned TokSize = 0;
   if (Range.isTokenRange())
-    TokSize = Lexer::MeasureTokenLength(Range.getEnd(),
-                                        SM, *LangOpts);
+    TokSize = Lexer::MeasureTokenLength(Range.getEnd(), SM, *LangOpts);
 
   AddLocToRecord(FullSourceLoc(Range.getEnd(), SM), Record, TokSize);
 }
 
-unsigned SDiagsWriter::getEmitFile(const char *FileName){
+unsigned SDiagsWriter::getEmitFile(const char *FileName) {
   if (!FileName)
     return 0;
 
@@ -456,12 +455,12 @@ void SDiagsWriter::EmitBlockInfoBlock() {
   // Emit abbreviation for RECORD_DIAG.
   Abbrev = std::make_shared<BitCodeAbbrev>();
   Abbrev->Add(BitCodeAbbrevOp(RECORD_DIAG));
-  Abbrev->Add(BitCodeAbbrevOp(BitCodeAbbrevOp::Fixed, 3));  // Diag level.
+  Abbrev->Add(BitCodeAbbrevOp(BitCodeAbbrevOp::Fixed, 3)); // Diag level.
   AddSourceLocationAbbrev(*Abbrev);
   Abbrev->Add(BitCodeAbbrevOp(BitCodeAbbrevOp::Fixed, 10)); // Category.
   Abbrev->Add(BitCodeAbbrevOp(BitCodeAbbrevOp::Fixed, 10)); // Mapped Diag ID.
-  Abbrev->Add(BitCodeAbbrevOp(BitCodeAbbrevOp::VBR, 16)); // Text size.
-  Abbrev->Add(BitCodeAbbrevOp(BitCodeAbbrevOp::Blob)); // Diagnostc text.
+  Abbrev->Add(BitCodeAbbrevOp(BitCodeAbbrevOp::VBR, 16));   // Text size.
+  Abbrev->Add(BitCodeAbbrevOp(BitCodeAbbrevOp::Blob));      // Diagnostc text.
   Abbrevs.set(RECORD_DIAG, Stream.EmitBlockInfoAbbrev(BLOCK_DIAG, Abbrev));
 
   // Emit abbreviation for RECORD_CATEGORY.
@@ -484,20 +483,19 @@ void SDiagsWriter::EmitBlockInfoBlock() {
   Abbrev->Add(BitCodeAbbrevOp(RECORD_DIAG_FLAG));
   Abbrev->Add(BitCodeAbbrevOp(BitCodeAbbrevOp::Fixed, 10)); // Mapped Diag ID.
   Abbrev->Add(BitCodeAbbrevOp(BitCodeAbbrevOp::Fixed, 16)); // Text size.
-  Abbrev->Add(BitCodeAbbrevOp(BitCodeAbbrevOp::Blob)); // Flag name text.
-  Abbrevs.set(RECORD_DIAG_FLAG, Stream.EmitBlockInfoAbbrev(BLOCK_DIAG,
-                                                           Abbrev));
+  Abbrev->Add(BitCodeAbbrevOp(BitCodeAbbrevOp::Blob));      // Flag name text.
+  Abbrevs.set(RECORD_DIAG_FLAG, Stream.EmitBlockInfoAbbrev(BLOCK_DIAG, Abbrev));
 
   // Emit the abbreviation for RECORD_FILENAME.
   Abbrev = std::make_shared<BitCodeAbbrev>();
   Abbrev->Add(BitCodeAbbrevOp(RECORD_FILENAME));
   Abbrev->Add(BitCodeAbbrevOp(BitCodeAbbrevOp::Fixed, 10)); // Mapped file ID.
   Abbrev->Add(BitCodeAbbrevOp(BitCodeAbbrevOp::Fixed, 32)); // Size.
-  Abbrev->Add(BitCodeAbbrevOp(BitCodeAbbrevOp::Fixed, 32)); // Modification time.
+  Abbrev->Add(
+      BitCodeAbbrevOp(BitCodeAbbrevOp::Fixed, 32)); // Modification time.
   Abbrev->Add(BitCodeAbbrevOp(BitCodeAbbrevOp::Fixed, 16)); // Text size.
-  Abbrev->Add(BitCodeAbbrevOp(BitCodeAbbrevOp::Blob)); // File name text.
-  Abbrevs.set(RECORD_FILENAME, Stream.EmitBlockInfoAbbrev(BLOCK_DIAG,
-                                                          Abbrev));
+  Abbrev->Add(BitCodeAbbrevOp(BitCodeAbbrevOp::Blob));      // File name text.
+  Abbrevs.set(RECORD_FILENAME, Stream.EmitBlockInfoAbbrev(BLOCK_DIAG, Abbrev));
 
   // Emit the abbreviation for RECORD_FIXIT.
   Abbrev = std::make_shared<BitCodeAbbrev>();
@@ -505,8 +503,7 @@ void SDiagsWriter::EmitBlockInfoBlock() {
   AddRangeLocationAbbrev(*Abbrev);
   Abbrev->Add(BitCodeAbbrevOp(BitCodeAbbrevOp::Fixed, 16)); // Text size.
   Abbrev->Add(BitCodeAbbrevOp(BitCodeAbbrevOp::Blob));      // FixIt text.
-  Abbrevs.set(RECORD_FIXIT, Stream.EmitBlockInfoAbbrev(BLOCK_DIAG,
-                                                       Abbrev));
+  Abbrevs.set(RECORD_FIXIT, Stream.EmitBlockInfoAbbrev(BLOCK_DIAG, Abbrev));
 
   Stream.ExitBlock();
 }
@@ -623,13 +620,15 @@ void SDiagsWriter::HandleDiagnostic(DiagnosticsEngine::Level DiagLevel,
 
 static serialized_diags::Level getStableLevel(DiagnosticsEngine::Level Level) {
   switch (Level) {
-#define CASE(X) case DiagnosticsEngine::X: return serialized_diags::X;
-  CASE(Ignored)
-  CASE(Note)
-  CASE(Remark)
-  CASE(Warning)
-  CASE(Error)
-  CASE(Fatal)
+#define CASE(X)                                                                \
+  case DiagnosticsEngine::X:                                                   \
+    return serialized_diags::X;
+    CASE(Ignored)
+    CASE(Note)
+    CASE(Remark)
+    CASE(Warning)
+    CASE(Error)
+    CASE(Fatal)
 #undef CASE
   }
 
@@ -650,7 +649,7 @@ void SDiagsWriter::EmitDiagnosticMessage(FullSourceLoc Loc, PresumedLoc PLoc,
   Record.push_back(getStableLevel(Level));
   AddLocToRecord(Loc, PLoc, Record);
 
-  if (const Diagnostic *Info = D.dyn_cast<const Diagnostic*>()) {
+  if (const Diagnostic *Info = D.dyn_cast<const Diagnostic *>()) {
     // Emit the category string lazily and get the category ID.
     unsigned DiagID = DiagnosticIDs::getCategoryNumberForDiag(Info->getID());
     Record.push_back(getEmitCategory(DiagID));
@@ -676,9 +675,7 @@ void SDiagsWriter::EnterDiagBlock() {
   State->Stream.EnterSubblock(BLOCK_DIAG, 4);
 }
 
-void SDiagsWriter::ExitDiagBlock() {
-  State->Stream.ExitBlock();
-}
+void SDiagsWriter::ExitDiagBlock() { State->Stream.ExitBlock(); }
 
 void SDiagsRenderer::beginDiagnostic(DiagOrStoredDiag D,
                                      DiagnosticsEngine::Level Level) {
@@ -708,8 +705,8 @@ void SDiagsWriter::EmitCodeContext(SmallVectorImpl<CharSourceRange> &Ranges,
       EmitCharSourceRange(*I, SM);
 
   // Emit FixIts.
-  for (ArrayRef<FixItHint>::iterator I = Hints.begin(), E = Hints.end();
-       I != E; ++I) {
+  for (ArrayRef<FixItHint>::iterator I = Hints.begin(), E = Hints.end(); I != E;
+       ++I) {
     const FixItHint &Fix = *I;
     if (Fix.isNull())
       continue;
@@ -755,8 +752,8 @@ DiagnosticsEngine *SDiagsWriter::getMetaDiags() {
     IntrusiveRefCntPtr<DiagnosticIDs> IDs(new DiagnosticIDs());
     auto Client =
         new TextDiagnosticPrinter(llvm::errs(), State->DiagOpts.get());
-    State->MetaDiagnostics = std::make_unique<DiagnosticsEngine>(
-        IDs, State->DiagOpts.get(), Client);
+    State->MetaDiagnostics =
+        std::make_unique<DiagnosticsEngine>(IDs, State->DiagOpts.get(), Client);
   }
   return State->MetaDiagnostics.get();
 }
@@ -796,7 +793,7 @@ void SDiagsWriter::finish() {
 
   std::error_code EC;
   auto OS = std::make_unique<llvm::raw_fd_ostream>(State->OutputFile.c_str(),
-                                                    EC, llvm::sys::fs::OF_None);
+                                                   EC, llvm::sys::fs::OF_None);
   if (EC) {
     getMetaDiags()->Report(diag::warn_fe_serialized_diag_failure)
         << State->OutputFile << EC.message();
@@ -831,7 +828,8 @@ SDiagsMerger::visitSourceRangeRecord(const serialized_diags::Location &Start,
                                      const serialized_diags::Location &End) {
   RecordData::value_type Record[] = {
       RECORD_SOURCE_RANGE, FileLookup[Start.FileID], Start.Line, Start.Col,
-      Start.Offset, FileLookup[End.FileID], End.Line, End.Col, End.Offset};
+      Start.Offset,        FileLookup[End.FileID],   End.Line,   End.Col,
+      End.Offset};
   Writer.State->Stream.EmitRecordWithAbbrev(
       Writer.State->Abbrevs.get(RECORD_SOURCE_RANGE), Record);
   return std::error_code();
@@ -840,10 +838,15 @@ SDiagsMerger::visitSourceRangeRecord(const serialized_diags::Location &Start,
 std::error_code SDiagsMerger::visitDiagnosticRecord(
     unsigned Severity, const serialized_diags::Location &Location,
     unsigned Category, unsigned Flag, StringRef Message) {
-  RecordData::value_type Record[] = {
-      RECORD_DIAG, Severity, FileLookup[Location.FileID], Location.Line,
-      Location.Col, Location.Offset, CategoryLookup[Category],
-      Flag ? DiagFlagLookup[Flag] : 0, Message.size()};
+  RecordData::value_type Record[] = {RECORD_DIAG,
+                                     Severity,
+                                     FileLookup[Location.FileID],
+                                     Location.Line,
+                                     Location.Col,
+                                     Location.Offset,
+                                     CategoryLookup[Category],
+                                     Flag ? DiagFlagLookup[Flag] : 0,
+                                     Message.size()};
 
   Writer.State->Stream.EmitRecordWithBlob(
       Writer.State->Abbrevs.get(RECORD_DIAG), Record, Message);
@@ -855,9 +858,10 @@ SDiagsMerger::visitFixitRecord(const serialized_diags::Location &Start,
                                const serialized_diags::Location &End,
                                StringRef Text) {
   RecordData::value_type Record[] = {RECORD_FIXIT, FileLookup[Start.FileID],
-                                     Start.Line, Start.Col, Start.Offset,
-                                     FileLookup[End.FileID], End.Line, End.Col,
-                                     End.Offset, Text.size()};
+                                     Start.Line,   Start.Col,
+                                     Start.Offset, FileLookup[End.FileID],
+                                     End.Line,     End.Col,
+                                     End.Offset,   Text.size()};
 
   Writer.State->Stream.EmitRecordWithBlob(
       Writer.State->Abbrevs.get(RECORD_FIXIT), Record, Text);

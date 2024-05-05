@@ -42,7 +42,7 @@ protected:
   void getMemoryBufferSizes(MemoryBufferSizes &sizes) const override {
     for (unsigned i = 0, e = CIs.size(); i != e; ++i) {
       if (const ExternalASTSource *eSrc =
-          CIs[i]->getASTContext().getExternalSource()) {
+              CIs[i]->getASTContext().getExternalSource()) {
         eSrc->getMemoryBufferSizes(sizes);
       }
     }
@@ -117,7 +117,7 @@ IntrusiveRefCntPtr<ExternalSemaSource> clang::createChainedIncludesSource(
     CInvok->getFrontendOpts().Inputs.push_back(InputFile);
 
     TextDiagnosticPrinter *DiagClient =
-      new TextDiagnosticPrinter(llvm::errs(), new DiagnosticOptions());
+        new TextDiagnosticPrinter(llvm::errs(), new DiagnosticOptions());
     IntrusiveRefCntPtr<DiagnosticIDs> DiagID(new DiagnosticIDs());
     IntrusiveRefCntPtr<DiagnosticsEngine> Diags(
         new DiagnosticsEngine(DiagID, &CI.getDiagnosticOpts(), DiagClient));
@@ -141,7 +141,7 @@ IntrusiveRefCntPtr<ExternalSemaSource> clang::createChainedIncludesSource(
         Clang->getPreprocessor(), Clang->getModuleCache(), "-", /*isysroot=*/"",
         Buffer, Extensions, /*AllowASTWithErrors=*/true);
     Clang->getASTContext().setASTMutationListener(
-                                            consumer->GetASTMutationListener());
+        consumer->GetASTMutationListener());
     Clang->setASTConsumer(std::move(consumer));
     Clang->createSema(TU_Prefix, nullptr);
 
@@ -156,9 +156,9 @@ IntrusiveRefCntPtr<ExternalSemaSource> clang::createChainedIncludesSource(
       // allocating new ones.
       for (auto &SB : SerialBufs)
         Bufs.push_back(llvm::MemoryBuffer::getMemBuffer(SB->getBuffer()));
-      std::string pchName = includes[i-1];
+      std::string pchName = includes[i - 1];
       llvm::raw_string_ostream os(pchName);
-      os << ".pch" << i-1;
+      os << ".pch" << i - 1;
       serialBufNames.push_back(os.str());
 
       IntrusiveRefCntPtr<ASTReader> Reader;

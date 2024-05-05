@@ -10,11 +10,11 @@
 //
 //===----------------------------------------------------------------------===//
 
-#include "clang/Frontend/Utils.h"
 #include "clang/Basic/FileManager.h"
 #include "clang/Basic/SourceManager.h"
 #include "clang/Frontend/DependencyOutputOptions.h"
 #include "clang/Frontend/FrontendDiagnostic.h"
+#include "clang/Frontend/Utils.h"
 #include "clang/Lex/DirectoryLookup.h"
 #include "clang/Lex/ModuleMap.h"
 #include "clang/Lex/PPCallbacks.h"
@@ -123,8 +123,8 @@ struct DepCollectorASTListener : public ASTReaderListener {
                                     /*IsSystem*/ false, /*IsModuleFile*/ true,
                                     /*IsMissing*/ false);
   }
-  bool visitInputFile(StringRef Filename, bool IsSystem,
-                      bool IsOverridden, bool IsExplicitModule) override {
+  bool visitInputFile(StringRef Filename, bool IsSystem, bool IsOverridden,
+                      bool IsExplicitModule) override {
     if (IsOverridden || IsExplicitModule)
       return true;
 
@@ -179,7 +179,7 @@ bool DependencyCollector::sawDependency(StringRef Filename, bool FromModule,
          (needSystemDependencies() || !IsSystem);
 }
 
-DependencyCollector::~DependencyCollector() { }
+DependencyCollector::~DependencyCollector() {}
 void DependencyCollector::attachToPreprocessor(Preprocessor &PP) {
   PP.addPPCallbacks(std::make_unique<DepCollectorPPCallbacks>(*this, PP));
   PP.getHeaderSearchInfo().getModuleMap().addModuleMapCallbacks(

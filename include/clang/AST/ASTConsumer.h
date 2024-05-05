@@ -44,7 +44,19 @@ public:
 
   /// Initialize - This is called to initialize the consumer, providing the
   /// ASTContext.
-  virtual void Initialize(ASTContext &Context) {}
+   virtual void Initialize(ASTContext &Context) {}
+
+  /// HandleModuleDecl - Handle the specified module to be built.  This is
+  /// called by the parser to process every SourceFile
+  ///
+  /// \returns true to continue parsing, or false to abort parsing.
+   virtual void HandleSourceFile(SourceFile* sourceFile) {}
+
+  /// HandleModuleDecl - Handle the specified module to be built.  This is
+  /// called by the parser to process the module.
+  ///
+  /// \returns true to continue parsing, or false to abort parsing.
+   virtual void HandleModuleDecl(ModuleDecl* moduleDecl) {}
 
   /// HandleTopLevelDecl - Handle the specified top-level declaration.  This is
   /// called by the parser to process every top-level Decl*.

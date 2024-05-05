@@ -36,11 +36,11 @@ public:
   LLVM_PREFERRED_TYPE(bool)
   unsigned IncludeSystemHeaders : 1; ///< Include system header dependencies.
   LLVM_PREFERRED_TYPE(bool)
-  unsigned ShowHeaderIncludes : 1;   ///< Show header inclusions (-H).
+  unsigned ShowHeaderIncludes : 1; ///< Show header inclusions (-H).
   LLVM_PREFERRED_TYPE(bool)
-  unsigned UsePhonyTargets : 1;      ///< Include phony targets for each
-                                     /// dependency, which can avoid some 'make'
-                                     /// problems.
+  unsigned UsePhonyTargets : 1; ///< Include phony targets for each
+                                /// dependency, which can avoid some 'make'
+                                /// problems.
   LLVM_PREFERRED_TYPE(bool)
   unsigned AddMissingHeaderDeps : 1; ///< Add missing headers to dependency list
   LLVM_PREFERRED_TYPE(bool)
@@ -94,6 +94,6 @@ public:
         HeaderIncludeFiltering(HIFIL_None) {}
 };
 
-}  // end namespace clang
+} // end namespace clang
 
 #endif

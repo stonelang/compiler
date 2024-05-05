@@ -820,6 +820,11 @@ public:
   bool SetTypeQual(TQ T, SourceLocation Loc, const char *&PrevSpec,
                    unsigned &DiagID, const LangOptions &Lang);
 
+  bool SetConstQual(SourceLocation Loc, const char *&PrevSpec,
+                   unsigned &DiagID, const LangOptions &Lang){
+    return SetTypeQual(TQ_const, Loc, PrevSpec, DiagID, Lang);
+  }
+
   bool setImportSpec(SourceLocation Loc, const char *&PrevSpec,
                              unsigned &DiagID);
 

@@ -21,8 +21,8 @@
 #include "clang/Frontend/MigratorOptions.h"
 #include "clang/Frontend/PreprocessorOutputOptions.h"
 #include "clang/StaticAnalyzer/Core/AnalyzerOptions.h"
-#include "llvm/ADT/IntrusiveRefCntPtr.h"
 #include "llvm/ADT/ArrayRef.h"
+#include "llvm/ADT/IntrusiveRefCntPtr.h"
 #include <memory>
 #include <string>
 
@@ -224,19 +224,19 @@ public:
   /// @{
   // Note: These need to be pulled in manually. Otherwise, they get hidden by
   // the mutable getters with the same names.
-  using CompilerInvocationBase::getLangOpts;
-  using CompilerInvocationBase::getTargetOpts;
-  using CompilerInvocationBase::getDiagnosticOpts;
-  using CompilerInvocationBase::getHeaderSearchOpts;
-  using CompilerInvocationBase::getPreprocessorOpts;
   using CompilerInvocationBase::getAnalyzerOpts;
-  using CompilerInvocationBase::getMigratorOpts;
   using CompilerInvocationBase::getAPINotesOpts;
   using CompilerInvocationBase::getCodeGenOpts;
+  using CompilerInvocationBase::getDependencyOutputOpts;
+  using CompilerInvocationBase::getDiagnosticOpts;
   using CompilerInvocationBase::getFileSystemOpts;
   using CompilerInvocationBase::getFrontendOpts;
-  using CompilerInvocationBase::getDependencyOutputOpts;
+  using CompilerInvocationBase::getHeaderSearchOpts;
+  using CompilerInvocationBase::getLangOpts;
+  using CompilerInvocationBase::getMigratorOpts;
+  using CompilerInvocationBase::getPreprocessorOpts;
   using CompilerInvocationBase::getPreprocessorOutputOpts;
+  using CompilerInvocationBase::getTargetOpts;
   /// @}
 
   /// Mutable getters.
@@ -262,9 +262,9 @@ public:
 
   /// Base class internals.
   /// @{
+  using CompilerInvocationBase::DiagnosticOpts;
   using CompilerInvocationBase::LangOpts;
   using CompilerInvocationBase::TargetOpts;
-  using CompilerInvocationBase::DiagnosticOpts;
   std::shared_ptr<HeaderSearchOptions> getHeaderSearchOptsPtr() {
     return HSOpts;
   }

@@ -25,21 +25,15 @@
 using namespace clang;
 
 static const enum raw_ostream::Colors noteColor = raw_ostream::CYAN;
-static const enum raw_ostream::Colors remarkColor =
-  raw_ostream::BLUE;
-static const enum raw_ostream::Colors fixitColor =
-  raw_ostream::GREEN;
-static const enum raw_ostream::Colors caretColor =
-  raw_ostream::GREEN;
-static const enum raw_ostream::Colors warningColor =
-  raw_ostream::MAGENTA;
-static const enum raw_ostream::Colors templateColor =
-  raw_ostream::CYAN;
+static const enum raw_ostream::Colors remarkColor = raw_ostream::BLUE;
+static const enum raw_ostream::Colors fixitColor = raw_ostream::GREEN;
+static const enum raw_ostream::Colors caretColor = raw_ostream::GREEN;
+static const enum raw_ostream::Colors warningColor = raw_ostream::MAGENTA;
+static const enum raw_ostream::Colors templateColor = raw_ostream::CYAN;
 static const enum raw_ostream::Colors errorColor = raw_ostream::RED;
 static const enum raw_ostream::Colors fatalColor = raw_ostream::RED;
 // Used for changing only the bold attribute.
-static const enum raw_ostream::Colors savedColor =
-  raw_ostream::SAVEDCOLOR;
+static const enum raw_ostream::Colors savedColor = raw_ostream::SAVEDCOLOR;
 
 /// Add highlights to differences in template strings.
 static void applyTemplateHighlighting(raw_ostream &OS, StringRef Str,
@@ -67,8 +61,8 @@ const unsigned WordWrapIndentation = 6;
 
 static int bytesSincePreviousTabOrLineBegin(StringRef SourceLine, size_t i) {
   int bytes = 0;
-  while (0<i) {
-    if (SourceLine[--i]=='\t')
+  while (0 < i) {
+    if (SourceLine[--i] == '\t')
       break;
     ++bytes;
   }
@@ -105,8 +99,8 @@ printableTextForNextCharacter(StringRef SourceLine, size_t *I,
            "Invalid -ftabstop value");
     unsigned Col = bytesSincePreviousTabOrLineBegin(SourceLine, *I);
     unsigned NumSpaces = TabStop - (Col % TabStop);
-    assert(0 < NumSpaces && NumSpaces <= TabStop
-           && "Invalid computation of space amt");
+    assert(0 < NumSpaces && NumSpaces <= TabStop &&
+           "Invalid computation of space amt");
     ++(*I);
 
     SmallString<16> ExpandedTab;
@@ -246,16 +240,16 @@ static void genColumnByteMapping(StringRef SourceLine, unsigned TabStop,
 namespace {
 struct SourceColumnMap {
   SourceColumnMap(StringRef SourceLine, unsigned TabStop)
-  : m_SourceLine(SourceLine) {
+      : m_SourceLine(SourceLine) {
 
     genColumnByteMapping(SourceLine, TabStop, m_columnToByte, m_byteToColumn);
 
-    assert(m_byteToColumn.size()==SourceLine.size()+1);
+    assert(m_byteToColumn.size() == SourceLine.size() + 1);
     assert(0 < m_byteToColumn.size() && 0 < m_columnToByte.size());
-    assert(m_byteToColumn.size()
-           == static_cast<unsigned>(m_columnToByte.back()+1));
-    assert(static_cast<unsigned>(m_byteToColumn.back()+1)
-           == m_columnToByte.size());
+    assert(m_byteToColumn.size() ==
+           static_cast<unsigned>(m_columnToByte.back() + 1));
+    assert(static_cast<unsigned>(m_byteToColumn.back() + 1) ==
+           m_columnToByte.size());
   }
   int columns() const { return m_byteToColumn.back(); }
   int bytes() const { return m_columnToByte.back(); }
@@ -263,7 +257,7 @@ struct SourceColumnMap {
   /// Map a byte to the column which it is at the start of, or return -1
   /// if it is not at the start of a column (for a UTF-8 trailing byte).
   int byteToColumn(int n) const {
-    assert(0<=n && n<static_cast<int>(m_byteToColumn.size()));
+    assert(0 <= n && n < static_cast<int>(m_byteToColumn.size()));
     return m_byteToColumn[n];
   }
 
@@ -279,32 +273,32 @@ struct SourceColumnMap {
   /// the column the second or subsequent column of an expanded tab or similar
   /// multi-column entity.
   int columnToByte(int n) const {
-    assert(0<=n && n<static_cast<int>(m_columnToByte.size()));
+    assert(0 <= n && n < static_cast<int>(m_columnToByte.size()));
     return m_columnToByte[n];
   }
 
   /// Map from a byte index to the next byte which starts a column.
   int startOfNextColumn(int N) const {
     assert(0 <= N && N < static_cast<int>(m_byteToColumn.size() - 1));
-    while (byteToColumn(++N) == -1) {}
+    while (byteToColumn(++N) == -1) {
+    }
     return N;
   }
 
   /// Map from a byte index to the previous byte which starts a column.
   int startOfPreviousColumn(int N) const {
     assert(0 < N && N < static_cast<int>(m_byteToColumn.size()));
-    while (byteToColumn(--N) == -1) {}
+    while (byteToColumn(--N) == -1) {
+    }
     return N;
   }
 
-  StringRef getSourceLine() const {
-    return m_SourceLine;
-  }
+  StringRef getSourceLine() const { return m_SourceLine; }
 
 private:
   const std::string m_SourceLine;
-  SmallVector<int,200> m_byteToColumn;
-  SmallVector<int,200> m_columnToByte;
+  SmallVector<int, 200> m_byteToColumn;
+  SmallVector<int, 200> m_columnToByte;
 };
 } // end anonymous namespace
 
@@ -356,8 +350,8 @@ static void selectInterestingSourceRegion(std::string &SourceLine,
     // because the characters up until FixItStart are all ASCII whitespace
     // characters.
     unsigned FixItStartCol = FixItStart;
-    unsigned FixItEndCol
-      = llvm::sys::locale::columnWidth(FixItInsertionLine.substr(0, FixItEnd));
+    unsigned FixItEndCol =
+        llvm::sys::locale::columnWidth(FixItInsertionLine.substr(0, FixItEnd));
 
     CaretStart = std::min(FixItStartCol, CaretStart);
     CaretEnd = std::max(FixItEndCol, CaretEnd);
@@ -371,11 +365,11 @@ static void selectInterestingSourceRegion(std::string &SourceLine,
     ++CaretEnd;
 
   assert((static_cast<int>(CaretStart) > map.columns() ||
-          -1!=map.columnToByte(CaretStart)) &&
+          -1 != map.columnToByte(CaretStart)) &&
          "CaretStart must not point to a column in the middle of a source"
          " line character");
   assert((static_cast<int>(CaretEnd) > map.columns() ||
-          -1!=map.columnToByte(CaretEnd)) &&
+          -1 != map.columnToByte(CaretEnd)) &&
          "CaretEnd must not point to a column in the middle of a source line"
          " character");
 
@@ -384,29 +378,30 @@ static void selectInterestingSourceRegion(std::string &SourceLine,
   // number of columns we have, try to grow the slice to encompass
   // more context.
 
-  unsigned SourceStart = map.columnToByte(std::min<unsigned>(CaretStart,
-                                                             map.columns()));
-  unsigned SourceEnd = map.columnToByte(std::min<unsigned>(CaretEnd,
-                                                           map.columns()));
+  unsigned SourceStart =
+      map.columnToByte(std::min<unsigned>(CaretStart, map.columns()));
+  unsigned SourceEnd =
+      map.columnToByte(std::min<unsigned>(CaretEnd, map.columns()));
 
-  unsigned CaretColumnsOutsideSource = CaretEnd-CaretStart
-    - (map.byteToColumn(SourceEnd)-map.byteToColumn(SourceStart));
+  unsigned CaretColumnsOutsideSource =
+      CaretEnd - CaretStart -
+      (map.byteToColumn(SourceEnd) - map.byteToColumn(SourceStart));
 
   char const *front_ellipse = "  ...";
-  char const *front_space   = "     ";
+  char const *front_space = "     ";
   char const *back_ellipse = "...";
   unsigned ellipses_space = strlen(front_ellipse) + strlen(back_ellipse);
 
   unsigned TargetColumns = Columns;
   // Give us extra room for the ellipses
   //  and any of the caret line that extends past the source
-  if (TargetColumns > ellipses_space+CaretColumnsOutsideSource)
-    TargetColumns -= ellipses_space+CaretColumnsOutsideSource;
+  if (TargetColumns > ellipses_space + CaretColumnsOutsideSource)
+    TargetColumns -= ellipses_space + CaretColumnsOutsideSource;
 
-  while (SourceStart>0 || SourceEnd<SourceLine.size()) {
+  while (SourceStart > 0 || SourceEnd < SourceLine.size()) {
     bool ExpandedRegion = false;
 
-    if (SourceStart>0) {
+    if (SourceStart > 0) {
       unsigned NewStart = map.startOfPreviousColumn(SourceStart);
 
       // Skip over any whitespace we see here; we're looking for
@@ -424,15 +419,15 @@ static void selectInterestingSourceRegion(std::string &SourceLine,
       }
 
       assert(map.byteToColumn(NewStart) != -1);
-      unsigned NewColumns = map.byteToColumn(SourceEnd) -
-                              map.byteToColumn(NewStart);
+      unsigned NewColumns =
+          map.byteToColumn(SourceEnd) - map.byteToColumn(NewStart);
       if (NewColumns <= TargetColumns) {
         SourceStart = NewStart;
         ExpandedRegion = true;
       }
     }
 
-    if (SourceEnd<SourceLine.size()) {
+    if (SourceEnd < SourceLine.size()) {
       unsigned NewEnd = map.startOfNextColumn(SourceEnd);
 
       // Skip over any whitespace we see here; we're looking for
@@ -446,8 +441,8 @@ static void selectInterestingSourceRegion(std::string &SourceLine,
         NewEnd = map.startOfNextColumn(NewEnd);
 
       assert(map.byteToColumn(NewEnd) != -1);
-      unsigned NewColumns = map.byteToColumn(NewEnd) -
-                              map.byteToColumn(SourceStart);
+      unsigned NewColumns =
+          map.byteToColumn(NewEnd) - map.byteToColumn(SourceStart);
       if (NewColumns <= TargetColumns) {
         SourceEnd = NewEnd;
         ExpandedRegion = true;
@@ -463,18 +458,18 @@ static void selectInterestingSourceRegion(std::string &SourceLine,
 
   // [CaretStart, CaretEnd) is the slice we want. Update the various
   // output lines to show only this slice.
-  assert(CaretStart!=(unsigned)-1 && CaretEnd!=(unsigned)-1 &&
-         SourceStart!=(unsigned)-1 && SourceEnd!=(unsigned)-1);
+  assert(CaretStart != (unsigned)-1 && CaretEnd != (unsigned)-1 &&
+         SourceStart != (unsigned)-1 && SourceEnd != (unsigned)-1);
   assert(SourceStart <= SourceEnd);
   assert(CaretStart <= CaretEnd);
 
-  unsigned BackColumnsRemoved
-    = map.byteToColumn(SourceLine.size())-map.byteToColumn(SourceEnd);
+  unsigned BackColumnsRemoved =
+      map.byteToColumn(SourceLine.size()) - map.byteToColumn(SourceEnd);
   unsigned FrontColumnsRemoved = CaretStart;
-  unsigned ColumnsKept = CaretEnd-CaretStart;
+  unsigned ColumnsKept = CaretEnd - CaretStart;
 
   // We checked up front that the line needed truncation
-  assert(FrontColumnsRemoved+ColumnsKept+BackColumnsRemoved > Columns);
+  assert(FrontColumnsRemoved + ColumnsKept + BackColumnsRemoved > Columns);
 
   // The line needs some truncation, and we'd prefer to keep the front
   //  if possible, so remove the back
@@ -482,7 +477,7 @@ static void selectInterestingSourceRegion(std::string &SourceLine,
     SourceLine.replace(SourceEnd, std::string::npos, back_ellipse);
 
   // If that's enough then we're done
-  if (FrontColumnsRemoved+ColumnsKept <= Columns)
+  if (FrontColumnsRemoved + ColumnsKept <= Columns)
     return;
 
   // Otherwise remove the front as well
@@ -514,13 +509,20 @@ static unsigned skipWhitespace(unsigned Idx, StringRef Str, unsigned Length) {
 /// character if the input character does not start any punctuation.
 static inline char findMatchingPunctuation(char c) {
   switch (c) {
-  case '\'': return '\'';
-  case '`': return '\'';
-  case '"':  return '"';
-  case '(':  return ')';
-  case '[': return ']';
-  case '{': return '}';
-  default: break;
+  case '\'':
+    return '\'';
+  case '`':
+    return '\'';
+  case '"':
+    return '"';
+  case '(':
+    return ')';
+  case '[':
+    return ']';
+  case '{':
+    return '}';
+  default:
+    break;
   }
 
   return 0;
@@ -531,9 +533,8 @@ static inline char findMatchingPunctuation(char c) {
 ///
 /// \returns the index pointing one character past the end of the
 /// word.
-static unsigned findEndOfWord(unsigned Start, StringRef Str,
-                              unsigned Length, unsigned Column,
-                              unsigned Columns) {
+static unsigned findEndOfWord(unsigned Start, StringRef Str, unsigned Length,
+                              unsigned Column, unsigned Columns) {
   assert(Start < Str.size() && "Invalid start position!");
   unsigned End = Start + 1;
 
@@ -569,11 +570,11 @@ static unsigned findEndOfWord(unsigned Start, StringRef Str,
     ++End;
 
   unsigned PunctWordLength = End - Start;
-  if (// If the word fits on this line
+  if ( // If the word fits on this line
       Column + PunctWordLength <= Columns ||
       // ... or the word is "short enough" to take up the next line
       // without too much ugly white space
-      PunctWordLength < Columns/3)
+      PunctWordLength < Columns / 3)
     return End; // Take the whole thing as a single "word".
 
   // The whole quoted/parenthesized string is too long to print as a
@@ -630,8 +631,8 @@ static bool printWordWrapped(raw_ostream &OS, StringRef Str, unsigned Columns,
     // line.
     OS << '\n';
     OS.indent(WordWrapIndentation);
-    applyTemplateHighlighting(OS, Str.substr(WordStart, WordLength),
-                              TextNormal, Bold);
+    applyTemplateHighlighting(OS, Str.substr(WordStart, WordLength), TextNormal,
+                              Bold);
     Column = WordWrapIndentation + WordLength;
     Wrapped = true;
   }
@@ -644,10 +645,9 @@ static bool printWordWrapped(raw_ostream &OS, StringRef Str, unsigned Columns,
   return Wrapped;
 }
 
-TextDiagnostic::TextDiagnostic(raw_ostream &OS,
-                               const LangOptions &LangOpts,
+TextDiagnostic::TextDiagnostic(raw_ostream &OS, const LangOptions &LangOpts,
                                DiagnosticOptions *DiagOpts)
-  : DiagnosticRenderer(LangOpts, DiagOpts), OS(OS) {}
+    : DiagnosticRenderer(LangOpts, DiagOpts), OS(OS) {}
 
 TextDiagnostic::~TextDiagnostic() {}
 
@@ -672,31 +672,49 @@ void TextDiagnostic::emitDiagnosticMessage(
                          DiagOpts->MessageLength, DiagOpts->ShowColors);
 }
 
-/*static*/ void
-TextDiagnostic::printDiagnosticLevel(raw_ostream &OS,
-                                     DiagnosticsEngine::Level Level,
-                                     bool ShowColors) {
+/*static*/ void TextDiagnostic::printDiagnosticLevel(
+    raw_ostream &OS, DiagnosticsEngine::Level Level, bool ShowColors) {
   if (ShowColors) {
     // Print diagnostic category in bold and color
     switch (Level) {
     case DiagnosticsEngine::Ignored:
       llvm_unreachable("Invalid diagnostic type");
-    case DiagnosticsEngine::Note:    OS.changeColor(noteColor, true); break;
-    case DiagnosticsEngine::Remark:  OS.changeColor(remarkColor, true); break;
-    case DiagnosticsEngine::Warning: OS.changeColor(warningColor, true); break;
-    case DiagnosticsEngine::Error:   OS.changeColor(errorColor, true); break;
-    case DiagnosticsEngine::Fatal:   OS.changeColor(fatalColor, true); break;
+    case DiagnosticsEngine::Note:
+      OS.changeColor(noteColor, true);
+      break;
+    case DiagnosticsEngine::Remark:
+      OS.changeColor(remarkColor, true);
+      break;
+    case DiagnosticsEngine::Warning:
+      OS.changeColor(warningColor, true);
+      break;
+    case DiagnosticsEngine::Error:
+      OS.changeColor(errorColor, true);
+      break;
+    case DiagnosticsEngine::Fatal:
+      OS.changeColor(fatalColor, true);
+      break;
     }
   }
 
   switch (Level) {
   case DiagnosticsEngine::Ignored:
     llvm_unreachable("Invalid diagnostic type");
-  case DiagnosticsEngine::Note:    OS << "note: "; break;
-  case DiagnosticsEngine::Remark:  OS << "remark: "; break;
-  case DiagnosticsEngine::Warning: OS << "warning: "; break;
-  case DiagnosticsEngine::Error:   OS << "error: "; break;
-  case DiagnosticsEngine::Fatal:   OS << "fatal error: "; break;
+  case DiagnosticsEngine::Note:
+    OS << "note: ";
+    break;
+  case DiagnosticsEngine::Remark:
+    OS << "remark: ";
+    break;
+  case DiagnosticsEngine::Warning:
+    OS << "warning: ";
+    break;
+  case DiagnosticsEngine::Error:
+    OS << "error: ";
+    break;
+  case DiagnosticsEngine::Fatal:
+    OS << "fatal error: ";
+    break;
   }
 
   if (ShowColors)
@@ -800,8 +818,12 @@ void TextDiagnostic::emitDiagnosticLoc(FullSourceLoc Loc, PresumedLoc PLoc,
     if (DiagOpts->ShowLine)
       OS << ':' << LineNo;
     break;
-  case DiagnosticOptions::MSVC:  OS << '('  << LineNo; break;
-  case DiagnosticOptions::Vi:    OS << " +" << LineNo; break;
+  case DiagnosticOptions::MSVC:
+    OS << '(' << LineNo;
+    break;
+  case DiagnosticOptions::Vi:
+    OS << " +" << LineNo;
+    break;
   }
 
   if (DiagOpts->ShowColumn)
@@ -820,7 +842,9 @@ void TextDiagnostic::emitDiagnosticLoc(FullSourceLoc Loc, PresumedLoc PLoc,
   switch (DiagOpts->getFormat()) {
   case DiagnosticOptions::SARIF:
   case DiagnosticOptions::Clang:
-  case DiagnosticOptions::Vi:    OS << ':';    break;
+  case DiagnosticOptions::Vi:
+    OS << ':';
+    break;
   case DiagnosticOptions::MSVC:
     // MSVC2013 and before print 'file(4) : error'. MSVC2015 gets rid of the
     // space and prints 'file(4): error'.
@@ -858,8 +882,7 @@ void TextDiagnostic::emitDiagnosticLoc(FullSourceLoc Loc, PresumedLoc PLoc,
         TokSize = Lexer::MeasureTokenLength(E, SM, LangOpts);
 
       FullSourceLoc BF(B, SM), EF(E, SM);
-      OS << '{'
-         << BF.getLineNumber() << ':' << BF.getColumnNumber() << '-'
+      OS << '{' << BF.getLineNumber() << ':' << BF.getColumnNumber() << '-'
          << EF.getLineNumber() << ':' << (EF.getColumnNumber() + TokSize)
          << '}';
       PrintedRange = true;
@@ -894,7 +917,7 @@ void TextDiagnostic::emitBuildingModuleLocation(FullSourceLoc Loc,
                                                 StringRef ModuleName) {
   if (DiagOpts->ShowLocation && PLoc.isValid())
     OS << "While building module '" << ModuleName << "' imported from "
-      << PLoc.getFilename() << ':' << PLoc.getLine() << ":\n";
+       << PLoc.getFilename() << ':' << PLoc.getLine() << ":\n";
   else
     OS << "While building module '" << ModuleName << "':\n";
 }
@@ -989,8 +1012,7 @@ static void highlightRange(const LineRange &R, const SourceColumnMap &Map,
   std::fill(CaretLine.begin() + StartColNo, CaretLine.begin() + EndColNo, '~');
 }
 
-static std::string buildFixItInsertionLine(FileID FID,
-                                           unsigned LineNo,
+static std::string buildFixItInsertionLine(FileID FID, unsigned LineNo,
                                            const SourceColumnMap &map,
                                            ArrayRef<FixItHint> Hints,
                                            const SourceManager &SM,
@@ -1343,11 +1365,10 @@ void TextDiagnostic::emitParseableFixits(ArrayRef<FixItHint> Hints,
 
     OS << "fix-it:\"";
     OS.write_escaped(PLoc.getFilename());
-    OS << "\":{" << SM.getLineNumber(BInfo.first, BInfo.second)
-      << ':' << SM.getColumnNumber(BInfo.first, BInfo.second)
-      << '-' << SM.getLineNumber(EInfo.first, EInfo.second)
-      << ':' << SM.getColumnNumber(EInfo.first, EInfo.second)
-      << "}:\"";
+    OS << "\":{" << SM.getLineNumber(BInfo.first, BInfo.second) << ':'
+       << SM.getColumnNumber(BInfo.first, BInfo.second) << '-'
+       << SM.getLineNumber(EInfo.first, EInfo.second) << ':'
+       << SM.getColumnNumber(EInfo.first, EInfo.second) << "}:\"";
     OS.write_escaped(H.CodeToInsert);
     OS << "\"\n";
   }

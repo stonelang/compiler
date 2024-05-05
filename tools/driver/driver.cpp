@@ -69,7 +69,7 @@ std::string GetExecutablePath(const char *Argv0, bool CanonicalPrefixes) {
 
   // This just needs to be some symbol in the binary; C++ doesn't
   // allow taking the address of ::main however.
-  void *P = (void*) (intptr_t) GetExecutablePath;
+  void *P = (void *)(intptr_t)GetExecutablePath;
   return llvm::sys::fs::getMainExecutable(Argv0, P);
 }
 
@@ -106,26 +106,24 @@ static const char *GetStableCStr(std::set<std::string> &SavedStrings,
 /// \param Edit - The override command to perform.
 /// \param SavedStrings - Set to use for storing string representations.
 static void ApplyOneQAOverride(raw_ostream &OS,
-                               SmallVectorImpl<const char*> &Args,
+                               SmallVectorImpl<const char *> &Args,
                                StringRef Edit,
                                std::set<std::string> &SavedStrings) {
   // This does not need to be efficient.
 
   if (Edit[0] == '^') {
-    const char *Str =
-      GetStableCStr(SavedStrings, Edit.substr(1));
+    const char *Str = GetStableCStr(SavedStrings, Edit.substr(1));
     OS << "### Adding argument " << Str << " at beginning\n";
     Args.insert(Args.begin() + 1, Str);
   } else if (Edit[0] == '+') {
-    const char *Str =
-      GetStableCStr(SavedStrings, Edit.substr(1));
+    const char *Str = GetStableCStr(SavedStrings, Edit.substr(1));
     OS << "### Adding argument " << Str << " at end\n";
     Args.push_back(Str);
   } else if (Edit[0] == 's' && Edit[1] == '/' && Edit.ends_with("/") &&
              Edit.slice(2, Edit.size() - 1).contains('/')) {
     StringRef MatchPattern = Edit.substr(2).split('/').first;
     StringRef ReplPattern = Edit.substr(2).split('/').second;
-    ReplPattern = ReplPattern.slice(0, ReplPattern.size()-1);
+    ReplPattern = ReplPattern.slice(0, ReplPattern.size() - 1);
 
     for (unsigned i = 1, e = Args.size(); i != e; ++i) {
       // Ignore end-of-line response file markers
@@ -161,9 +159,8 @@ static void ApplyOneQAOverride(raw_ostream &OS,
       if (A == nullptr)
         continue;
       if (A[0] == '-' && A[1] == 'O' &&
-          (A[2] == '\0' ||
-           (A[3] == '\0' && (A[2] == 's' || A[2] == 'z' ||
-                             ('0' <= A[2] && A[2] <= '9'))))) {
+          (A[2] == '\0' || (A[3] == '\0' && (A[2] == 's' || A[2] == 'z' ||
+                                             ('0' <= A[2] && A[2] <= '9'))))) {
         OS << "### Deleting argument " << Args[i] << '\n';
         Args.erase(Args.begin() + i);
       } else
@@ -178,7 +175,7 @@ static void ApplyOneQAOverride(raw_ostream &OS,
 
 /// ApplyQAOverride - Apply a space separated list of edits to the
 /// input argument lists. See ApplyOneQAOverride.
-static void ApplyQAOverride(SmallVectorImpl<const char*> &Args,
+static void ApplyQAOverride(SmallVectorImpl<const char *> &Args,
                             const char *OverrideStr,
                             std::set<std::string> &SavedStrings) {
   raw_ostream *OS = &llvm::errs();
@@ -225,10 +222,10 @@ static void insertTargetAndModeArgs(const ParsedClangName &NameParts,
   }
 
   if (NameParts.TargetIsValid) {
-    const char *arr[] = {"-target", GetStableCStr(SavedStrings,
-                                                  NameParts.TargetPrefix)};
-    ArgVector.insert(ArgVector.begin() + InsertionPoint,
-                     std::begin(arr), std::end(arr));
+    const char *arr[] = {"-target",
+                         GetStableCStr(SavedStrings, NameParts.TargetPrefix)};
+    ArgVector.insert(ArgVector.begin() + InsertionPoint, std::begin(arr),
+                     std::end(arr));
   }
 }
 
@@ -455,8 +452,8 @@ int clang_main(int Argc, char **Argv, const llvm::ToolContext &ToolContext) {
   IntrusiveRefCntPtr<DiagnosticOptions> DiagOpts =
       CreateAndPopulateDiagOpts(Args);
 
-  TextDiagnosticPrinter *DiagClient
-    = new TextDiagnosticPrinter(llvm::errs(), &*DiagOpts);
+  TextDiagnosticPrinter *DiagClient =
+      new TextDiagnosticPrinter(llvm::errs(), &*DiagOpts);
   FixupDiagPrefixExeName(DiagClient, ProgName);
 
   IntrusiveRefCntPtr<DiagnosticIDs> DiagID(new DiagnosticIDs());
@@ -563,8 +560,8 @@ int clang_main(int Argc, char **Argv, const llvm::ToolContext &ToolContext) {
   if (::getenv("FORCE_CLANG_DIAGNOSTICS_CRASH"))
     llvm::dbgs() << llvm::getBugReportMsg();
   if (FailingCommand != nullptr &&
-    TheDriver.maybeGenerateCompilationDiagnostics(CommandStatus, ReproLevel,
-                                                  *C, *FailingCommand))
+      TheDriver.maybeGenerateCompilationDiagnostics(CommandStatus, ReproLevel,
+                                                    *C, *FailingCommand))
     Res = 1;
 
   Diags.getClient()->finish();

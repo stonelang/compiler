@@ -10,10 +10,10 @@
 #include "clang/Basic/TokenKinds.h"
 #include "clang/Lex/CodeCompletionHandler.h"
 #include "clang/Lex/Preprocessor.h"
+#include "clang/Parse/IdentifierInfoCache.h"
 #include "clang/Parse/ParserDiagnostic.h"
 #include "clang/Parse/ParserLoopHint.h"
 #include "clang/Parse/ParserResult.h"
-#include "clang/Parse/IdentifierInfoCache.h"
 #include "clang/Sema/DeclSpec.h"
 #include "clang/Sema/Sema.h"
 
@@ -255,8 +255,10 @@ public:
   AttributeFactory &GetAttrFactory() { return attrFactory; }
   Token &GetTok() { return Tok; }
 
-  IdentifierInfoCache& GetIdentifierInfoCache() { return identifierInfoCache;}
-  IdentifierInfo* GetIdentifierInfo(StringRef name){ return &GetLexer().getIdentifierTable().get(name);}
+  IdentifierInfoCache &GetIdentifierInfoCache() { return identifierInfoCache; }
+  IdentifierInfo *GetIdentifierInfo(StringRef name) {
+    return &GetLexer().getIdentifierTable().get(name);
+  }
 
 public:
   void EndParsing() { CutOffParsing(); }

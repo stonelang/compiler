@@ -88,9 +88,7 @@ protected:
   std::unique_ptr<ASTConsumer> CreateASTConsumer(CompilerInstance &CI,
                                                  StringRef InFile) override;
 
-  TranslationUnitKind getTranslationUnitKind() override {
-    return TU_Prefix;
-  }
+  TranslationUnitKind getTranslationUnitKind() override { return TU_Prefix; }
 
   bool hasASTFileSupport() const override { return false; }
 
@@ -121,9 +119,7 @@ protected:
   std::unique_ptr<ASTConsumer> CreateASTConsumer(CompilerInstance &CI,
                                                  StringRef InFile) override;
 
-  TranslationUnitKind getTranslationUnitKind() override {
-    return TU_Module;
-  }
+  TranslationUnitKind getTranslationUnitKind() override { return TU_Module; }
 
   bool hasASTFileSupport() const override { return false; }
 
@@ -311,6 +307,6 @@ public:
       : ModuleName(ModuleName) {}
 };
 
-}  // end namespace clang
+} // end namespace clang
 
 #endif

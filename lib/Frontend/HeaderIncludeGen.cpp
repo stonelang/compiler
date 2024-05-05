@@ -6,10 +6,10 @@
 //
 //===----------------------------------------------------------------------===//
 
-#include "clang/Frontend/DependencyOutputOptions.h"
-#include "clang/Frontend/Utils.h"
 #include "clang/Basic/SourceManager.h"
+#include "clang/Frontend/DependencyOutputOptions.h"
 #include "clang/Frontend/FrontendDiagnostic.h"
+#include "clang/Frontend/Utils.h"
 #include "clang/Lex/Preprocessor.h"
 #include "llvm/ADT/SmallString.h"
 #include "llvm/Support/JSON.h"
@@ -106,7 +106,7 @@ public:
   void FileSkipped(const FileEntryRef &SkippedFile, const Token &FilenameTok,
                    SrcMgr::CharacteristicKind FileType) override;
 };
-}
+} // namespace
 
 static void PrintHeaderInfo(raw_ostream *OutputFile, StringRef Filename,
                             bool ShowDepth, unsigned CurrentIncludeDepth,
@@ -245,8 +245,8 @@ void HeaderIncludesCallback::FileChanged(SourceLocation Loc,
   }
 }
 
-void HeaderIncludesCallback::FileSkipped(const FileEntryRef &SkippedFile, const
-                                         Token &FilenameTok,
+void HeaderIncludesCallback::FileSkipped(const FileEntryRef &SkippedFile,
+                                         const Token &FilenameTok,
                                          SrcMgr::CharacteristicKind FileType) {
   if (!DepOpts.ShowSkippedHeaderIncludes)
     return;

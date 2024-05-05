@@ -188,13 +188,11 @@ LayoutOverrideSource::LayoutOverrideSource(StringRef Filename) {
     Layouts[CurrentType] = CurrentLayout;
 }
 
-bool
-LayoutOverrideSource::layoutRecordType(const RecordDecl *Record,
-  uint64_t &Size, uint64_t &Alignment,
-  llvm::DenseMap<const FieldDecl *, uint64_t> &FieldOffsets,
-  llvm::DenseMap<const CXXRecordDecl *, CharUnits> &BaseOffsets,
-  llvm::DenseMap<const CXXRecordDecl *, CharUnits> &VirtualBaseOffsets)
-{
+bool LayoutOverrideSource::layoutRecordType(
+    const RecordDecl *Record, uint64_t &Size, uint64_t &Alignment,
+    llvm::DenseMap<const FieldDecl *, uint64_t> &FieldOffsets,
+    llvm::DenseMap<const CXXRecordDecl *, CharUnits> &BaseOffsets,
+    llvm::DenseMap<const CXXRecordDecl *, CharUnits> &VirtualBaseOffsets) {
   // We can't override unnamed declarations.
   if (!Record->getIdentifier())
     return false;
@@ -207,7 +205,7 @@ LayoutOverrideSource::layoutRecordType(const RecordDecl *Record,
   // Provide field layouts.
   unsigned NumFields = 0;
   for (RecordDecl::field_iterator F = Record->field_begin(),
-                               FEnd = Record->field_end();
+                                  FEnd = Record->field_end();
        F != FEnd; ++F, ++NumFields) {
     if (NumFields >= Known->second.FieldOffsets.size())
       continue;
@@ -245,7 +243,7 @@ LayoutOverrideSource::layoutRecordType(const RecordDecl *Record,
 LLVM_DUMP_METHOD void LayoutOverrideSource::dump() {
   raw_ostream &OS = llvm::errs();
   for (llvm::StringMap<Layout>::iterator L = Layouts.begin(),
-                                      LEnd = Layouts.end();
+                                         LEnd = Layouts.end();
        L != LEnd; ++L) {
     OS << "Type: blah " << L->first() << '\n';
     OS << "  Size:" << L->second.Size << '\n';
@@ -259,4 +257,3 @@ LLVM_DUMP_METHOD void LayoutOverrideSource::dump() {
     OS << "]\n";
   }
 }
-

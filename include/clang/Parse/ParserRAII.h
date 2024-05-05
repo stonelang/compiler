@@ -91,7 +91,6 @@ private:
   }
 };
 
-
 /// Move to DeclSpec
 enum class DeclSpecKind {
   Fun = 0,
@@ -127,16 +126,16 @@ enum class DeclSpecKind {
 
 };
 
-
 class ParsingDeclSpec final : public DeclSpec {
   ParsingDeclRAII parsingRAII;
+
+  /// Every DeclSpec can only have one kind.
   DeclSpecKind kind;
 
 public:
   const char *prevSpec = nullptr;
   unsigned diagID = 0;
   bool isTopLevelDecl = false;
-
 
 public:
   ParsingDeclSpec(Parser &parser)
@@ -145,15 +144,15 @@ public:
 
   ParsingDeclSpec(Parser &parser, ParsingDeclRAII *RAII)
       : DeclSpec(parser.GetAttrFactory()), parsingRAII(parser, RAII) {}
-public:
 
+public:
   DeclSpecKind GetKind() { return kind; }
   const sema::DelayedDiagnosticPool &getDelayedDiagnosticPool() const {
     return parsingRAII.getDelayedDiagnosticPool();
   }
 
 public:
-
+  // High level wrappers
   void SetFunSpec(SourceLocation loc);
   void ClearFunSpec();
   bool HasFunSpec();
@@ -181,10 +180,9 @@ public:
   bool HasCharSpec();
 
   void SetConstSpec(SourceLocation loc);
-  bool HasConst(); 
+  bool HasConst();
 
 public:
-
   void Complete(Decl *D) { parsingRAII.complete(D); }
   void Abort() { parsingRAII.abort(); }
 };

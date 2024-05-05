@@ -47,8 +47,7 @@ static void DefineBuiltinMacro(MacroBuilder &Builder, StringRef Macro,
     // Per GCC -D semantics, the macro ends at \n if it exists.
     StringRef::size_type End = MacroBody.find_first_of("\n\r");
     if (End != StringRef::npos)
-      Diags.Report(diag::warn_fe_macro_contains_embedded_newline)
-        << MacroName;
+      Diags.Report(diag::warn_fe_macro_contains_embedded_newline) << MacroName;
     MacroBody = MacroBody.substr(0, End);
     // We handle macro bodies which end in a backslash by appending an extra
     // backslash+newline.  This makes sure we don't accidentally treat the
@@ -97,17 +96,17 @@ template <typename T>
 static T PickFP(const llvm::fltSemantics *Sem, T IEEEHalfVal, T IEEESingleVal,
                 T IEEEDoubleVal, T X87DoubleExtendedVal, T PPCDoubleDoubleVal,
                 T IEEEQuadVal) {
-  if (Sem == (const llvm::fltSemantics*)&llvm::APFloat::IEEEhalf())
+  if (Sem == (const llvm::fltSemantics *)&llvm::APFloat::IEEEhalf())
     return IEEEHalfVal;
-  if (Sem == (const llvm::fltSemantics*)&llvm::APFloat::IEEEsingle())
+  if (Sem == (const llvm::fltSemantics *)&llvm::APFloat::IEEEsingle())
     return IEEESingleVal;
-  if (Sem == (const llvm::fltSemantics*)&llvm::APFloat::IEEEdouble())
+  if (Sem == (const llvm::fltSemantics *)&llvm::APFloat::IEEEdouble())
     return IEEEDoubleVal;
-  if (Sem == (const llvm::fltSemantics*)&llvm::APFloat::x87DoubleExtended())
+  if (Sem == (const llvm::fltSemantics *)&llvm::APFloat::x87DoubleExtended())
     return X87DoubleExtendedVal;
-  if (Sem == (const llvm::fltSemantics*)&llvm::APFloat::PPCDoubleDouble())
+  if (Sem == (const llvm::fltSemantics *)&llvm::APFloat::PPCDoubleDouble())
     return PPCDoubleDoubleVal;
-  assert(Sem == (const llvm::fltSemantics*)&llvm::APFloat::IEEEquad());
+  assert(Sem == (const llvm::fltSemantics *)&llvm::APFloat::IEEEquad());
   return IEEEQuadVal;
 }
 
@@ -129,8 +128,8 @@ static void DefineFloatMacros(MacroBuilder &Builder, StringRef Prefix,
   int Max10Exp = PickFP(Sem, 4, 38, 308, 4932, 308, 4932);
   int MinExp = PickFP(Sem, -13, -125, -1021, -16381, -968, -16381);
   int MaxExp = PickFP(Sem, 16, 128, 1024, 16384, 1024, 16384);
-  Min = PickFP(Sem, "6.103515625e-5", "1.17549435e-38", "2.2250738585072014e-308",
-               "3.36210314311209350626e-4932",
+  Min = PickFP(Sem, "6.103515625e-5", "1.17549435e-38",
+               "2.2250738585072014e-308", "3.36210314311209350626e-4932",
                "2.00416836000897277799610805135016e-292",
                "3.36210314311209350626267781732175260e-4932");
   Max = PickFP(Sem, "6.5504e+4", "3.40282347e+38", "1.7976931348623157e+308",
@@ -143,24 +142,23 @@ static void DefineFloatMacros(MacroBuilder &Builder, StringRef Prefix,
   DefPrefix += Prefix;
   DefPrefix += "_";
 
-  Builder.defineMacro(DefPrefix + "DENORM_MIN__", Twine(DenormMin)+Ext);
+  Builder.defineMacro(DefPrefix + "DENORM_MIN__", Twine(DenormMin) + Ext);
   Builder.defineMacro(DefPrefix + "HAS_DENORM__");
   Builder.defineMacro(DefPrefix + "DIG__", Twine(Digits));
   Builder.defineMacro(DefPrefix + "DECIMAL_DIG__", Twine(DecimalDigits));
-  Builder.defineMacro(DefPrefix + "EPSILON__", Twine(Epsilon)+Ext);
+  Builder.defineMacro(DefPrefix + "EPSILON__", Twine(Epsilon) + Ext);
   Builder.defineMacro(DefPrefix + "HAS_INFINITY__");
   Builder.defineMacro(DefPrefix + "HAS_QUIET_NAN__");
   Builder.defineMacro(DefPrefix + "MANT_DIG__", Twine(MantissaDigits));
 
   Builder.defineMacro(DefPrefix + "MAX_10_EXP__", Twine(Max10Exp));
   Builder.defineMacro(DefPrefix + "MAX_EXP__", Twine(MaxExp));
-  Builder.defineMacro(DefPrefix + "MAX__", Twine(Max)+Ext);
+  Builder.defineMacro(DefPrefix + "MAX__", Twine(Max) + Ext);
 
-  Builder.defineMacro(DefPrefix + "MIN_10_EXP__","("+Twine(Min10Exp)+")");
-  Builder.defineMacro(DefPrefix + "MIN_EXP__", "("+Twine(MinExp)+")");
-  Builder.defineMacro(DefPrefix + "MIN__", Twine(Min)+Ext);
+  Builder.defineMacro(DefPrefix + "MIN_10_EXP__", "(" + Twine(Min10Exp) + ")");
+  Builder.defineMacro(DefPrefix + "MIN_EXP__", "(" + Twine(MinExp) + ")");
+  Builder.defineMacro(DefPrefix + "MIN__", Twine(Min) + Ext);
 }
-
 
 /// DefineTypeSize - Emit a macro to the predefines buffer that declares a macro
 /// named MacroName with the max value for a type with width 'TypeWidth' a
@@ -203,8 +201,7 @@ static void DefineTypeWidth(const Twine &MacroName, TargetInfo::IntType Ty,
 
 static void DefineTypeSizeof(StringRef MacroName, unsigned BitWidth,
                              const TargetInfo &TI, MacroBuilder &Builder) {
-  Builder.defineMacro(MacroName,
-                      Twine(BitWidth / TI.getCharWidth()));
+  Builder.defineMacro(MacroName, Twine(BitWidth / TI.getCharWidth()));
 }
 
 // This will generate a macro based on the prefix with `_MAX__` as the suffix
@@ -296,7 +293,6 @@ static void DefineFastIntType(unsigned TypeWidth, bool IsSigned,
   DefineFmt(Prefix + Twine(TypeWidth), Ty, TI, Builder);
 }
 
-
 /// Get the value the ATOMIC_*_LOCK_FREE macro should have for a type with
 /// the specified properties.
 static const char *getLockFreeValue(unsigned TypeWidth, const TargetInfo &TI) {
@@ -337,7 +333,8 @@ static void AddObjCXXARCLibstdcxxDefines(const LangOptions &LangOpts,
 
     if (LangOpts.ObjCAutoRefCount) {
       Out << "template<typename _Tp>\n"
-          << "struct __is_scalar<__attribute__((objc_ownership(strong))) _Tp> {\n"
+          << "struct __is_scalar<__attribute__((objc_ownership(strong))) _Tp> "
+             "{\n"
           << "  enum { __value = 0 };\n"
           << "  typedef __false_type __type;\n"
           << "};\n"
@@ -518,12 +515,12 @@ static void InitializeStandardPredefinedMacros(const TargetInfo &TI,
       Builder.defineMacro("__CL_CPP_VERSION_2021__", "202100");
     } else {
       // OpenCL v1.0 and v1.1 do not have a predefined macro to indicate the
-      // language standard with which the program is compiled. __OPENCL_VERSION__
-      // is for the OpenCL version supported by the OpenCL device, which is not
-      // necessarily the language standard with which the program is compiled.
-      // A shared OpenCL header file requires a macro to indicate the language
-      // standard. As a workaround, __OPENCL_C_VERSION__ is defined for
-      // OpenCL v1.0 and v1.1.
+      // language standard with which the program is compiled.
+      // __OPENCL_VERSION__ is for the OpenCL version supported by the OpenCL
+      // device, which is not necessarily the language standard with which the
+      // program is compiled. A shared OpenCL header file requires a macro to
+      // indicate the language standard. As a workaround, __OPENCL_C_VERSION__
+      // is defined for OpenCL v1.0 and v1.1.
       switch (LangOpts.OpenCLVersion) {
       case 100:
         Builder.defineMacro("__OPENCL_C_VERSION__", "100");
@@ -686,7 +683,7 @@ static void InitializeCPlusPlusFeatureTestMacros(const LangOptions &LangOpts,
     Builder.defineMacro("__cpp_capture_star_this", "201603L");
     Builder.defineMacro("__cpp_if_constexpr", "201606L");
     Builder.defineMacro("__cpp_deduction_guides", "201703L"); // (not latest)
-    Builder.defineMacro("__cpp_template_auto", "201606L"); // (old name)
+    Builder.defineMacro("__cpp_template_auto", "201606L");    // (old name)
     Builder.defineMacro("__cpp_namespace_attributes", "201411L");
     Builder.defineMacro("__cpp_enumerator_attributes", "201411L");
     Builder.defineMacro("__cpp_nested_namespace_definitions", "201411L");
@@ -719,7 +716,7 @@ static void InitializeCPlusPlusFeatureTestMacros(const LangOptions &LangOpts,
     Builder.defineMacro("__cpp_impl_coroutine", "201902L");
     Builder.defineMacro("__cpp_designated_initializers", "201707L");
     Builder.defineMacro("__cpp_impl_three_way_comparison", "201907L");
-    //Builder.defineMacro("__cpp_modules", "201907L");
+    // Builder.defineMacro("__cpp_modules", "201907L");
     Builder.defineMacro("__cpp_using_enum", "201907L");
   }
   // C++23 features.
@@ -781,9 +778,9 @@ static void InitializePredefinedMacros(const TargetInfo &TI,
   Builder.defineMacro("__clang_patchlevel__", TOSTR(CLANG_VERSION_PATCHLEVEL));
 #undef TOSTR
 #undef TOSTR2
-  Builder.defineMacro("__clang_version__",
-                      "\"" CLANG_VERSION_STRING " "
-                      + getClangFullRepositoryVersion() + "\"");
+  Builder.defineMacro("__clang_version__", "\"" CLANG_VERSION_STRING " " +
+                                               getClangFullRepositoryVersion() +
+                                               "\"");
 
   if (LangOpts.GNUCVersion != 0) {
     // Major, minor, patch, are given two decimal places each, so 4.2.1 becomes
@@ -848,8 +845,8 @@ static void InitializePredefinedMacros(const TargetInfo &TI,
 
   // Previously this macro was set to a string aiming to achieve compatibility
   // with GCC 4.2.1. Now, just return the full Clang version
-  Builder.defineMacro("__VERSION__", "\"" +
-                      Twine(getClangFullCPPVersion()) + "\"");
+  Builder.defineMacro("__VERSION__",
+                      "\"" + Twine(getClangFullCPPVersion()) + "\"");
 
   // Initialize language-specific preprocessor defines.
 
@@ -892,9 +889,9 @@ static void InitializePredefinedMacros(const TargetInfo &TI,
       VersionTuple tuple = LangOpts.ObjCRuntime.getVersion();
       unsigned minor = tuple.getMinor().value_or(0);
       unsigned subminor = tuple.getSubminor().value_or(0);
-      Builder.defineMacro("__OBJFW_RUNTIME_ABI__",
-                          Twine(tuple.getMajor() * 10000 + minor * 100 +
-                                subminor));
+      Builder.defineMacro(
+          "__OBJFW_RUNTIME_ABI__",
+          Twine(tuple.getMajor() * 10000 + minor * 100 + subminor));
     }
 
     Builder.defineMacro("IBOutlet", "__attribute__((iboutlet))");
@@ -916,7 +913,7 @@ static void InitializePredefinedMacros(const TargetInfo &TI,
   // darwin_constant_cfstrings controls this. This is also dependent
   // on other things like the runtime I believe.  This is set even for C code.
   if (!LangOpts.NoConstantCFStrings)
-      Builder.defineMacro("__CONSTANT_CFSTRINGS__");
+    Builder.defineMacro("__CONSTANT_CFSTRINGS__");
 
   if (LangOpts.ObjC)
     Builder.defineMacro("OBJC_NEW_PROPERTIES");
@@ -987,8 +984,8 @@ static void InitializePredefinedMacros(const TargetInfo &TI,
   // We don't support the PDP-11 as a target, but include
   // the define so it can still be compared against.
   Builder.defineMacro("__ORDER_LITTLE_ENDIAN__", "1234");
-  Builder.defineMacro("__ORDER_BIG_ENDIAN__",    "4321");
-  Builder.defineMacro("__ORDER_PDP_ENDIAN__",    "3412");
+  Builder.defineMacro("__ORDER_BIG_ENDIAN__", "4321");
+  Builder.defineMacro("__ORDER_PDP_ENDIAN__", "3412");
   if (TI.isBigEndian()) {
     Builder.defineMacro("__BYTE_ORDER__", "__ORDER_BIG_ENDIAN__");
     Builder.defineMacro("__BIG_ENDIAN__");
@@ -1046,7 +1043,8 @@ static void InitializePredefinedMacros(const TargetInfo &TI,
   DefineTypeSizeof("__SIZEOF_FLOAT__", TI.getFloatWidth(), TI, Builder);
   DefineTypeSizeof("__SIZEOF_INT__", TI.getIntWidth(), TI, Builder);
   DefineTypeSizeof("__SIZEOF_LONG__", TI.getLongWidth(), TI, Builder);
-  DefineTypeSizeof("__SIZEOF_LONG_DOUBLE__",TI.getLongDoubleWidth(),TI,Builder);
+  DefineTypeSizeof("__SIZEOF_LONG_DOUBLE__", TI.getLongDoubleWidth(), TI,
+                   Builder);
   DefineTypeSizeof("__SIZEOF_LONG_LONG__", TI.getLongLongWidth(), TI, Builder);
   DefineTypeSizeof("__SIZEOF_POINTER__", TI.getPointerWidth(LangAS::Default),
                    TI, Builder);
@@ -1054,12 +1052,12 @@ static void InitializePredefinedMacros(const TargetInfo &TI,
   DefineTypeSizeof("__SIZEOF_PTRDIFF_T__",
                    TI.getTypeWidth(TI.getPtrDiffType(LangAS::Default)), TI,
                    Builder);
-  DefineTypeSizeof("__SIZEOF_SIZE_T__",
-                   TI.getTypeWidth(TI.getSizeType()), TI, Builder);
-  DefineTypeSizeof("__SIZEOF_WCHAR_T__",
-                   TI.getTypeWidth(TI.getWCharType()), TI, Builder);
-  DefineTypeSizeof("__SIZEOF_WINT_T__",
-                   TI.getTypeWidth(TI.getWIntType()), TI, Builder);
+  DefineTypeSizeof("__SIZEOF_SIZE_T__", TI.getTypeWidth(TI.getSizeType()), TI,
+                   Builder);
+  DefineTypeSizeof("__SIZEOF_WCHAR_T__", TI.getTypeWidth(TI.getWCharType()), TI,
+                   Builder);
+  DefineTypeSizeof("__SIZEOF_WINT_T__", TI.getTypeWidth(TI.getWIntType()), TI,
+                   Builder);
   if (TI.hasInt128Type())
     DefineTypeSizeof("__SIZEOF_INT128__", 128, TI, Builder);
 
@@ -1107,7 +1105,7 @@ static void InitializePredefinedMacros(const TargetInfo &TI,
 
   // Define __BIGGEST_ALIGNMENT__ to be compatible with gcc.
   Builder.defineMacro("__BIGGEST_ALIGNMENT__",
-                      Twine(TI.getSuitableAlign() / TI.getCharWidth()) );
+                      Twine(TI.getSuitableAlign() / TI.getCharWidth()));
 
   if (!LangOpts.CharIsSigned)
     Builder.defineMacro("__CHAR_UNSIGNED__");
@@ -1201,7 +1199,7 @@ static void InitializePredefinedMacros(const TargetInfo &TI,
   }
 
   auto addLockFreeMacros = [&](const llvm::Twine &Prefix) {
-    // Used by libc++ and libstdc++ to implement ATOMIC_<foo>_LOCK_FREE.
+  // Used by libc++ and libstdc++ to implement ATOMIC_<foo>_LOCK_FREE.
 #define DEFINE_LOCK_FREE_MACRO(TYPE, Type)                                     \
   Builder.defineMacro(Prefix + #TYPE "_LOCK_FREE",                             \
                       getLockFreeValue(TI.get##Type##Width(), TI));
@@ -1438,7 +1436,7 @@ void clang::InitializePreprocessor(Preprocessor &PP,
 
   // Process #define's and #undef's in the order they are given.
   for (unsigned i = 0, e = InitOpts.Macros.size(); i != e; ++i) {
-    if (InitOpts.Macros[i].second)  // isUndef
+    if (InitOpts.Macros[i].second) // isUndef
       Builder.undefineMacro(InitOpts.Macros[i].first);
     else
       DefineBuiltinMacro(Builder, InitOpts.Macros[i].first,

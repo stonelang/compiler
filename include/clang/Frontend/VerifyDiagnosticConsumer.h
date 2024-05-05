@@ -35,8 +35,8 @@ class TextDiagnosticBuffer;
 /// those expected. See clang/docs/InternalsManual.rst for details about how to
 /// write tests to verify diagnostics.
 ///
-class VerifyDiagnosticConsumer: public DiagnosticConsumer,
-                                public CommentHandler {
+class VerifyDiagnosticConsumer : public DiagnosticConsumer,
+                                 public CommentHandler {
 public:
   /// Directive - Abstract class representing a parsed verify directive.
   ///

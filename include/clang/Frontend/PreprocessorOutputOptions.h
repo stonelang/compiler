@@ -18,23 +18,25 @@ namespace clang {
 class PreprocessorOutputOptions {
 public:
   LLVM_PREFERRED_TYPE(bool)
-  unsigned ShowCPP : 1;            ///< Print normal preprocessed output.
+  unsigned ShowCPP : 1; ///< Print normal preprocessed output.
   LLVM_PREFERRED_TYPE(bool)
-  unsigned ShowComments : 1;       ///< Show comments.
+  unsigned ShowComments : 1; ///< Show comments.
   LLVM_PREFERRED_TYPE(bool)
-  unsigned ShowLineMarkers : 1;    ///< Show \#line markers.
+  unsigned ShowLineMarkers : 1; ///< Show \#line markers.
   LLVM_PREFERRED_TYPE(bool)
-  unsigned UseLineDirectives : 1;   ///< Use \#line instead of GCC-style \# N.
+  unsigned UseLineDirectives : 1; ///< Use \#line instead of GCC-style \# N.
   LLVM_PREFERRED_TYPE(bool)
-  unsigned ShowMacroComments : 1;  ///< Show comments, even in macros.
+  unsigned ShowMacroComments : 1; ///< Show comments, even in macros.
   LLVM_PREFERRED_TYPE(bool)
-  unsigned ShowMacros : 1;         ///< Print macro definitions.
+  unsigned ShowMacros : 1; ///< Print macro definitions.
   LLVM_PREFERRED_TYPE(bool)
-  unsigned ShowIncludeDirectives : 1;  ///< Print includes, imports etc. within preprocessed output.
+  unsigned ShowIncludeDirectives : 1; ///< Print includes, imports etc. within
+                                      ///< preprocessed output.
   LLVM_PREFERRED_TYPE(bool)
-  unsigned RewriteIncludes : 1;    ///< Preprocess include directives only.
+  unsigned RewriteIncludes : 1; ///< Preprocess include directives only.
   LLVM_PREFERRED_TYPE(bool)
-  unsigned RewriteImports  : 1;    ///< Include contents of transitively-imported modules.
+  unsigned RewriteImports : 1; ///< Include contents of transitively-imported
+                               ///< modules.
   LLVM_PREFERRED_TYPE(bool)
   unsigned MinimizeWhitespace : 1; ///< Ignore whitespace from input.
   LLVM_PREFERRED_TYPE(bool)
@@ -59,6 +61,6 @@ public:
   }
 };
 
-}  // end namespace clang
+} // end namespace clang
 
 #endif

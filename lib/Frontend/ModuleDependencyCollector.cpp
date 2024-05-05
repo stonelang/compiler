@@ -27,6 +27,7 @@ namespace {
 class ModuleDependencyListener : public ASTReaderListener {
   ModuleDependencyCollector &Collector;
   FileManager &FileMgr;
+
 public:
   ModuleDependencyListener(ModuleDependencyCollector &Collector,
                            FileManager &FileMgr)
