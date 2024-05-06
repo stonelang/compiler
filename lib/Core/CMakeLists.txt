@@ -4,16 +4,17 @@ set(LLVM_LINK_COMPONENTS
   MCParser
   Support
   TargetParser
-  )
+)
 
-add_clang_library(clangUtils
+add_clang_library(clangCore
   
-  DiagnosticEngine.cpp
+  Diagnostics.cpp
 
   LINK_LIBS
-   
   clangBasic
 
+
+
   DEPENDS
-  omp_gen
-  )
+  
+)

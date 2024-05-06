@@ -1,6 +1,5 @@
-
-#ifndef LLVM_CLANG_UTILS_DIAGNOSTICENGINE_H
-#define LLVM_CLANG_UTILS_DIAGNOSTICENGINE_H
+#ifndef LLVM_CLANG_CORE_DIAGNOSTS_H
+#define LLVM_CLANG_CORE_DIAGNOSTS_H
 
 #include "clang/Basic/Specifiers.h"
 #include "llvm/ADT/ArrayRef.h"
