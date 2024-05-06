@@ -2,6 +2,7 @@
 #define LLVM_CLANG_PARSE_PARSESOURCEFILE_H
 
 #include "clang/Basic/LangOptions.h"
+#include "clang/Support/OptionSet.h"
 
 namespace clang {
 class Sema;
@@ -35,7 +36,7 @@ void ParseAST(Preprocessor &pp, ASTConsumer *C, ASTContext &Ctx,
 void ParseAST(Sema &sem, bool printStats = false,
               bool skipFunctionBodies = false);
 
-/// Parse the main file known to the preprocessor, producing an
+// Parse the main file known to the preprocessor, producing an
 /// abstract syntax tree.
 void ParseAST(SourceFile &sourceFile, Sema &sem, bool printStats = false,
               bool skipFunctionBodies = false);

@@ -125,6 +125,9 @@ add_clang_library(clangAST
   VTableBuilder.cpp
   VTTBuilder.cpp
 
+  ASTCtx.cpp
+  DeclCtx.cpp
+
   LINK_LIBS
   clangBasic
   clangLex

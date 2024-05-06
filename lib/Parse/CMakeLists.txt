@@ -10,6 +10,7 @@ add_clang_library(clangParse
   
   CollectDeclSpec.cpp
   IdentifierInfoCache.cpp
+  Lexer.cpp
   ParseDecl.cpp
   ParseExpr.cpp
   Parser.cpp
@@ -18,6 +19,7 @@ add_clang_library(clangParse
   ParseTemplate.cpp
   ParseType.cpp
   ParseDeclarator.cpp
+  Parsing.cpp
 
   LINK_LIBS
   clangAST

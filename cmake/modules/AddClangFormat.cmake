@@ -2,11 +2,13 @@ set(stone_include_files
 	${CMAKE_CURRENT_SOURCE_DIR}/include/clang/Frontend/*.h
 	${CMAKE_CURRENT_SOURCE_DIR}/include/clang/Compile/*.h
 	${CMAKE_CURRENT_SOURCE_DIR}/include/clang/Parse/*.h
+	${CMAKE_CURRENT_SOURCE_DIR}/include/clang/Sem/*.h
 )
 set(stone_lib_files
 	${CMAKE_CURRENT_SOURCE_DIR}/lib/Compile/*.cpp
 	${CMAKE_CURRENT_SOURCE_DIR}/lib/Frontend/*.cpp
 	${CMAKE_CURRENT_SOURCE_DIR}/lib/Parse/*.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/lib/Sem/*.cpp
 )
 set(stone_tools_files
 	${CMAKE_CURRENT_SOURCE_DIR}/tools/driver/*.cpp  

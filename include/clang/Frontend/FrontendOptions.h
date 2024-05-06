@@ -263,6 +263,38 @@ public:
   }
 };
 
+
+enum class FrontendActionKind : unsigned {
+  None = 0, 
+
+   /// Parse and perform semantic analysis.
+  Parse,
+
+  /// Parse ASTs and dump them.
+  DumpAST,
+
+  /// Parse ASTs and print them.
+  PrintAST, 
+  /// Emit a .ll file.
+  EmitLLVM,
+
+  /// Emit a .bc file.
+  EmitBC,
+
+  /// Emit a .o file.
+  EmitObject,
+
+  /// Emit a .s file.
+  EmitAssembly,
+  ///
+  EmitModule,
+
+  /// Generate pre-compiled header.
+  GeneratePCH,
+
+};
+
+
 /// FrontendOptions - Options for controlling the behavior of the frontend.
 class FrontendOptions {
 public:
@@ -544,6 +576,9 @@ public:
 
   /// Path which stores the output files for -ftime-trace
   std::string TimeTracePath;
+
+
+  FrontendActionKind MainActionKind = FrontendActionKind::None;
 
 public:
   FrontendOptions()

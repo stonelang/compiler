@@ -27,6 +27,7 @@ endif()
 add_clang_library(clangCompile
   CodeGen.cpp
   Compile.cpp
+  Frontend.cpp
 
   DEPENDS
   ClangDriverOptions
