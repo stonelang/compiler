@@ -1,5 +1,6 @@
 set(stone_include_files
 	${CMAKE_CURRENT_SOURCE_DIR}/include/clang/Compile/*.h
+	${CMAKE_CURRENT_SOURCE_DIR}/include/clang/Core/*.h
 	${CMAKE_CURRENT_SOURCE_DIR}/include/clang/CodeGeneration/*.h
 	${CMAKE_CURRENT_SOURCE_DIR}/include/clang/Frontend/Frontend.h
 	${CMAKE_CURRENT_SOURCE_DIR}/include/clang/Syntax/*.h
@@ -7,6 +8,7 @@ set(stone_include_files
 )
 set(stone_lib_files
 	${CMAKE_CURRENT_SOURCE_DIR}/lib/Compile/*.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/lib/Core/*.cpp
 	${CMAKE_CURRENT_SOURCE_DIR}/lib/CodeGeneration/*.cpp
 	${CMAKE_CURRENT_SOURCE_DIR}/lib/Frontend/Frontend.cpp
 	${CMAKE_CURRENT_SOURCE_DIR}/lib/Syntax/*.cpp

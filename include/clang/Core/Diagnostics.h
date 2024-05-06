@@ -10,7 +10,6 @@
 #include "llvm/ADT/iterator_range.h"
 #include "llvm/Support/Compiler.h"
 
-
 #include <cassert>
 #include <cstdint>
 #include <limits>
@@ -30,12 +29,11 @@ class raw_ostream;
 
 namespace clang {
 namespace diags {
-	class DiagnosticEngine final {
-		public:
-			//DiagnosticEngine(src::SourceManager& srcMgr)
+class DiagnosticEngine final {
+public:
+  // DiagnosticEngine(src::SourceManager& srcMgr)
+};
+} // namespace diags
+} // namespace clang
 
-	};
-}
-}
-
-#endif 
+#endif

@@ -9,7 +9,10 @@
 namespace clang {
 namespace syntax {
 
-class ASTContext final {};
+class ASTContext final {
+public:
+
+};
 } // namespace syntax
 
 } // end namespace clang
