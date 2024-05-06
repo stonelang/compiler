@@ -2,7 +2,6 @@
 #include "clang/Compile/Compile.h"
 #include "clang/ARCMigrate/ARCMTActions.h"
 #include "clang/CodeGen/CodeGenAction.h"
-#include "clang/Compile/CodeGen.h"
 #include "clang/Config/config.h"
 #include "clang/Driver/Options.h"
 #include "clang/ExtractAPI/FrontendActions.h"

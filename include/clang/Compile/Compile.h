@@ -22,6 +22,11 @@ namespace clang {
 class CompilerInstance;
 class FrontendAction;
 
+
+class FrontendInputFile;
+
+
+
 /// Construct the FrontendAction of a compiler invocation based on the
 /// options specified for the compiler invocation.
 ///
@@ -42,6 +47,24 @@ int Compile(int argc, char **args);
 
 int Compile(llvm::ArrayRef<const char *> Argv, const char *Argv0,
             void *MainAddr);
+
+
+
+//bool CompileFile(FrontendInputFile& inputFile);
+
+/// Maybe pass FrontendInputFile 
+bool ExecuteCodeAnalysis();
+
+bool SetupCodeGeneration();
+
+bool ExecuteCodeGeneration();
+
+bool ExecuteIRGeneration();
+
+bool ExecuteIROptimization();
+
+bool ExecuteNativeGeneration();
+
 
 } // end namespace clang
 

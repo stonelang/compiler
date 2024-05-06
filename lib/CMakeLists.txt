@@ -29,5 +29,4 @@ add_subdirectory(Support)
 
 add_subdirectory(Compile)
 add_subdirectory(Core)
-add_subdirectory(Sem)
 add_subdirectory(CodeGeneration)

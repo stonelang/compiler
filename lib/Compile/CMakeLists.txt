@@ -15,8 +15,11 @@ set(compile_link_libs
   )
 
 add_clang_library(clangCompile
-  CodeGen.cpp
+
   Compile.cpp
+  ExecuteCodeAnalysis.cpp
+  ExecuteCodeGeneration.cpp
+  Sem.cpp
 
   DEPENDS
   ClangDriverOptions
