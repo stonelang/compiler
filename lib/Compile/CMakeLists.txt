@@ -3,13 +3,15 @@ set(LLVM_LINK_COMPONENTS
   Support
   )
 
-set(link_libs
+set(compile_link_libs
   clangBasic
   clangCodeGen
   clangDriver
   clangExtractAPI
   clangFrontend
   clangRewriteFrontend
+
+   clangCodeGeneration
   )
 
 add_clang_library(clangCompile
@@ -20,7 +22,6 @@ add_clang_library(clangCompile
   ClangDriverOptions
 
   LINK_LIBS
-  ${link_libs}
-
+  ${compile_link_libs}
 
 )
