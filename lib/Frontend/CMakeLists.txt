@@ -43,6 +43,8 @@ add_clang_library(clangFrontend
   VerifyDiagnosticConsumer.cpp
   InterfaceStubFunctionsConsumer.cpp
 
+  Frontend.cpp
+
   DEPENDS
   ClangDriverOptions
   intrinsics_gen

@@ -1,4 +1,4 @@
-#ifndef LLVM_CLANG_COMPILE_FRONTEND_H
+#ifndef LLVM_CLANG_FRONTEND_FRONTEND_H
 #define LLVM_CLANG_FRONTEND_FRONTEND_H
 
 #include "clang/Basic/LLVM.h"
@@ -96,7 +96,10 @@ public:
                                   bool defaultDiagColor = true);
 };
 
-class FrontendInstance {};
+class FrontendInstance {
+public:
+
+};
 
 } // namespace clang
 #endif
