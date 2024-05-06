@@ -6,3 +6,6 @@ add_subdirectory(Sema)
 add_subdirectory(Serialization)
 add_subdirectory(StaticAnalyzer/Checkers)
 add_subdirectory(Tooling/Syntax)
+
+add_subdirectory(Syntax)
+
