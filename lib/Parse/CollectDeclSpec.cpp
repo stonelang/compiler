@@ -5,34 +5,34 @@ using namespace clang;
 
 ParserStatus Parser::CollectDeclSpec(ParsingDeclSpec &spec) {
 
-  ParserStatus status;
-  status = CollectAccessLevelSpec(spec);
-  if (status.IsSuccess()) {
-    return status;
+  ParserStatus foundSpec;
+  foundSpec = CollectAccessLevelSpec(spec);
+  if (foundSpec.IsSuccess()) {
+    return foundSpec;
   }
-  status = CollectFunctionSpec(spec);
-  if (status.IsSuccess()) {
-    return status;
+  foundSpec = CollectFunctionSpec(spec);
+  if (foundSpec.IsSuccess()) {
+    return foundSpec;
   }
-  status = CollectBasicTypeSpec(spec);
-  if (status.IsSuccess()) {
-    return status;
+  foundSpec = CollectBasicTypeSpec(spec);
+  if (foundSpec.IsSuccess()) {
+    return foundSpec;
   }
-  status = CollectNominalTypeSpec(spec);
-  if (status.IsSuccess()) {
-    return status;
+  foundSpec = CollectNominalTypeSpec(spec);
+  if (foundSpec.IsSuccess()) {
+    return foundSpec;
   }
-  status = CollectQualTypeSpec(spec);
-  if (status.IsSuccess()) {
-    return status;
+  foundSpec = CollectQualTypeSpec(spec);
+  if (foundSpec.IsSuccess()) {
+    return foundSpec;
   }
   // status = CollectStorageSpec(collector);
   // if (status.IsSuccess()) {
   //   return status;
   // }
   // If we are here, we did not find anything
-  status.SetHasCodeCompletion();
-  return status;
+  foundSpec.SetHasCodeCompletion();
+  return foundSpec;
 }
 
 ParserStatus Parser::CollectAccessLevelSpec(ParsingDeclSpec &spec) {

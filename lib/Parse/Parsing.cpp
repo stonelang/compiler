@@ -1,10 +1,3 @@
 #include "clang/Parse/Parsing.h"
 
-
- bool ParsingDeclSpec::HasAnySpec() {
-
- 	return true;
-
-
- }
-
+bool ParsingDeclSpec::HasAnySpec() { return true; }

@@ -1730,10 +1730,10 @@ Sema::ActOnDoStmt(SourceLocation DoLoc, Stmt *Body,
     return StmtError();
   Cond = CondResult.get();
 
-  // Only call the CommaVisitor for C89 due to differences in scope flags.
-  if (Cond && !getLangOpts().C99 && !getLangOpts().CPlusPlus &&
-      !Diags.isIgnored(diag::warn_comma_operator, Cond->getExprLoc()))
-    CommaVisitor(*this).Visit(Cond);
+  // MS: Only call the CommaVisitor for C89 due to differences in scope flags.
+  // if (Cond && !getLangOpts().C99 && !getLangOpts().CPlusPlus &&
+  //     !Diags.isIgnored(diag::warn_comma_operator, Cond->getExprLoc()))
+  //   CommaVisitor(*this).Visit(Cond);
 
   return new (Context) DoStmt(Body, Cond, DoLoc, WhileLoc, CondRParen);
 }

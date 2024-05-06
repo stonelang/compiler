@@ -7,6 +7,7 @@ bool Parser::IsTopLevelDeclSpec() {
   switch (Tok.getKind()) {
   case tok::kw_fun:
   case tok::kw_enum:
+  case tok::kw_public:
   case tok::kw_class:
   case tok::kw_interface:
     return true;
@@ -46,9 +47,8 @@ ParserResult<Decl> Parser::ParseTopLevelDecl(ParsingDeclSpec &spec) {
   spec.takeAttributesFrom(declSpecAttrs);
 
   while (result.IsNull() && IsParsing() && IsTopLevelDeclSpec()) {
-
+    // Try to collect a decl spec
     if (CollectDeclSpec(spec).HasCodeCompletion()) {
-      // This is an empty file -- stop parsing.
       return result;
     }
     result = ParseDecl(DeclaratorContext::File, attrs, declSpecAttrs, spec);
@@ -60,10 +60,8 @@ ParserResult<Decl> Parser::ParseDecl(DeclaratorContext declaratorContext,
                                      ParsedAttributes &attrs,
                                      ParsedAttributes &declSpecAttrs,
                                      ParsingDeclSpec &spec) {
-  // if (spec.hasImportSpecified()) {
-  //   return ParseImportDecl();
-  // }
 
+  // Now that we have a valide decl spec, get its declarator
   ParsedAttributes localAttrs(attrFactory);
   localAttrs.takeAllFrom(attrs);
 
@@ -76,24 +74,21 @@ ParserResult<Decl> Parser::ParseDecl(DeclaratorContext declaratorContext,
     return ParserResult<Decl>();
   }
 
-  // switch (spec.GetKind()) {
-  // case DeclSpecKind::Fun: {
-  //   assert(spec.isFunSpecified());
-  //   return ParseFunDecl(declarator);
-  // }
-  // case DeclSpecKind::Struct: {
-  //   assert(spec.hasStructSpecifier());
-  //   return ParseStructDecl(declarator);
-  // }
-  // case DeclSpecKind::Enum: {
-  //   assert(spec.hasEnumSpecifier());
-  //   return ParseEnumDecl(declarator);
-  // }
-  // case DeclSpecKind::Class: {
-  //   assert(spec.hasStructSpecifier());
-  //   return ParseClassDecl(declarator);
-  // }
-  // }
+  // Ok, we have found a declarator for the decl spec -- parse the decl spec
+
+  if (spec.isFunSpecified()) {
+    return ParseFunDecl(declarator);
+  } else if (spec.hasStructSpecifier()) {
+    return ParseStructDecl(declarator);
+  }
+
+  else if (spec.hasEnumSpecifier()) {
+    return ParseEnumDecl(declarator);
+  }
+
+  else if (spec.hasStructSpecifier()) {
+    return ParseClassDecl(declarator);
+  }
 
   return ParserResult<Decl>();
 }

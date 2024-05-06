@@ -1048,6 +1048,8 @@ CodeGenAction::CreateASTConsumer(CompilerInstance &CI, StringRef InFile) {
     std::unique_ptr<PPCallbacks> Callbacks =
         std::make_unique<MacroPPCallbacks>(BEConsumer->getCodeGenerator(),
                                             CI.getPreprocessor());
+
+        //TODO-MS:: Think about removing 
     CI.getPreprocessor().addPPCallbacks(std::move(Callbacks));
   }
 

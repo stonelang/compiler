@@ -8,9 +8,9 @@
 
 #include "llvm/ADT/ArrayRef.h"
 
-#include "clang/Frontend/FrontendAction.h"
-#include "clang/Frontend/CompilerInstance.h"
 #include "clang/AST/ModuleDecl.h"
+#include "clang/Frontend/CompilerInstance.h"
+#include "clang/Frontend/FrontendAction.h"
 
 #include <memory>
 
@@ -68,7 +68,6 @@ namespace codegen {
 //   llvm::FunctionPassManager &GetFunctionPassManager() { return fpm; }
 //   llvm::Module *GetLLVMModule() { return llvmModule; }
 // };
-
 
 // struct CodeGenTypeCache final {
 

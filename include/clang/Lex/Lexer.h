@@ -241,6 +241,10 @@ public:
     return BufferPtr == BufferEnd;
   }
 
+  void EnableRawLexingMode() { LexingRawMode = true; }
+  
+  void DisableRawLexingMode() { LexingRawMode = false;}
+
   /// isKeepWhitespaceMode - Return true if the lexer should return tokens for
   /// every character in the file, including whitespace and comments.  This
   /// should only be used in raw mode, as the preprocessor is not prepared to

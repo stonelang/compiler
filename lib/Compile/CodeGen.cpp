@@ -1,8 +1,8 @@
 #include "clang/Compile/CodeGen.h"
 
-
 // codegen::CodeGenModule::CodeGenModule(codegen::CodeGenAction &codeGenAction)
-//     : codeGenAction(codeGenAction), codeGenPassMgr(nullptr), codeGenTypeCache() {}
+//     : codeGenAction(codeGenAction), codeGenPassMgr(nullptr),
+//     codeGenTypeCache() {}
 
 // codegen::CodeGenAction::CodeGenAction(codegen::CodeGenKind kind)
 //     : kind(kind), codeGenModule(*this) {}
@@ -22,7 +22,8 @@
 //   pb.registerFunctionAnalyses(fam);
 //   pb.registerLoopAnalyses(lam);
 //   pb.crossRegisterProxies(lam, fam, cgam, mam);
-//   // mpm = pb.buildPerModuleDefaultPipeline(codeGenOpts.GetOptimizationLevel());
+//   // mpm =
+//   pb.buildPerModuleDefaultPipeline(codeGenOpts.GetOptimizationLevel());
 // }
 
 // // TODO: Ok for now -- may move to IRGenMoulde
@@ -49,7 +50,8 @@
 
 // void CodeGenExecution::EmitIR() {}
 
-// codegen::CodeGenExecution::CodeGenExecution(codegen::CodeGenModule &codeGenModule)
+// codegen::CodeGenExecution::CodeGenExecution(codegen::CodeGenModule
+// &codeGenModule)
 //     : codeGenModule(codeGenModule) {}
 
 // void codegen::CodeGenExecution::EmitBC() {}
