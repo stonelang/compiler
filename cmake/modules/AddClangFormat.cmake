@@ -1,14 +1,15 @@
 set(stone_include_files
-	${CMAKE_CURRENT_SOURCE_DIR}/include/clang/Frontend/*.h
 	${CMAKE_CURRENT_SOURCE_DIR}/include/clang/Compile/*.h
-	${CMAKE_CURRENT_SOURCE_DIR}/include/clang/Parse/*.h
-	${CMAKE_CURRENT_SOURCE_DIR}/include/clang/Sem/*.h
+	${CMAKE_CURRENT_SOURCE_DIR}/include/clang/CodeGeneration/*.h
+	${CMAKE_CURRENT_SOURCE_DIR}/include/clang/Frontend/Frontend.h
+	${CMAKE_CURRENT_SOURCE_DIR}/include/clang/Syntax/*.h
+	
 )
 set(stone_lib_files
 	${CMAKE_CURRENT_SOURCE_DIR}/lib/Compile/*.cpp
-	${CMAKE_CURRENT_SOURCE_DIR}/lib/Frontend/*.cpp
-	${CMAKE_CURRENT_SOURCE_DIR}/lib/Parse/*.cpp
-	${CMAKE_CURRENT_SOURCE_DIR}/lib/Sem/*.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/lib/CodeGeneration/*.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/lib/Frontend/Frontend.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/lib/Syntax/*.cpp
 )
 set(stone_tools_files
 	${CMAKE_CURRENT_SOURCE_DIR}/tools/driver/*.cpp  

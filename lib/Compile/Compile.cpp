@@ -1,4 +1,3 @@
-
 #include "clang/Compile/Compile.h"
 #include "clang/ARCMigrate/ARCMTActions.h"
 #include "clang/CodeGen/CodeGenAction.h"
@@ -76,3 +75,15 @@ bool clang::Compile(CompilerInstance &clangInstance) {
   }
   return success;
 }
+
+bool clang::ExecuteCodeAnalysis() { return true; }
+
+bool clang::SetupCodeGeneration() {}
+
+bool clang::ExecuteCodeGeneration() {}
+
+bool clang::ExecuteIRGeneration() {}
+
+bool clang::ExecuteIROptimization() {}
+
+bool clang::ExecuteNativeGeneration() {}

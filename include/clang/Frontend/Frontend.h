@@ -44,7 +44,7 @@ class TargetOptions;
 
 class FrontendInvocation {
 
-	/// Options controlling the language variant.
+  /// Options controlling the language variant.
   std::unique_ptr<LangOptions> LangOpts;
 
   /// Options controlling the target.
@@ -74,9 +74,6 @@ class FrontendInvocation {
   std::unique_ptr<DependencyOutputOptions> DependencyOutputOpts;
 
 public:
-
-	
-
 public:
   // This lets us create the DiagnosticsEngine with a properly-filled-out
   // DiagnosticOptions instance.
@@ -98,7 +95,6 @@ public:
 
 class FrontendInstance {
 public:
-
 };
 
 } // namespace clang
