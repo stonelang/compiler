@@ -263,11 +263,11 @@ public:
   }
 };
 
-enum class FrontendActionKind : unsigned {
+enum class FrontendModeKind : unsigned {
   None = 0,
 
   /// Parse and perform semantic analysis.
-  Parse,
+  ParseAST,
 
   /// Parse ASTs and dump them.
   DumpAST,
@@ -575,7 +575,7 @@ public:
   /// Path which stores the output files for -ftime-trace
   std::string TimeTracePath;
 
-  FrontendActionKind MainActionKind = FrontendActionKind::None;
+  FrontendModeKind MainModeKind = FrontendModeKind::None;
 
 public:
   FrontendOptions()
