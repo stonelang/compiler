@@ -19,5 +19,49 @@ class TypeNode<TypeNode base, bit abstract = 0> : ASTNode {
 /// to types that may not be leaves should not declare this.
 class LeafType {}
 
-def Type : TypeNode<?, 1>;
-def BuiltinType : TypeNode<Type>, LeafType;
+
+def Type : TypeNode<?, 1>; // Abstract
+
+def BuiltinType : TypeNode<Type, 1>; //abstrct 
+def NumberType 	: TypeNode<BuiltinType,1>;//abstrct 
+def IntType 	: TypeNode<NumberType>;
+def Int8Type 	: TypeNode<NumberType>;
+def Int16Type 	: TypeNode<NumberType>;
+def Int32Type 	: TypeNode<NumberType>;
+def Int64Type 	: TypeNode<NumberType>;
+def Int128Type 	: TypeNode<NumberType>;
+
+def UIntType 	: TypeNode<NumberType>;
+def UInt8Type 	: TypeNode<NumberType>;
+def UInt16Type 	: TypeNode<NumberType>;
+def UInt32Type 	: TypeNode<NumberType>;
+def UInt64Type 	: TypeNode<NumberType>;
+def UInt128Type : TypeNode<NumberType>;
+
+def FloatType 	: TypeNode<NumberType>;
+def Float16Type : TypeNode<NumberType>;
+def Float32Type : TypeNode<NumberType>;
+def Float64Type : TypeNode<NumberType>;
+
+def PointerType 	 	: TypeNode<Type>;
+def BlockPointerType 	: TypeNode<Type>;
+def MemberPointerType 	: TypeNode<Type>;
+
+def ReferenceType 		: TypeNode<Type, 1>; // Abstract
+def LValueReferenceType : TypeNode<ReferenceType>;
+def RValueReferenceType : TypeNode<ReferenceType>;
+
+
+def FunctionType : TypeNode<Type, 1>; // Abstract 
+def FunType 	 : TypeNode<FunctionType>;
+
+def NominalType 	: TypeNode<Type, 1>; // Abstract
+def EnumType 		: TypeNode<NominalType>; 
+def StructType 		: TypeNode<NominalType>; 
+def InterfaceType 	: TypeNode<NominalType>; 
+
+
+
+
+
+

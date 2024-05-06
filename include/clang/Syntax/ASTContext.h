@@ -11,7 +11,6 @@ namespace syntax {
 
 class ASTContext final {
 public:
-
 };
 } // namespace syntax
 
