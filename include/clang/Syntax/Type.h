@@ -143,9 +143,7 @@ public:
 
   /// Add the `volatile` type qualifier to this QualType.
   void AddVolatile() { AddFastQuals(TypeQuals::Volatile); }
-  QualType withVolatile() const {
-    return WithFastQuals(TypeQuals::Volatile);
-  }
+  QualType withVolatile() const { return WithFastQuals(TypeQuals::Volatile); }
 
   /// Add the `immutable` qualifier to this QualType.
   void AddImmutable() { AddFastQuals(TypeQuals::Immutable); }
@@ -198,6 +196,8 @@ public:
   void ClearLocalConst();
   void ClearLocalImmutable();
   void ClearLocalVolatile();
+
+  QualType GetCanType() const;
 };
 
 class alignas(1 << TypeAlignInBits) Type
