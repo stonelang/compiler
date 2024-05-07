@@ -11,7 +11,7 @@ enum class TypeKind : uint8_t {
 #define TYPE(Class, Base) Class,
 #define LAST_TYPE(Class) TypeLast = Class
 #define ABSTRACT_TYPE(Class, Base)
-#include "clang/Syntax/TypeKind.inc"
+#include "clang/Syntax/TypeNode.inc"
 
 };
 class Type {

@@ -6,6 +6,38 @@ class TypeNode<TypeNode base, bit abstract = 0> : ASTNode {
 }
 
 
+/// A type node that is only used to represent dependent types in C++.  For
+/// example, DependentTemplateSpecializationType is used to represent types
+/// where the base template-id is dependent (such as `T::foo<U>`).  Code
+/// that only works with non-dependent types can ignore these type nodes.
+class AlwaysDependent {}
+
+/// A type node that is never used to represent a canonical type, which is to
+/// say that it always represents some sort of type "sugar" which can
+/// (supposedly) be erased without affecting the formal behavior of the
+/// language.  For example, in standard C/C++, typedefs do not introduce new
+/// types and do not affect the semantics of the program.  Code that only
+/// works with canonical types can ignore these type nodes.
+///
+/// Note that this simple story about non-canonical types is not the whole
+/// truth.  Languages and extensions often have formation rules which differ
+/// based on how a type is spelled and which therefore are not consistent
+/// with immediately stipping away type sugar.  More critically, attributes on
+/// typedefs can have semantic impacts in ways that are only reflected in our
+/// AST by preserving the typedef sugar; for example, we do not otherwise
+/// represent the alignment attribute on typedefs, and so it is necessary to
+/// preserve typedef structure into most parts of IR generation.
+class NeverCanonical {}
+
+/// A type node that only represents a canonical type in some dependent cases.
+/// For example, `std::vector<int>` (a TemplateSpecializationType) is
+/// considered to be a non-canonical representation for the RecordType
+/// referencing the concrete ClassTemplateSpecializationDecl; but
+/// `std::vector<T>` cannot be resolved to a concrete specialization
+/// and so remains canonical.  Code which only works with non-dependent
+/// canonical types can ignore these nodes.
+class NeverCanonicalUnlessDependent {}
+
 /// A type node which never has component type structure.  Some code may be
 /// able to operate on leaf types faster than they can on non-leaf types.
 ///
