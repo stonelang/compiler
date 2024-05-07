@@ -85,19 +85,19 @@ public:
   // public:
   //   bool HasConst() const { return qualifiers & TypeQuals::Const; }
   //   bool IsConst() const { return qualifiers == TypeQuals::Const; }
-  //   void RemoveConst() { qualifiers &= ~TypeQuals::Const; }
+  //   void ClearConst() { qualifiers &= ~TypeQuals::Const; }
   //   void AddConst() { qualifiers |= TypeQuals::Const; }
 
   // public:
   //   bool HasImmutable() const { return qualifiers & TypeQuals::Immutable; }
   //   bool IsImmutable() const { return qualifiers == TypeQuals::Immutable; }
-  //   void RemoveImmutable() { qualifiers &= ~TypeQuals::Immutable; }
+  //   void ClearImmutable() { qualifiers &= ~TypeQuals::Immutable; }
   //   void AddImmutable() { qualifiers |= TypeQuals::Immutable; }
 
   // public:
   //   bool HasVolatile() const { return qualifiers & TypeQuals::Volatile; }
   //   bool IsVolatile() const { return qualifiers == TypeQuals::Volatile; }
-  //   void RemoveVolatile() { qualifiers &= ~TypeQuals::Volatile; }
+  //   void ClearVolatile() { qualifiers &= ~TypeQuals::Volatile; }
   //   void AddVolatile() { qualifiers |= TypeQuals::Volatile; }
 };
 
@@ -137,6 +137,20 @@ public:
   const Type *GetTypePtrOrNull() const;
 
 public:
+  /// Add the `const` type qualifier to this QualType.
+  void AddConst() { AddFastQuals(TypeQuals::Const); }
+  QualType WithConst() const { return WithFastQuals(TypeQuals::Const); }
+
+  /// Add the `volatile` type qualifier to this QualType.
+  void AddVolatile() { AddFastQuals(TypeQuals::Volatile); }
+  QualType withVolatile() const {
+    return WithFastQuals(TypeQuals::Volatile);
+  }
+
+  /// Add the `immutable` qualifier to this QualType.
+  void AddImmutable() { AddFastQuals(TypeQuals::Immutable); }
+  QualType WithImmutable() const { return WithFastQuals(TypeQuals::Immutable); }
+
   /// Determine whether this type has any qualifiers.
   bool HasQuals() const;
 
@@ -161,6 +175,29 @@ public:
     T.AddFastQuals(quals);
     return T;
   }
+
+  // Creates a type with exactly the given fast qualifiers, removing
+  // any existing fast qualifiers.
+  QualType WithExactLocalFastQuals(unsigned quals) const {
+    return WithoutLocalFastQuals().WithFastQuals(quals);
+  }
+
+  // Clears fast qualifiers, but leaves any extended qualifiers in place.
+  QualType WithoutLocalFastQuals() const {
+    QualType T = *this;
+    T.ClearLocalFastQuals();
+    return T;
+  }
+
+  void ClearLocalFastQuals() { val.setInt(0); }
+  void ClearLocalFastQuals(unsigned mask) {
+    assert(!(mask & ~TypeQuals::FastMask) && "mask has non-fast qualifiers");
+    val.setInt(val.getInt() & ~mask);
+  }
+
+  void ClearLocalConst();
+  void ClearLocalImmutable();
+  void ClearLocalVolatile();
 };
 
 class alignas(1 << TypeAlignInBits) Type
