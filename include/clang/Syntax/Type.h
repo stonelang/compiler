@@ -4,14 +4,40 @@
 #include "clang/Core/InlineBitfield.h"
 #include "clang/Syntax/ASTAllocation.h"
 #include "clang/Syntax/TypeAlignment.h"
+#include "clang/Syntax/TypeQualifiers.h"
 
+#include "llvm/ADT/APInt.h"
+#include "llvm/ADT/APSInt.h"
 #include "llvm/ADT/ArrayRef.h"
+#include "llvm/ADT/FoldingSet.h"
+#include "llvm/ADT/PointerIntPair.h"
+#include "llvm/ADT/PointerUnion.h"
+#include "llvm/ADT/STLForwardCompat.h"
+#include "llvm/ADT/StringRef.h"
+#include "llvm/ADT/Twine.h"
+#include "llvm/ADT/iterator_range.h"
+#include "llvm/Support/Casting.h"
+#include "llvm/Support/Compiler.h"
+#include "llvm/Support/ErrorHandling.h"
+#include "llvm/Support/PointerLikeTypeTraits.h"
+#include "llvm/Support/TrailingObjects.h"
+#include "llvm/Support/type_traits.h"
 
+#include <cassert>
+#include <cstddef>
+#include <cstdint>
+#include <cstring>
 #include <memory>
+#include <optional>
+#include <string>
+#include <type_traits>
+#include <utility>
 
 namespace clang {
 namespace syn {
 class Type;
+class QualType;
+
 // Provide forward declarations for all of the *Type classes.
 #define TYPE(Class, Base) class Class##Type;
 #include "clang/Syntax/TypeNode.inc"
@@ -35,13 +61,41 @@ enum : unsigned {
       clang::CountBitsUsed(static_cast<unsigned>(TypeKind::TypeLast))
 };
 
+/// A qualifier set is used to build a set of qualifiers.
+class TypeQualifierCollector final : public TypeQualifiers {
+public:
+  TypeQualifierCollector(TypeQualifiers typeQuals = TypeQualifiers())
+      : TypeQualifiers(typeQuals) {}
+
+public:
+  /// Apply the collected qualifiers to the given type.
+  syn::QualType Apply(const syn::ASTContext &Context, QualType QT) const;
+
+  /// Apply the collected qualifiers to the given type.
+  syn::QualType Apply(const syn::ASTContext &Context, const Type *T) const;
+};
+
 class QualType {
-  // Thankfully, these are efficiently composable.
-  // llvm::PointerIntPair<const Type *, TypeQuals::FastWidth> val;
+
+  friend class TypeQualifierCollector;
+  llvm::PointerIntPair<const Type *, TypeQualifiers::FastWidth> val;
+
 public:
   QualType() = default;
-  // QualType(const Type *typePtr, unsigned typeQuals) : val(typePtr, typeQuals)
-  // {}
+  QualType(const Type *typePtr, unsigned typeQuals) : val(typePtr, typeQuals) {}
+
+public:
+  unsigned GetLocalFastQuals() const { return val.getInt(); }
+  void SetLocalFastQuals(unsigned typeQuals) { val.setInt(typeQuals); }
+
+public:
+  /// Retrieves a pointer to the underlying (unqualified) type.
+  ///
+  /// This function requires that the type not be NULL. If the type might be
+  /// NULL, use the (slightly less efficient) \c getTypePtrOrNull().
+  const Type *GetTypePtr() const;
+
+  const Type *GetTypePtrOrNull() const;
 };
 
 class alignas(1 << TypeAlignInBits) Type
@@ -255,6 +309,16 @@ public:
 class AliasType : public SugaredType {
 public:
   AliasType() : SugaredType(TypeKind::Alias) {}
+};
+
+class DeducedType : public Type {
+public:
+  DeducedType(TypeKind kind) : Type(kind) {}
+};
+
+class AutoType final : public DeducedType {
+public:
+  AutoType(TypeKind kind) : DeducedType(TypeKind::Auto) {}
 };
 
 } // namespace syn

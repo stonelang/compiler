@@ -90,6 +90,9 @@ def NominalType 	: TypeNode<Type, 1>; // Abstract
 	def InterfaceType 	: TypeNode<NominalType>; 
 def SugaredType : TypeNode<Type, 1>; //abstrct 
 	def AliasType : TypeNode<SugaredType>; //abstrct 
+	
+def DeducedType : TypeNode<Type, 1>;
+	def AutoType : TypeNode<DeducedType>;
 
 
 
