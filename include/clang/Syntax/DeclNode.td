@@ -11,11 +11,11 @@ class DeclContext {}
 def Decl : DeclNode<?, "", 1>;
 
 def Named : DeclNode<Decl, "named declarations", 1>;
-  def Namespace : DeclNode<Named, "namespaces">, DeclContext;
+  def Space : DeclNode<Named, "spaces">, DeclContext;
   def UsingDirective : DeclNode<Named>;
   def NamespaceAlias : DeclNode<Named>;
   def Label : DeclNode<Named, "labels">;
-  
+
 def Import : DeclNode<Decl>;
 
 
