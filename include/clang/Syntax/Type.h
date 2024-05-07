@@ -143,7 +143,7 @@ public:
 
   /// Add the `volatile` type qualifier to this QualType.
   void AddVolatile() { AddFastQuals(TypeQuals::Volatile); }
-  QualType withVolatile() const { return WithFastQuals(TypeQuals::Volatile); }
+  QualType WithVolatile() const { return WithFastQuals(TypeQuals::Volatile); }
 
   /// Add the `immutable` qualifier to this QualType.
   void AddImmutable() { AddFastQuals(TypeQuals::Immutable); }
@@ -347,10 +347,10 @@ public:
   FunctionType(TypeKind kind) : Type(kind) {}
 };
 
-class FunType : public Type {
+class FunType : public FunctionType {
 
 public:
-  FunType() : Type(TypeKind::Fun) {}
+  FunType() : FunType(TypeKind::Fun) {}
 };
 
 class PointerType : public Type {

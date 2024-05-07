@@ -26,9 +26,9 @@ def Named : DeclNode<Decl, "named declarations", 1>;
   def Value : DeclNode<Named, "value declarations", 1>;
     def Declarator : DeclNode<Value, "declarators", 1>;
       def Function : DeclNode<Declarator, "functions">, DeclContext;
-        def MemberFunction : DeclNode<Function>;
-          def Constructor : DeclNode<MemberFunction>;
-          def Destructor : DeclNode<MemberFunction>;
+        def Fun : DeclNode<Function>;
+        def Constructor : DeclNode<Function>;
+        def Destructor : DeclNode<Function>;
 
 def Import : DeclNode<Decl>;
 def Export : DeclNode<Decl>, DeclContext;

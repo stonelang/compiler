@@ -101,3 +101,16 @@ def Empty : DeclNode<Decl>;
 def RequiresExprBody : DeclNode<Decl>, DeclContext;
 def LifetimeExtendedTemporary : DeclNode<Decl>;
 def HLSLBuffer : DeclNode<Named, "HLSLBuffer">, DeclContext;
+
+
+  CLANG_INLINE_BITFIELD(FunDecl, FunctionDecl, 1 + 1,
+
+                          /// Whether this function is a 'static' method.
+                          IsStatic : 1,
+
+                          IsMain : 1);
+
+    CLANG_INLINE_BITFIELD(ConstructorDecl, FunctionDecl, 1,
+    /// Whether this constructor can fail, by building an Optional type.
+    Failable : 1);
+

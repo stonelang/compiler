@@ -140,8 +140,8 @@ private:
   }
 
 protected:
-  union {
-    uint64_t OpaqueBits;
+  union { uint64_t OpaqueBits;
+
     CLANG_INLINE_BITFIELD_BASE(
         Decl, clang::BitMax(NumDeclKindBits, 8) + 1 + 1 + 1 + 1 + 1 + 1, Kind
         : clang::BitMax(NumDeclKindBits, 8),
@@ -170,6 +170,9 @@ protected:
 
           /// Wether this is a top level decl
           IsTopLevel : 1);
+
+
+
   } Bits;
 
 public:
@@ -211,17 +214,17 @@ class FunctionDecl : public DeclaratorDecl {
 public:
 };
 
-class MemberFunctionDecl : public FunctionDecl {
+class FunDecl : public FunctionDecl {
 
 public:
 };
 
-class ConstructDecl : public MemberFunctionDecl {
+class ConstructDecl : public FunctionDecl {
 
 public:
 };
 
-class DesctructorDecl : public MemberFunctionDecl {
+class DesctructorDecl : public FunctionDecl {
 
 public:
 };
