@@ -4,7 +4,6 @@
 #include "clang/Core/InlineBitfield.h"
 #include "clang/Syntax/ASTAllocation.h"
 #include "clang/Syntax/TypeAlignment.h"
-#include "clang/Syntax/TypeQualifiers.h"
 
 #include "llvm/ADT/APInt.h"
 #include "llvm/ADT/APSInt.h"
@@ -61,11 +60,51 @@ enum : unsigned {
       clang::CountBitsUsed(static_cast<unsigned>(TypeKind::TypeLast))
 };
 
-/// A qualifier set is used to build a set of qualifiers.
-class TypeQualifierCollector final : public TypeQualifiers {
+class TypeQuals {
+  unsigned qualifiers = 0;
+
 public:
-  TypeQualifierCollector(TypeQualifiers typeQuals = TypeQualifiers())
-      : TypeQualifiers(typeQuals) {}
+  enum : uint64_t {
+    Const = 1 << 1,
+    Immutable = 1 << 2,
+    Volatile = 1 << 3,
+  };
+
+  enum : uint64_t {
+    /// The maximum supported address space number.
+    /// 23 bits should be enough for anyone.
+    MaxAddressSpace = 0x7fffffu,
+
+    /// The width of the "fast" qualifier mask.
+    FastWidth = 3,
+
+    /// The fast qualifier mask.
+    FastMask = (1 << FastWidth) - 1
+  };
+
+public:
+  bool HasConst() const { return qualifiers & TypeQuals::Const; }
+  bool IsConst() const { return qualifiers == TypeQuals::Const; }
+  void RemoveConst() { qualifiers &= ~TypeQuals::Const; }
+  void AddConst() { qualifiers |= TypeQuals::Const; }
+
+public:
+  bool HasImmutable() const { return qualifiers & TypeQuals::Immutable; }
+  bool IsImmutable() const { return qualifiers == TypeQuals::Immutable; }
+  void RemoveImmutable() { qualifiers &= ~TypeQuals::Immutable; }
+  void AddImmutable() { qualifiers |= TypeQuals::Immutable; }
+
+public:
+  bool HasVolatile() const { return qualifiers & TypeQuals::Volatile; }
+  bool IsVolatile() const { return qualifiers == TypeQuals::Volatile; }
+  void RemoveVolatile() { qualifiers &= ~TypeQuals::Volatile; }
+  void AddVolatile() { qualifiers |= TypeQuals::Volatile; }
+};
+
+/// A qualifier set is used to build a set of qualifiers.
+class TypeQualCollector final : public TypeQuals {
+public:
+  TypeQualCollector(TypeQuals typeQuals = TypeQuals()) : TypeQuals(typeQuals) {}
 
 public:
   /// Apply the collected qualifiers to the given type.
@@ -77,8 +116,8 @@ public:
 
 class QualType {
 
-  friend class TypeQualifierCollector;
-  llvm::PointerIntPair<const Type *, TypeQualifiers::FastWidth> val;
+  friend class TypeQualCollector;
+  llvm::PointerIntPair<const Type *, TypeQuals::FastWidth> val;
 
 public:
   QualType() = default;
