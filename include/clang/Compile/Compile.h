@@ -47,6 +47,8 @@ int Compile(llvm::ArrayRef<const char *> Argv, const char *Argv0,
 
 // bool CompileFile(FrontendInputFile& inputFile);
 
+bool ExecuteAction();
+
 /// Maybe pass FrontendInputFile
 bool ExecuteCodeAnalysis();
 
@@ -59,6 +61,8 @@ bool ExecuteIRGeneration();
 bool ExecuteIROptimization();
 
 bool ExecuteNativeGeneration();
+
+bool ExecuteCompileLLVM();
 
 } // end namespace clang
 

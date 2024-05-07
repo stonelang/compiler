@@ -12,6 +12,9 @@
 namespace clang {
 namespace syn {
 class Type;
+// Provide forward declarations for all of the *Type classes.
+#define TYPE(Class, Base) class Class##Type;
+#include "clang/Syntax/TypeNode.inc"
 
 enum : uint64_t {
   /// The maximum supported address space number.
@@ -55,99 +58,121 @@ public:
   BuilitinType(TypeKind kind) : Type(kind) {}
 };
 
-class NumberType : public BuilitinType {
-
+class VoidType : public BuilitinType {
 public:
-  NumberType(TypeKind kind) : BuilitinType(kind) {}
+  VoidType() : BuilitinType(TypeKind::Void) {}
 };
 
-class IntType : public NumberType {
-
+class NullType : public BuilitinType {
 public:
-  IntType() : NumberType(TypeKind::Int) {}
+  NullType() : BuilitinType(TypeKind::Null) {}
 };
 
-class Int8Type : public NumberType {
+class NumericType : public BuilitinType {
 
 public:
-  Int8Type() : NumberType(TypeKind::Int8) {}
-};
-class Int16Type : public NumberType {
-
-public:
-  Int16Type() : NumberType(TypeKind::Int16) {}
-};
-class Int32Type : public NumberType {
-
-public:
-  Int32Type() : NumberType(TypeKind::Int32) {}
+  NumericType(TypeKind kind) : BuilitinType(kind) {}
 };
 
-class Int64Type : public NumberType {
+class SignedType : public NumericType {
 
 public:
-  Int64Type() : NumberType(TypeKind::Int64) {}
+  SignedType(TypeKind kind) : NumericType(kind) {}
 };
 
-class Int128Type : public NumberType {
+class IntType : public SignedType {
 
 public:
-  Int128Type() : NumberType(TypeKind::Int128) {}
+  IntType() : SignedType(TypeKind::Int) {}
 };
 
-class UIntType : public NumberType {
+class Int8Type : public SignedType {
 
 public:
-  UIntType() : NumberType(TypeKind::UInt) {}
+  Int8Type() : SignedType(TypeKind::Int8) {}
+};
+class Int16Type : public SignedType {
+
+public:
+  Int16Type() : SignedType(TypeKind::Int16) {}
+};
+class Int32Type : public SignedType {
+
+public:
+  Int32Type() : SignedType(TypeKind::Int32) {}
 };
 
-class UInt8Type : public NumberType {
+class Int64Type : public SignedType {
 
 public:
-  UInt8Type() : NumberType(TypeKind::UInt8) {}
-};
-class UInt16Type : public NumberType {
-
-public:
-  UInt16Type() : NumberType(TypeKind::UInt16) {}
-};
-class UInt32Type : public NumberType {
-
-public:
-  UInt32Type() : NumberType(TypeKind::UInt32) {}
+  Int64Type() : SignedType(TypeKind::Int64) {}
 };
 
-class UInt64Type : public NumberType {
+class Int128Type : public SignedType {
 
 public:
-  UInt64Type() : NumberType(TypeKind::UInt64) {}
+  Int128Type() : SignedType(TypeKind::Int128) {}
 };
 
-class UInt128Type : public NumberType {
+class UnsignedType : public NumericType {
 
 public:
-  UInt128Type() : NumberType(TypeKind::UInt128) {}
+  UnsignedType(TypeKind kind) : NumericType(kind) {}
 };
 
-class FloatType : public NumberType {
+class UIntType : public UnsignedType {
 
 public:
-  FloatType() : NumberType(TypeKind::Float) {}
+  UIntType() : UnsignedType(TypeKind::UInt) {}
 };
-class Float16Type : public NumberType {
+
+class UInt8Type : public UnsignedType {
 
 public:
-  Float16Type() : NumberType(TypeKind::Float16) {}
+  UInt8Type() : UnsignedType(TypeKind::UInt8) {}
 };
-class Float32Type : public NumberType {
+class UInt16Type : public UnsignedType {
 
 public:
-  Float32Type() : NumberType(TypeKind::Float32) {}
+  UInt16Type() : UnsignedType(TypeKind::UInt16) {}
 };
-class Float64Type : public NumberType {
+class UInt32Type : public UnsignedType {
 
 public:
-  Float64Type() : NumberType(TypeKind::Float64) {}
+  UInt32Type() : UnsignedType(TypeKind::UInt32) {}
+};
+
+class UInt64Type : public UnsignedType {
+
+public:
+  UInt64Type() : UnsignedType(TypeKind::UInt64) {}
+};
+
+class UInt128Type : public UnsignedType {
+
+public:
+  UInt128Type() : UnsignedType(TypeKind::UInt128) {}
+};
+
+class FloatType : public NumericType {
+
+public:
+  FloatType() : NumericType(TypeKind::Float) {}
+};
+class Float16Type : public NumericType {
+
+public:
+  Float16Type() : NumericType(TypeKind::Float16) {}
+};
+class Float32Type : public NumericType {
+
+public:
+  Float32Type() : NumericType(TypeKind::Float32) {}
+};
+class Float64Type : public NumericType {
+
+public:
+  Float64Type() : NumericType(TypeKind::Float64) {}
 };
 
 class FunctionType : public Type {

@@ -76,6 +76,8 @@ bool clang::Compile(CompilerInstance &clangInstance) {
   return success;
 }
 
+bool clang::ExecuteAction() {}
+
 bool clang::ExecuteCodeAnalysis() { return true; }
 
 bool clang::SetupCodeGeneration() {}
@@ -87,3 +89,5 @@ bool clang::ExecuteIRGeneration() {}
 bool clang::ExecuteIROptimization() {}
 
 bool clang::ExecuteNativeGeneration() {}
+
+bool clang::ExecuteCompileLLVM() {}

@@ -3,15 +3,16 @@
 
 #include "clang/Basic/LLVM.h"
 #include "clang/Basic/LangOptions.h"
+#include "clang/Basic/TargetOptions.h"
 #include "clang/Frontend/FrontendOptions.h"
 
-#include "clang/APINotes/APINotesOptions.h"
 #include "clang/Basic/CodeGenOptions.h"
 #include "clang/Basic/DiagnosticOptions.h"
 #include "clang/Basic/FileSystemOptions.h"
 #include "clang/Basic/LLVM.h"
 #include "clang/Basic/LangOptions.h"
 #include "clang/Basic/LangStandard.h"
+#include "clang/Core/Diagnostics.h"
 #include "clang/Frontend/DependencyOutputOptions.h"
 #include "clang/Frontend/FrontendOptions.h"
 #include "clang/Frontend/MigratorOptions.h"
@@ -39,10 +40,10 @@ class FileSystem;
 
 namespace clang {
 
-class DiagnosticsEngine;
+class DiagnosticEngine;
 class TargetOptions;
 
-class FrontendInvocation {
+class FrontendInvocation final {
 
   /// Options controlling the language variant.
   std::unique_ptr<LangOptions> LangOpts;
@@ -51,15 +52,10 @@ class FrontendInvocation {
   std::unique_ptr<TargetOptions> TargetOpts;
 
   /// Options controlling the diagnostic engine.
-  IntrusiveRefCntPtr<DiagnosticOptions> DiagnosticOpts;
+  std::unique_ptr<DiagnosticOptions> DiagnosticOpts;
 
   /// Options controlling the static analyzer.
   AnalyzerOptionsRef AnalyzerOpts;
-
-  std::unique_ptr<MigratorOptions> MigratorOpts;
-
-  /// Options controlling API notes.
-  std::unique_ptr<APINotesOptions> APINotesOpts;
 
   /// Options controlling IRgen and the backend.
   std::unique_ptr<CodeGenOptions> CodeGenOpts;
@@ -74,6 +70,11 @@ class FrontendInvocation {
   std::unique_ptr<DependencyOutputOptions> DependencyOutputOpts;
 
 public:
+  FrontendInvocation();
+
+  bool ParserArgs(ArrayRef<const char *> CommandLineArgs,
+                  DiagnosticEngine &diags, const char *Argv0 = nullptr);
+
 public:
   // This lets us create the DiagnosticsEngine with a properly-filled-out
   // DiagnosticOptions instance.
@@ -89,12 +90,15 @@ public:
   /// report the error(s).
   static bool ParseDiagnosticArgs(DiagnosticOptions &diagOpts,
                                   llvm::opt::ArgList &args,
-                                  DiagnosticsEngine *diags = nullptr,
+                                  DiagnosticEngine *diags = nullptr,
                                   bool defaultDiagColor = true);
 };
 
 class FrontendInstance {
+  const FrontendInvocation &invocation;
+
 public:
+  FrontendInstance(const FrontendInvocation &invocation);
 };
 
 } // namespace clang

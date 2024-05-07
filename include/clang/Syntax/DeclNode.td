@@ -30,7 +30,6 @@ def Named : DeclNode<Decl, "named declarations", 1>;
           def Constructor : DeclNode<MemberFunction>;
           def Destructor : DeclNode<MemberFunction>;
 
-
 def Import : DeclNode<Decl>;
 def Export : DeclNode<Decl>, DeclContext;
 def Trust : DeclNode<Decl>;

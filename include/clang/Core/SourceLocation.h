@@ -29,7 +29,9 @@ class raw_ostream;
 
 namespace clang {
 namespace source {
-class SourceLocation final {};
+class SourceLocation final {
+public:
+};
 } // namespace source
 } // namespace clang
 

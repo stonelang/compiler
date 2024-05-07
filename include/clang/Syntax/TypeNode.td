@@ -53,44 +53,41 @@ class LeafType {}
 
 
 def Type : TypeNode<?, 1>; // Abstract
-
 def BuiltinType : TypeNode<Type, 1>; //abstrct 
-def NumberType 	: TypeNode<BuiltinType,1>;//abstrct 
-def IntType 	: TypeNode<NumberType>;
-def Int8Type 	: TypeNode<NumberType>;
-def Int16Type 	: TypeNode<NumberType>;
-def Int32Type 	: TypeNode<NumberType>;
-def Int64Type 	: TypeNode<NumberType>;
-def Int128Type 	: TypeNode<NumberType>;
-
-def UIntType 	: TypeNode<NumberType>;
-def UInt8Type 	: TypeNode<NumberType>;
-def UInt16Type 	: TypeNode<NumberType>;
-def UInt32Type 	: TypeNode<NumberType>;
-def UInt64Type 	: TypeNode<NumberType>;
-def UInt128Type : TypeNode<NumberType>;
-
-def FloatType 	: TypeNode<NumberType>;
-def Float16Type : TypeNode<NumberType>;
-def Float32Type : TypeNode<NumberType>;
-def Float64Type : TypeNode<NumberType>;
-
+	def NumericType 	: TypeNode<BuiltinType,1>;//abstrct 
+		def SignedType 	: TypeNode<NumericType,1>;//abstrct 
+			def IntType 	: TypeNode<SignedType>;
+			def Int8Type 	: TypeNode<SignedType>;
+			def Int16Type 	: TypeNode<SignedType>;
+			def Int32Type 	: TypeNode<SignedType>;
+			def Int64Type 	: TypeNode<SignedType>;
+			def Int128Type 	: TypeNode<SignedType>;
+		def UnsignedType 	: TypeNode<NumericType,1>;//abstrct 
+			def UIntType 	: TypeNode<UnsignedType>;
+			def UInt8Type 	: TypeNode<UnsignedType>;
+			def UInt16Type 	: TypeNode<UnsignedType>;
+			def UInt32Type 	: TypeNode<UnsignedType>;
+			def UInt64Type 	: TypeNode<UnsignedType>;
+			def UInt128Type : TypeNode<UnsignedType>;
+			def BoolType 	: TypeNode<UnsignedType>;
+		def FloatType 	: TypeNode<NumericType>;
+		def Float16Type : TypeNode<NumericType>;
+		def Float32Type : TypeNode<NumericType>;
+		def Float64Type : TypeNode<NumericType>;
+	def VoidType 	: TypeNode<BuiltinType>;
+	def NullType 	: TypeNode<BuiltinType>;
 def PointerType 	 	: TypeNode<Type>;
 def BlockPointerType 	: TypeNode<Type>;
 def MemberPointerType 	: TypeNode<Type>;
-
 def ReferenceType 		: TypeNode<Type, 1>; // Abstract
-def LValueReferenceType : TypeNode<ReferenceType>;
-def RValueReferenceType : TypeNode<ReferenceType>;
-
-
+	def LValueReferenceType : TypeNode<ReferenceType>;
+	def RValueReferenceType : TypeNode<ReferenceType>;
 def FunctionType : TypeNode<Type, 1>; // Abstract 
-def FunType 	 : TypeNode<FunctionType>;
-
+	def FunType 	 : TypeNode<FunctionType>;
 def NominalType 	: TypeNode<Type, 1>; // Abstract
-def EnumType 		: TypeNode<NominalType>; 
-def StructType 		: TypeNode<NominalType>; 
-def InterfaceType 	: TypeNode<NominalType>; 
+	def EnumType 		: TypeNode<NominalType>; 
+	def StructType 		: TypeNode<NominalType>; 
+	def InterfaceType 	: TypeNode<NominalType>; 
 
 
 

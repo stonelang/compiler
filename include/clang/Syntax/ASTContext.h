@@ -48,7 +48,6 @@ private:
   const CanType<Type> BuiltinUInt128Type;
   const CanType<Type> BuiltinUIntType;
 
-  const CanType<Type> BuiltinAnyType;
   const CanType<Type> BuiltinVoidType;
   const CanType<Type> BuiltinNullType;
   const CanType<Type> BuiltinBoolType;

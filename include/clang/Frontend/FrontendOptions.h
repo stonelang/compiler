@@ -263,7 +263,7 @@ public:
   }
 };
 
-enum class FrontendModeKind : unsigned {
+enum class FrontendInputAction : unsigned {
   None = 0,
 
   /// Parse and perform semantic analysis.
@@ -290,6 +290,12 @@ enum class FrontendModeKind : unsigned {
 
   /// Generate pre-compiled header.
   GeneratePCH,
+
+  /// Generate pre-compiled header.
+  Help,
+
+  /// Generate pre-compiled header.
+  HelpHidden
 
 };
 
@@ -575,7 +581,7 @@ public:
   /// Path which stores the output files for -ftime-trace
   std::string TimeTracePath;
 
-  FrontendModeKind MainModeKind = FrontendModeKind::None;
+  FrontendInputAction InputAction = FrontendInputAction::None;
 
 public:
   FrontendOptions()
