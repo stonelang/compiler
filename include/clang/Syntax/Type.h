@@ -48,6 +48,16 @@ class alignas(1 << TypeAlignInBits) Type
     : public syn::ASTAllocation<std::aligned_storage<8, 8>::type> {
   TypeKind kind;
 
+protected:
+  union {
+
+    CLANG_INLINE_BITFIELD_BASE(Type, clang::BitMax(NumTypeKindBits, 8) + 1, Kind
+                               : clang::BitMax(NumTypeKindBits, 8),
+
+                                 /// Whether this declaration is invalid.
+                                 IsBuiltin : 1);
+  } Bits;
+
 public:
   Type(TypeKind kind) : kind(kind) {}
 };
@@ -58,12 +68,12 @@ public:
   BuilitinType(TypeKind kind) : Type(kind) {}
 };
 
-class VoidType : public BuilitinType {
+class VoidType final : public BuilitinType {
 public:
   VoidType() : BuilitinType(TypeKind::Void) {}
 };
 
-class NullType : public BuilitinType {
+class NullType final : public BuilitinType {
 public:
   NullType() : BuilitinType(TypeKind::Null) {}
 };
@@ -80,35 +90,35 @@ public:
   SignedType(TypeKind kind) : NumericType(kind) {}
 };
 
-class IntType : public SignedType {
+class IntType final : public SignedType {
 
 public:
   IntType() : SignedType(TypeKind::Int) {}
 };
 
-class Int8Type : public SignedType {
+class Int8Type final : public SignedType {
 
 public:
   Int8Type() : SignedType(TypeKind::Int8) {}
 };
-class Int16Type : public SignedType {
+class Int16Type final : public SignedType {
 
 public:
   Int16Type() : SignedType(TypeKind::Int16) {}
 };
-class Int32Type : public SignedType {
+class Int32Type final : public SignedType {
 
 public:
   Int32Type() : SignedType(TypeKind::Int32) {}
 };
 
-class Int64Type : public SignedType {
+class Int64Type final : public SignedType {
 
 public:
   Int64Type() : SignedType(TypeKind::Int64) {}
 };
 
-class Int128Type : public SignedType {
+class Int128Type final : public SignedType {
 
 public:
   Int128Type() : SignedType(TypeKind::Int128) {}
@@ -120,56 +130,56 @@ public:
   UnsignedType(TypeKind kind) : NumericType(kind) {}
 };
 
-class UIntType : public UnsignedType {
+class UIntType final : public UnsignedType {
 
 public:
   UIntType() : UnsignedType(TypeKind::UInt) {}
 };
 
-class UInt8Type : public UnsignedType {
+class UInt8Type final : public UnsignedType {
 
 public:
   UInt8Type() : UnsignedType(TypeKind::UInt8) {}
 };
-class UInt16Type : public UnsignedType {
+class UInt16Type final : public UnsignedType {
 
 public:
   UInt16Type() : UnsignedType(TypeKind::UInt16) {}
 };
-class UInt32Type : public UnsignedType {
+class UInt32Type final : public UnsignedType {
 
 public:
   UInt32Type() : UnsignedType(TypeKind::UInt32) {}
 };
 
-class UInt64Type : public UnsignedType {
+class UInt64Type final : public UnsignedType {
 
 public:
   UInt64Type() : UnsignedType(TypeKind::UInt64) {}
 };
 
-class UInt128Type : public UnsignedType {
+class UInt128Type final : public UnsignedType {
 
 public:
   UInt128Type() : UnsignedType(TypeKind::UInt128) {}
 };
 
-class FloatType : public NumericType {
+class FloatType final : public NumericType {
 
 public:
   FloatType() : NumericType(TypeKind::Float) {}
 };
-class Float16Type : public NumericType {
+class Float16Type final : public NumericType {
 
 public:
   Float16Type() : NumericType(TypeKind::Float16) {}
 };
-class Float32Type : public NumericType {
+class Float32Type final : public NumericType {
 
 public:
   Float32Type() : NumericType(TypeKind::Float32) {}
 };
-class Float64Type : public NumericType {
+class Float64Type final : public NumericType {
 
 public:
   Float64Type() : NumericType(TypeKind::Float64) {}
@@ -222,19 +232,29 @@ public:
   NominalType(TypeKind kind) : Type(kind) {}
 };
 
-class EnumType : public Type {
+class EnumType : public NominalType {
 public:
-  EnumType() : Type(TypeKind::Enum) {}
+  EnumType() : NominalType(TypeKind::Enum) {}
 };
 
-class StructType : public Type {
+class StructType : public NominalType {
 public:
-  StructType() : Type(TypeKind::Struct) {}
+  StructType() : NominalType(TypeKind::Struct) {}
 };
 
-class InterfaceType : public Type {
+class InterfaceType : public NominalType {
 public:
-  InterfaceType() : Type(TypeKind::Interface) {}
+  InterfaceType() : NominalType(TypeKind::Interface) {}
+};
+
+class SugaredType : public Type {
+public:
+  SugaredType(TypeKind kind) : Type(kind) {}
+};
+
+class AliasType : public SugaredType {
+public:
+  AliasType() : SugaredType(TypeKind::Alias) {}
 };
 
 } // namespace syn

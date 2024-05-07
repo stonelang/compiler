@@ -88,6 +88,8 @@ def NominalType 	: TypeNode<Type, 1>; // Abstract
 	def EnumType 		: TypeNode<NominalType>; 
 	def StructType 		: TypeNode<NominalType>; 
 	def InterfaceType 	: TypeNode<NominalType>; 
+def SugaredType : TypeNode<Type, 1>; //abstrct 
+	def AliasType : TypeNode<SugaredType>; //abstrct 
 
 
 
