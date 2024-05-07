@@ -82,23 +82,23 @@ public:
     FastMask = (1 << FastWidth) - 1
   };
 
-public:
-  bool HasConst() const { return qualifiers & TypeQuals::Const; }
-  bool IsConst() const { return qualifiers == TypeQuals::Const; }
-  void RemoveConst() { qualifiers &= ~TypeQuals::Const; }
-  void AddConst() { qualifiers |= TypeQuals::Const; }
+  // public:
+  //   bool HasConst() const { return qualifiers & TypeQuals::Const; }
+  //   bool IsConst() const { return qualifiers == TypeQuals::Const; }
+  //   void RemoveConst() { qualifiers &= ~TypeQuals::Const; }
+  //   void AddConst() { qualifiers |= TypeQuals::Const; }
 
-public:
-  bool HasImmutable() const { return qualifiers & TypeQuals::Immutable; }
-  bool IsImmutable() const { return qualifiers == TypeQuals::Immutable; }
-  void RemoveImmutable() { qualifiers &= ~TypeQuals::Immutable; }
-  void AddImmutable() { qualifiers |= TypeQuals::Immutable; }
+  // public:
+  //   bool HasImmutable() const { return qualifiers & TypeQuals::Immutable; }
+  //   bool IsImmutable() const { return qualifiers == TypeQuals::Immutable; }
+  //   void RemoveImmutable() { qualifiers &= ~TypeQuals::Immutable; }
+  //   void AddImmutable() { qualifiers |= TypeQuals::Immutable; }
 
-public:
-  bool HasVolatile() const { return qualifiers & TypeQuals::Volatile; }
-  bool IsVolatile() const { return qualifiers == TypeQuals::Volatile; }
-  void RemoveVolatile() { qualifiers &= ~TypeQuals::Volatile; }
-  void AddVolatile() { qualifiers |= TypeQuals::Volatile; }
+  // public:
+  //   bool HasVolatile() const { return qualifiers & TypeQuals::Volatile; }
+  //   bool IsVolatile() const { return qualifiers == TypeQuals::Volatile; }
+  //   void RemoveVolatile() { qualifiers &= ~TypeQuals::Volatile; }
+  //   void AddVolatile() { qualifiers |= TypeQuals::Volatile; }
 };
 
 /// A qualifier set is used to build a set of qualifiers.
@@ -135,6 +135,32 @@ public:
   const Type *GetTypePtr() const;
 
   const Type *GetTypePtrOrNull() const;
+
+public:
+  /// Determine whether this type has any qualifiers.
+  bool HasQuals() const;
+
+  /// Retrieve the set of qualifiers local to this particular QualType
+  /// instance, not including any qualifiers acquired through typedefs or
+  /// other sugar.
+  TypeQuals GetLocalQuals() const;
+
+  /// Retrieve the set of qualifiers applied to this type.
+  TypeQuals GetQuals() const;
+
+  void AddFastQuals(unsigned quals) {
+    assert(!(quals & ~TypeQuals::FastMask) &&
+           "non-fast qualifier bits set in mask!");
+    val.setInt(val.getInt() | quals);
+  }
+
+  // Creates a type with the given qualifiers in addition to any
+  // qualifiers already on this type.
+  QualType WithFastQuals(unsigned quals) const {
+    QualType T = *this;
+    T.AddFastQuals(quals);
+    return T;
+  }
 };
 
 class alignas(1 << TypeAlignInBits) Type
