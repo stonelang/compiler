@@ -5,9 +5,10 @@
 #include <memory>
 
 namespace clang {
-namespace syntax {
+namespace syn {
 constexpr size_t DeclAlignInBits = 8;
-}
+constexpr size_t TypeAlignInBits = 8;
+} // namespace syn
 } // namespace clang
 
 #endif

@@ -1,5 +1,5 @@
-#ifndef LLVM_CLANG_SYNTAX_DECLCONTEXT_H
-#define LLVM_CLANG_SYNTAX_DECLCONTEXT_H
+#ifndef LLVM_CLANG_SYNTAX_MODULEDECL_H
+#define LLVM_CLANG_SYNTAX_MODULEDECL_H
 
 #include "clang/Syntax/TypeAlignment.h"
 
@@ -9,7 +9,7 @@
 namespace clang {
 namespace syn {
 
-class alignas(1 << DeclAlignInBits) DeclContext {
+class ModuleDecl : public TypeDecl {
 public:
 };
 } // namespace syn

@@ -14,7 +14,7 @@
 #endif
 
 namespace clang {
-namespace syntax {
+namespace syn {
 
 class ASTContext;
 
@@ -34,7 +34,7 @@ enum class AllocationArena {
   Temporary
 };
 
-void *ASTContextAllocateMem(size_t bytes, const ASTContext &ctx,
+void *ASTContextAllocateMem(size_t bytes, const syn::ASTContext &ctx,
                             AllocationArena arena, unsigned alignment);
 
 template <typename AlignTy> class ASTAllocation {
@@ -50,14 +50,14 @@ public:
                      AllocationArena arena = AllocationArena::Permanent,
                      unsigned alignment = alignof(AlignTy)) {
 
-    return clang::syntax::ASTContextAllocateMem(bytes, ctx, arena, alignment);
+    return clang::syn::ASTContextAllocateMem(bytes, ctx, arena, alignment);
   }
   void *operator new(size_t bytes, void *mem) throw() {
     assert(mem && "placement new into failed allocation");
     return mem;
   }
 };
-} // namespace syntax
+} // namespace syn
 } // end namespace clang
 
 #endif

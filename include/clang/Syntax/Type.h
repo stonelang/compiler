@@ -1,11 +1,23 @@
 #ifndef LLVM_CLANG_SYNTAX_TYPE_H
 #define LLVM_CLANG_SYNTAX_TYPE_H
 
+#include "clang/Core/InlineBitfield.h"
+#include "clang/Syntax/TypeAlignment.h"
+
 #include "llvm/ADT/ArrayRef.h"
+
+
 #include <memory>
 
 namespace clang {
-namespace syntax {
+namespace syn {
+class Type;
+
+enum : uint64_t {
+  /// The maximum supported address space number.
+  /// 23 bits should be enough for anyone.
+  MaxAddressSpace = 0x7fffffu
+};
 
 enum class TypeKind : uint8_t {
 #define TYPE(Class, Base) Class,
@@ -14,7 +26,22 @@ enum class TypeKind : uint8_t {
 #include "clang/Syntax/TypeNode.inc"
 
 };
-class Type {
+
+enum : unsigned {
+  NumTypeKindBits =
+      clang::CountBitsUsed(static_cast<unsigned>(TypeKind::TypeLast))
+};
+
+class QualType {
+  // Thankfully, these are efficiently composable.
+  // llvm::PointerIntPair<const Type *, TypeQuals::FastWidth> val;
+public:
+  QualType() = default;
+  // QualType(const Type *typePtr, unsigned typeQuals) : val(typePtr, typeQuals)
+  // {}
+};
+
+class alignas(1 << TypeAlignInBits) Type {
   TypeKind kind;
 
 public:
@@ -184,7 +211,7 @@ public:
   InterfaceType() : Type(TypeKind::Interface) {}
 };
 
-} // namespace syntax
+} // namespace syn
 
 } // end namespace clang
 

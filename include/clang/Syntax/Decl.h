@@ -3,10 +3,8 @@
 
 #include "clang/Core/InlineBitfield.h"
 #include "clang/Syntax/ASTAllocation.h"
-#include "clang/Syntax/TypeAlignment.h"
 #include "clang/Syntax/DeclContext.h"
-
-
+#include "clang/Syntax/TypeAlignment.h"
 
 #include "clang/AST/DeclarationName.h"
 #include "clang/Basic/SourceLocation.h"
@@ -32,7 +30,10 @@
 #include <memory>
 
 namespace clang {
-namespace syntax {
+namespace syn {
+
+class Type;
+class ModuleDecl;
 
 enum class DeclKind : uint8_t {
 #define DECL(DERIVED, BASE) DERIVED,
@@ -126,16 +127,16 @@ private:
   bool IsInSemanticDeclContext() const {
     return JointDeclContext.is<DeclContext *>();
   }
-  // bool IsOutOfSemanticDeclContext() const {
-  //   return JointDeclContext.is<MultipleDeclContext *>();
-  // }
+  bool IsOutOfSemanticDeclContext() const {
+    return JointDeclContext.is<MultipleDeclContext *>();
+  }
 
-  // MultipleDeclContext *GetMultipleDeclContext() const {
-  //   return JointDeclContext.get<MultipleDeclContext *>();
-  // }
-  // DeclContext *GetSemanticDeclContext() const {
-  //   return JointDeclContext.get<DeclContext *>();
-  // }
+  MultipleDeclContext *GetMultipleDeclContext() const {
+    return JointDeclContext.get<MultipleDeclContext *>();
+  }
+  DeclContext *GetSemanticDeclContext() const {
+    return JointDeclContext.get<DeclContext *>();
+  }
 
 protected:
   union {
@@ -196,13 +197,47 @@ protected:
       : Decl(kind, dc, loc), name(name) {}
 };
 
+class TypeDecl : public NamedDecl {
+  friend class ASTContext;
+
+  /// This indicates the Type object that represents
+  /// this TypeDecl.  It is a cache maintained by
+  /// ASTContext::tetTypedefType, ASTContext::getTagDeclType, and
+  /// ASTContext::getTemplateTypeParmType, and TemplateTypeParmDecl.
+  mutable const Type *typeForDecl = nullptr;
+
+  /// The start of the source range for this declaration.
+  SourceLocation startLoc;
+
+protected:
+  TypeDecl(DeclKind kind, DeclContext *dc, SourceLocation loc,
+           const IdentifierInfo *identifier,
+           SourceLocation startLoc = SourceLocation())
+      : NamedDecl(kind, dc, loc, identifier), startLoc(startLoc) {}
+};
+
 // class ImportDecl : public Decl {
+/// The resolved module.
+// ModuleDecl *Mod = nullptr;
 // public:
 //   ImportDecl(DeclContext *dc, SourceLocation loc,
 //             DeclarationName name) : Decl(DeclKind::Import, dc, ) {}
 // };
 
-} // namespace syntax
+// TODO: Redeclarable<NominalType>
+class NominalType : public TypeDecl {
+public:
+};
+
+// public Redeclarable<AliasNameDecl>
+class AliasNameDecl : public TypeDecl {
+public:
+};
+class AliasDecl : public AliasNameDecl {
+public:
+};
+
+} // namespace syn
 
 } // end namespace clang
 

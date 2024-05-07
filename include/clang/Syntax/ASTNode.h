@@ -6,12 +6,12 @@
 #include <memory>
 
 namespace clang {
-namespace syntax {
+namespace syn {
 
 class ASTNode {
 public:
 };
-} // namespace syntax
+} // namespace syn
 
 } // end namespace clang
 
