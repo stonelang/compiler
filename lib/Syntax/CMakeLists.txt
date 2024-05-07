@@ -8,7 +8,8 @@ set(syntax_link_libs
 )
 
 add_clang_library(clangSyntax
-
+  
+  CanType.cpp
   ASTContext.cpp
   Type.cpp
   Decl.cpp

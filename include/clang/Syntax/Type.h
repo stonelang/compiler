@@ -2,10 +2,10 @@
 #define LLVM_CLANG_SYNTAX_TYPE_H
 
 #include "clang/Core/InlineBitfield.h"
+#include "clang/Syntax/ASTAllocation.h"
 #include "clang/Syntax/TypeAlignment.h"
 
 #include "llvm/ADT/ArrayRef.h"
-
 
 #include <memory>
 
@@ -41,7 +41,8 @@ public:
   // {}
 };
 
-class alignas(1 << TypeAlignInBits) Type {
+class alignas(1 << TypeAlignInBits) Type
+    : public syn::ASTAllocation<std::aligned_storage<8, 8>::type> {
   TypeKind kind;
 
 public:

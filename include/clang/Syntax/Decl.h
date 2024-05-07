@@ -1,13 +1,13 @@
 #ifndef LLVM_CLANG_SYNTAX_DECL_H
 #define LLVM_CLANG_SYNTAX_DECL_H
 
+#include "clang/AST/DeclarationName.h"
+#include "clang/Basic/SourceLocation.h"
 #include "clang/Core/InlineBitfield.h"
 #include "clang/Syntax/ASTAllocation.h"
 #include "clang/Syntax/DeclContext.h"
+#include "clang/Syntax/Type.h"
 #include "clang/Syntax/TypeAlignment.h"
-
-#include "clang/AST/DeclarationName.h"
-#include "clang/Basic/SourceLocation.h"
 
 #include "llvm/ADT/ArrayRef.h"
 #include "llvm/ADT/PointerIntPair.h"
@@ -34,6 +34,7 @@ namespace syn {
 
 class Type;
 class ModuleDecl;
+class QualType;
 
 enum class DeclKind : uint8_t {
 #define DECL(DERIVED, BASE) DERIVED,
@@ -197,6 +198,34 @@ protected:
       : Decl(kind, dc, loc), name(name) {}
 };
 
+class ValueDecl : public NamedDecl {
+  QualType declType;
+};
+
+class DeclaratorDecl : public ValueDecl {
+public:
+};
+
+class FunctionDecl : public DeclaratorDecl {
+
+public:
+};
+
+class MemberFunctionDecl : public FunctionDecl {
+
+public:
+};
+
+class ConstructDecl : public MemberFunctionDecl {
+
+public:
+};
+
+class DesctructorDecl : public MemberFunctionDecl {
+
+public:
+};
+
 class TypeDecl : public NamedDecl {
   friend class ASTContext;
 
@@ -225,7 +254,23 @@ protected:
 // };
 
 // TODO: Redeclarable<NominalType>
-class NominalType : public TypeDecl {
+class NominalTypeDecl : public TypeDecl {
+public:
+};
+
+class EnumDecl : public NominalTypeDecl {
+public:
+};
+
+class StructDecl : public NominalTypeDecl {
+public:
+};
+
+class ClassDecl : public NominalTypeDecl {
+public:
+};
+
+class InterfaceDecl : public NominalTypeDecl {
 public:
 };
 

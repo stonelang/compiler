@@ -22,6 +22,15 @@ def Named : DeclNode<Decl, "named declarations", 1>;
       def Interface : DeclNode<Nominal, "interfaces">;
     def AliasName : DeclNode<Type, "aliases", 1>;
       def Alias : DeclNode<AliasName>;
+
+  def Value : DeclNode<Named, "value declarations", 1>;
+    def Declarator : DeclNode<Value, "declarators", 1>;
+      def Function : DeclNode<Declarator, "functions">, DeclContext;
+        def MemberFunction : DeclNode<Function>;
+          def Constructor : DeclNode<MemberFunction>;
+          def Destructor : DeclNode<MemberFunction>;
+
+
 def Import : DeclNode<Decl>;
 def Export : DeclNode<Decl>, DeclContext;
 def Trust : DeclNode<Decl>;
