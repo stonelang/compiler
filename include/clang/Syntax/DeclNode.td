@@ -15,3 +15,7 @@ def Named : DeclNode<Decl, "named declarations", 1>;
   def UsingDirective : DeclNode<Named>;
   def NamespaceAlias : DeclNode<Named>;
   def Label : DeclNode<Named, "labels">;
+  
+def Import : DeclNode<Decl>;
+
+

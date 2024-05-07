@@ -13,8 +13,6 @@ add_clang_library(clangCore
   LINK_LIBS
   clangBasic
 
-
-
   DEPENDS
   
 )

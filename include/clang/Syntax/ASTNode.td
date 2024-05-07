@@ -3,6 +3,6 @@
 
 class HasProperties;
 class ASTNode : HasProperties;
-class AttrSubject;
+class AttributeSubject;
 
 #endif
