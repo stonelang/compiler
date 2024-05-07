@@ -4,6 +4,9 @@
 #include "clang/Core/InlineBitfield.h"
 #include "clang/Syntax/ASTAllocation.h"
 #include "clang/Syntax/TypeAlignment.h"
+#include "clang/Syntax/DeclContext.h"
+
+
 
 #include "clang/AST/DeclarationName.h"
 #include "clang/Basic/SourceLocation.h"
@@ -120,9 +123,9 @@ private:
   ///                // LexicalDeclContext == global namespace
   llvm::PointerUnion<DeclContext *, MultipleDeclContext *> JointDeclContext;
 
-  // bool IsInSemanticDeclContext() const {
-  //   return JointDeclContext.is<DeclContext *>();
-  // }
+  bool IsInSemanticDeclContext() const {
+    return JointDeclContext.is<DeclContext *>();
+  }
   // bool IsOutOfSemanticDeclContext() const {
   //   return JointDeclContext.is<MultipleDeclContext *>();
   // }
