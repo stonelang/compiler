@@ -3,6 +3,7 @@
 
 #include "clang/Core/InlineBitfield.h"
 #include "clang/Syntax/ASTAllocation.h"
+#include "clang/Syntax/Spec.h"
 #include "clang/Syntax/TypeAlignment.h"
 
 #include "llvm/ADT/APInt.h"
@@ -47,24 +48,12 @@ enum : uint64_t {
   MaxAddressSpace = 0x7fffffu
 };
 
-enum class TypeKind : uint8_t {
-#define TYPE(Class, Base) Class,
-#define LAST_TYPE(Class) TypeLast = Class
-#define ABSTRACT_TYPE(Class, Base)
-#include "clang/Syntax/TypeNode.inc"
-
-};
-
-enum : unsigned {
-  NumTypeKindBits =
-      clang::CountBitsUsed(static_cast<unsigned>(TypeKind::TypeLast))
-};
-
 class TypeQuals {
   unsigned qualifiers = 0;
 
 public:
   enum : uint64_t {
+    None = 1 << 0,
     Const = 1 << 1,
     Immutable = 1 << 2,
     Volatile = 1 << 3,
@@ -350,7 +339,7 @@ public:
 class FunType : public FunctionType {
 
 public:
-  FunType() : FunType(TypeKind::Fun) {}
+  FunType() : FunctionType(TypeKind::Fun) {}
 };
 
 class PointerType : public Type {

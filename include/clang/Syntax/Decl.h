@@ -140,7 +140,8 @@ private:
   }
 
 protected:
-  union { uint64_t OpaqueBits;
+  union {
+    uint64_t OpaqueBits;
 
     CLANG_INLINE_BITFIELD_BASE(
         Decl, clang::BitMax(NumDeclKindBits, 8) + 1 + 1 + 1 + 1 + 1 + 1, Kind
@@ -170,8 +171,6 @@ protected:
 
           /// Wether this is a top level decl
           IsTopLevel : 1);
-
-
 
   } Bits;
 

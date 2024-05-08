@@ -13,6 +13,7 @@ add_clang_library(clangSyntax
   ASTContext.cpp
   Type.cpp
   Decl.cpp
+  DeclSpec.cpp
  
   DEPENDS
   
