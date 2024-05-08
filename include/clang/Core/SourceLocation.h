@@ -28,11 +28,12 @@ class raw_ostream;
 } // namespace llvm
 
 namespace clang {
-namespace source {
+namespace src {
 class SourceLocation final {
 public:
+  bool IsValid() const { return false; }
 };
-} // namespace source
+} // namespace src
 } // namespace clang
 
 #endif

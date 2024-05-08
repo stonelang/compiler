@@ -28,9 +28,11 @@ class raw_ostream;
 } // namespace llvm
 
 namespace clang {
-namespace source {
-class SourceManager final {};
-} // namespace source
+namespace src {
+class SourceManager final {
+public:
+};
+} // namespace src
 } // namespace clang
 
 #endif

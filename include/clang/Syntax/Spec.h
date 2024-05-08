@@ -1,6 +1,9 @@
 #ifndef LLVM_CLANG_SYNTAX_SPEC_H
 #define LLVM_CLANG_SYNTAX_SPEC_H
 
+#include "clang/Core/InlineBitfield.h"
+
+
 #include "llvm/ADT/ArrayRef.h"
 #include <memory>
 
@@ -8,6 +11,7 @@ namespace clang {
 namespace syn {
 
 enum class TypeKind : uint8_t {
+  None = 0,
 #define TYPE(Class, Base) Class,
 #define LAST_TYPE(Class) TypeLast = Class
 #define ABSTRACT_TYPE(Class, Base)

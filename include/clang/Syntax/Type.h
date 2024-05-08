@@ -1,7 +1,7 @@
 #ifndef LLVM_CLANG_SYNTAX_TYPE_H
 #define LLVM_CLANG_SYNTAX_TYPE_H
 
-#include "clang/Core/InlineBitfield.h"
+
 #include "clang/Syntax/ASTAllocation.h"
 #include "clang/Syntax/Spec.h"
 #include "clang/Syntax/TypeAlignment.h"

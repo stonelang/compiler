@@ -51,7 +51,6 @@ class NeverCanonicalUnlessDependent {}
 /// to types that may not be leaves should not declare this.
 class LeafType {}
 
-
 def Type : TypeNode<?, 1>; // Abstract
 def BuiltinType : TypeNode<Type, 1>; //abstrct 
 	def NumericType 	: TypeNode<BuiltinType,1>;//abstrct 
@@ -69,11 +68,19 @@ def BuiltinType : TypeNode<Type, 1>; //abstrct
 			def UInt32Type 	: TypeNode<UnsignedType>;
 			def UInt64Type 	: TypeNode<UnsignedType>;
 			def UInt128Type : TypeNode<UnsignedType>;
-			def BoolType 	: TypeNode<UnsignedType>;
+		    def BoolType 	: TypeNode<UnsignedType>;
+		    def CharType 	: TypeNode<UnsignedType>;
+		    def Char8Type 	: TypeNode<UnsignedType>;
+		    def Char16Type 	: TypeNode<UnsignedType>;
+		    def Char32Type 	: TypeNode<UnsignedType>;
 		def FloatType 	: TypeNode<NumericType>;
 		def Float16Type : TypeNode<NumericType>;
 		def Float32Type : TypeNode<NumericType>;
 		def Float64Type : TypeNode<NumericType>;
+		def Complex32Type : TypeNode<NumericType>;
+		def Complex64Type : TypeNode<NumericType>;
+		def Imaginary32Type : TypeNode<NumericType>;
+		def Imaginary64Type : TypeNode<NumericType>;
 	def VoidType 	: TypeNode<BuiltinType>;
 	def NullType 	: TypeNode<BuiltinType>;
 def PointerType 	 	: TypeNode<Type>;
@@ -90,7 +97,6 @@ def NominalType 	: TypeNode<Type, 1>; // Abstract
 	def InterfaceType 	: TypeNode<NominalType>; 
 def SugaredType : TypeNode<Type, 1>; //abstrct 
 	def AliasType : TypeNode<SugaredType>; //abstrct 
-	
 def DeducedType : TypeNode<Type, 1>;
 	def AutoType : TypeNode<DeducedType>;
 
