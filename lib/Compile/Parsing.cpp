@@ -1,4 +1,4 @@
-#include "clang/Parse/Parsing.h"
+#include "clang/Compile/Parsing.h"
 
 using namespace clang;
 

@@ -3,7 +3,6 @@
 
 #include "clang/Core/InlineBitfield.h"
 
-
 #include "llvm/ADT/ArrayRef.h"
 #include <memory>
 
@@ -29,6 +28,15 @@ enum class AccessSpecKind : uint8_t {
   Public,
   Internal,
   Private,
+};
+
+enum class StorageSpec : uint8_t {
+  None = 0,
+  Alias,
+  Static,
+  Auto,
+  Register,
+  Mutable
 };
 
 } // namespace syn

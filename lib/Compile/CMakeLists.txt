@@ -17,9 +17,27 @@ set(compile_link_libs
 add_clang_library(clangCompile
 
   Compile.cpp
+
+
+  CollectDeclSpec.cpp
+  IdentifierInfoCache.cpp
+  Lexer.cpp
+  ParseDecl.cpp
+  ParseExpr.cpp
+  Parser.cpp
+  ParseAST.cpp
+  ParseStmt.cpp
+  ParseTemplate.cpp
+  ParseType.cpp
+  ParseDeclarator.cpp
+  Parsing.cpp
+
+
   DeclSpec.cpp
   Sem.cpp
   SemDecl.cpp
+
+
 
 
   DEPENDS

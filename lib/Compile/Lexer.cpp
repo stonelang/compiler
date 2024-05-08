@@ -1,4 +1,4 @@
-#include "clang/Parse/Lexer.h"
+#include "clang/Compile/Lexer.h"
 
 using namespace clang;
 

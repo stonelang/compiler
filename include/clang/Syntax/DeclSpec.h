@@ -2,9 +2,8 @@
 #define LLVM_CLANG_SYNTAX_DECLCONTEXT_H
 
 #include "clang/Core/SourceLocation.h"
-#include "clang/Syntax/TypeAlignment.h"
 #include "clang/Syntax/Spec.h"
-
+#include "clang/Syntax/TypeAlignment.h"
 
 #include "llvm/ADT/ArrayRef.h"
 #include <memory>
@@ -16,6 +15,7 @@ class TypeSpec final {
   TypeKind kind;
 
   void SetTypeSpec(TypeKind kind, src::SourceLocation inputLoc);
+
 public:
   TypeSpec();
 
@@ -103,6 +103,7 @@ public:
 };
 
 class DeclSpec {
+  TypeSpec typeSpec;
 
 public:
   DeclSpec();

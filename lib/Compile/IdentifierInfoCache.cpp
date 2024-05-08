@@ -1,5 +1,5 @@
-#include "clang/Parse/IdentifierInfoCache.h"
-#include "clang/Parse/Parser.h"
+#include "clang/Compile/IdentifierInfoCache.h"
+#include "clang/Compile/Parser.h"
 
 using namespace clang;
 
