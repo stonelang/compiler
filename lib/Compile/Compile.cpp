@@ -1,8 +1,6 @@
 #include "clang/Compile/Compile.h"
 #include "clang/Driver/Options.h"
-#include "clang/Frontend/CompilerExecution.h"
-#include "clang/Frontend/CompilerInstance.h"
-#include "clang/Frontend/FrontendDiagnostic.h"
+#include "clang/Compile/CompilerExecution.h"
 
 using namespace clang;
 using namespace llvm::opt;
