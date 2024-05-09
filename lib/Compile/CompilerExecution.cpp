@@ -1,4 +1,6 @@
 #include "clang/Frontend/CompilerInvocation.h"
 
 
-CompilerExecution::CompilerExecution(const CompilerInvocation &invocation) : invocation(invocation){}
+using namespace clang;
+
+CompilerExecution::CompilerExecution(CompilerInvocation &invocation) : invocation(invocation){}

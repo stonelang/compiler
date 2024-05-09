@@ -17,7 +17,6 @@ set(compile_link_libs
 add_clang_library(clangCompile
 
   Compile.cpp
-  CompilerExecution.cpp
   DeclSpec.cpp
   Sem.cpp
   SemDecl.cpp

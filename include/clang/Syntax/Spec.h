@@ -3,7 +3,6 @@
 
 #include "clang/Core/InlineBitfield.h"
 
-
 #include "llvm/ADT/ArrayRef.h"
 #include <memory>
 

@@ -17,6 +17,7 @@ add_clang_library(clangFrontend
   ChainedIncludesSource.cpp
   CompilerInstance.cpp
   CompilerInvocation.cpp
+  CompilerExecution.cpp
   CreateInvocationFromCommandLine.cpp
   DependencyFile.cpp
   DependencyGraph.cpp
@@ -43,7 +44,7 @@ add_clang_library(clangFrontend
   VerifyDiagnosticConsumer.cpp
   InterfaceStubFunctionsConsumer.cpp
 
-  Frontend.cpp
+  
 
   DEPENDS
   ClangDriverOptions
