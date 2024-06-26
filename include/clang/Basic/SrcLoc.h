@@ -243,27 +243,27 @@ public:
 /// last token of the range (a "token range").  In the token range case, the
 /// size of the last token must be measured to determine the actual end of the
 /// range.
-class CharSourceRange {
+class CharSrcRange {
   SourceRange Range;
   bool IsTokenRange = false;
 
 public:
-  CharSourceRange() = default;
-  CharSourceRange(SourceRange R, bool ITR) : Range(R), IsTokenRange(ITR) {}
+  CharSrcRange() = default;
+  CharSrcRange(SourceRange R, bool ITR) : Range(R), IsTokenRange(ITR) {}
 
-  static CharSourceRange getTokenRange(SourceRange R) {
-    return CharSourceRange(R, true);
+  static CharSrcRange getTokenRange(SourceRange R) {
+    return CharSrcRange(R, true);
   }
 
-  static CharSourceRange getCharRange(SourceRange R) {
-    return CharSourceRange(R, false);
+  static CharSrcRange getCharRange(SourceRange R) {
+    return CharSrcRange(R, false);
   }
 
-  static CharSourceRange getTokenRange(SrcLoc B, SrcLoc E) {
+  static CharSrcRange getTokenRange(SrcLoc B, SrcLoc E) {
     return getTokenRange(SourceRange(B, E));
   }
 
-  static CharSourceRange getCharRange(SrcLoc B, SrcLoc E) {
+  static CharSrcRange getCharRange(SrcLoc B, SrcLoc E) {
     return getCharRange(SourceRange(B, E));
   }
 
@@ -355,14 +355,14 @@ public:
 /// This class does not guarantee the presence of either the SrcMgr or
 /// a valid SrcLoc. Clients should use `isValid()` and `hasManager()`
 /// before calling the member functions.
-class FullSourceLoc : public SrcLoc {
+class FullSrcLoc : public SrcLoc {
   const SrcMgr *SM = nullptr;
 
 public:
-  /// Creates a FullSourceLoc where isValid() returns \c false.
-  FullSourceLoc() = default;
+  /// Creates a FullSrcLoc where isValid() returns \c false.
+  FullSrcLoc() = default;
 
-  explicit FullSourceLoc(SrcLoc Loc, const SrcMgr &SM) : SrcLoc(Loc), SM(&SM) {}
+  explicit FullSrcLoc(SrcLoc Loc, const SrcMgr &SM) : SrcLoc(Loc), SM(&SM) {}
 
   /// Checks whether the SrcMgr is present.
   bool hasManager() const { return SM != nullptr; }
@@ -375,13 +375,13 @@ public:
 
   FileID getFileID() const;
 
-  FullSourceLoc getExpansionLoc() const;
-  FullSourceLoc getSpellingLoc() const;
-  FullSourceLoc getFileLoc() const;
+  FullSrcLoc getExpansionLoc() const;
+  FullSrcLoc getSpellingLoc() const;
+  FullSrcLoc getFileLoc() const;
   PresumedLoc getPresumedLoc(bool UseLineDirectives = true) const;
-  bool isMacroArgExpansion(FullSourceLoc *StartLoc = nullptr) const;
-  FullSourceLoc getImmediateMacroCallerLoc() const;
-  std::pair<FullSourceLoc, StringRef> getModuleImportLoc() const;
+  bool isMacroArgExpansion(FullSrcLoc *StartLoc = nullptr) const;
+  FullSrcLoc getImmediateMacroCallerLoc() const;
+  std::pair<FullSrcLoc, StringRef> getModuleImportLoc() const;
   unsigned getFileOffset() const;
 
   unsigned getExpansionLineNumber(bool *Invalid = nullptr) const;
@@ -424,29 +424,29 @@ public:
   /// Determines the order of 2 source locations in the translation unit.
   ///
   /// \returns true if this source location comes before 'Loc', false otherwise.
-  bool isBeforeInTranslationUnitThan(FullSourceLoc Loc) const {
+  bool isBeforeInTranslationUnitThan(FullSrcLoc Loc) const {
     assert(Loc.isValid());
     assert(SM == Loc.SM && "Loc comes from another SrcMgr!");
     return isBeforeInTranslationUnitThan((SrcLoc)Loc);
   }
 
-  /// Comparison function class, useful for sorting FullSourceLocs.
+  /// Comparison function class, useful for sorting FullSrcLocs.
   struct BeforeThanCompare {
-    bool operator()(const FullSourceLoc &lhs, const FullSourceLoc &rhs) const {
+    bool operator()(const FullSrcLoc &lhs, const FullSrcLoc &rhs) const {
       return lhs.isBeforeInTranslationUnitThan(rhs);
     }
   };
 
-  /// Prints information about this FullSourceLoc to stderr.
+  /// Prints information about this FullSrcLoc to stderr.
   ///
   /// This is useful for debugging.
   void dump() const;
 
-  friend bool operator==(const FullSourceLoc &LHS, const FullSourceLoc &RHS) {
+  friend bool operator==(const FullSrcLoc &LHS, const FullSrcLoc &RHS) {
     return LHS.getRawEncoding() == RHS.getRawEncoding() && LHS.SM == RHS.SM;
   }
 
-  friend bool operator!=(const FullSourceLoc &LHS, const FullSourceLoc &RHS) {
+  friend bool operator!=(const FullSrcLoc &LHS, const FullSrcLoc &RHS) {
     return !(LHS == RHS);
   }
 };

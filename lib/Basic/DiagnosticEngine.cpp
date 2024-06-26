@@ -2,6 +2,8 @@
 
 using namespace clang;
 
+DiagnosticEngine::DiagnosticEngine() {}
+
 InFlightDiagnostic DiagnosticEngine::Diagnose(SrcLoc Loc, DiagID diagID) {
   return InFlightDiagnostic();
 }

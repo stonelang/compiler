@@ -947,7 +947,7 @@ StringRef SrcMgr::getFilename(SrcLoc SpellingLoc) const {
 
 /// getImmediateExpansionRange - Loc is required to be an expansion location.
 /// Return the start/end of the expansion information.
-CharSourceRange SrcMgr::getImmediateExpansionRange(SrcLoc Loc) const {
+CharSrcRange SrcMgr::getImmediateExpansionRange(SrcLoc Loc) const {
   assert(Loc.isMacroID() && "Not a macro expansion loc!");
   const ExpansionInfo &Expansion = getSLocEntry(getFileID(Loc)).getExpansion();
   return Expansion.getExpansionLocRange();
@@ -961,18 +961,18 @@ SrcLoc SrcMgr::getTopMacroCallerLoc(SrcLoc Loc) const {
 
 /// getExpansionRange - Given a SrcLoc object, return the range of
 /// tokens covered by the expansion in the ultimate file.
-CharSourceRange SrcMgr::getExpansionRange(SrcLoc Loc) const {
+CharSrcRange SrcMgr::getExpansionRange(SrcLoc Loc) const {
   if (Loc.isFileID())
-    return CharSourceRange(SourceRange(Loc, Loc), true);
+    return CharSrcRange(SourceRange(Loc, Loc), true);
 
-  CharSourceRange Res = getImmediateExpansionRange(Loc);
+  CharSrcRange Res = getImmediateExpansionRange(Loc);
 
   // Fully resolve the start and end locations to their ultimate expansion
   // points.
   while (!Res.getBegin().isFileID())
     Res.setBegin(getImmediateExpansionRange(Res.getBegin()).getBegin());
   while (!Res.getEnd().isFileID()) {
-    CharSourceRange EndRange = getImmediateExpansionRange(Res.getEnd());
+    CharSrcRange EndRange = getImmediateExpansionRange(Res.getEnd());
     Res.setEnd(EndRange.getEnd());
     Res.setTokenRange(EndRange.isTokenRange());
   }

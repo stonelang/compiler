@@ -388,8 +388,8 @@ public:
 
   bool isExpansionTokenRange() const { return ExpansionIsTokenRange; }
 
-  CharSourceRange getExpansionLocRange() const {
-    return CharSourceRange(
+  CharSrcRange getExpansionLocRange() const {
+    return CharSrcRange(
         SourceRange(getExpansionLocStart(), getExpansionLocEnd()),
         isExpansionTokenRange());
   }
@@ -636,7 +636,7 @@ public:
 /// The stack used when building modules on demand, which is used
 /// to provide a link between the source managers of the different compiler
 /// instances.
-using ModuleBuildStack = ArrayRef<std::pair<std::string, FullSourceLoc>>;
+using ModuleBuildStack = ArrayRef<std::pair<std::string, FullSrcLoc>>;
 
 /// This class handles loading and caching of source files into memory.
 ///
@@ -824,7 +824,7 @@ class SrcMgr final : public RefCountedBase<SrcMgr> {
   /// There is no way to set this value from the command line. If we ever need
   /// to do so (e.g., if on-demand module construction moves out-of-process),
   /// we can add a cc1-level option to do so.
-  SmallVector<std::pair<std::string, FullSourceLoc>, 2> StoredModuleBuildStack;
+  SmallVector<std::pair<std::string, FullSrcLoc>, 2> StoredModuleBuildStack;
 
 public:
   SrcMgr(DiagnosticEngine &Diag, FileManager &FileMgr,
@@ -866,7 +866,7 @@ public:
   }
 
   /// Push an entry to the module build stack.
-  void pushModuleBuildStack(StringRef moduleName, FullSourceLoc importLoc) {
+  void pushModuleBuildStack(StringRef moduleName, FullSrcLoc importLoc) {
     StoredModuleBuildStack.push_back(
         std::make_pair(moduleName.str(), importLoc));
   }
@@ -1193,25 +1193,25 @@ public:
   /// expansion location.
   ///
   /// \pre \p Loc is required to be an expansion location.
-  CharSourceRange getImmediateExpansionRange(SrcLoc Loc) const;
+  CharSrcRange getImmediateExpansionRange(SrcLoc Loc) const;
 
   /// Given a SrcLoc object, return the range of
   /// tokens covered by the expansion in the ultimate file.
-  CharSourceRange getExpansionRange(SrcLoc Loc) const;
+  CharSrcRange getExpansionRange(SrcLoc Loc) const;
 
   /// Given a SourceRange object, return the range of
   /// tokens or characters covered by the expansion in the ultimate file.
-  CharSourceRange getExpansionRange(SourceRange Range) const {
+  CharSrcRange getExpansionRange(SourceRange Range) const {
     SrcLoc Begin = getExpansionRange(Range.getBegin()).getBegin();
-    CharSourceRange End = getExpansionRange(Range.getEnd());
-    return CharSourceRange(SourceRange(Begin, End.getEnd()),
+    CharSrcRange End = getExpansionRange(Range.getEnd());
+    return CharSrcRange(SourceRange(Begin, End.getEnd()),
                            End.isTokenRange());
   }
 
-  /// Given a CharSourceRange object, return the range of
+  /// Given a CharSrcRange object, return the range of
   /// tokens or characters covered by the expansion in the ultimate file.
-  CharSourceRange getExpansionRange(CharSourceRange Range) const {
-    CharSourceRange Expansion = getExpansionRange(Range.getAsRange());
+  CharSrcRange getExpansionRange(CharSrcRange Range) const {
+    CharSrcRange Expansion = getExpansionRange(Range.getAsRange());
     if (Expansion.getEnd() == Range.getEnd())
       Expansion.setTokenRange(Range.isTokenRange());
     return Expansion;

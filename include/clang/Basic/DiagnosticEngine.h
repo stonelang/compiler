@@ -160,6 +160,76 @@ enum class DiagnosticLevel {
   Fatal = 5    ///< Present this diagnostic as a fatal error.
 };
 
+class FixIt final {
+public:
+  /// Code that should be replaced to correct the error. Empty for an
+  /// insertion hint.
+  CharSrcRange RemoveRange;
+
+  /// Code in the specific range that should be inserted in the insertion
+  /// location.
+  CharSrcRange InsertFromRange;
+
+  /// The actual code to insert at the insertion location, as a
+  /// string.
+  std::string CodeToInsert;
+
+  bool BeforePreviousInsertions = false;
+
+  /// Empty code modification hint, indicating that no code
+  /// modification is known.
+  FixIt() = default;
+
+  bool isNull() const { return !RemoveRange.isValid(); }
+
+  /// Create a code modification hint that inserts the given
+  /// code string at a specific location.
+  static FixIt CreateInsertion(SrcLoc InsertionLoc, StringRef Code,
+                               bool BeforePreviousInsertions = false) {
+    FixIt Hint;
+    Hint.RemoveRange = CharSrcRange::getCharRange(InsertionLoc, InsertionLoc);
+    Hint.CodeToInsert = std::string(Code);
+    Hint.BeforePreviousInsertions = BeforePreviousInsertions;
+    return Hint;
+  }
+
+  /// Create a code modification hint that inserts the given
+  /// code from \p FromRange at a specific location.
+  static FixIt CreateInsertionFromRange(SrcLoc InsertionLoc,
+                                        CharSrcRange FromRange,
+                                        bool BeforePreviousInsertions = false) {
+    FixIt Hint;
+    Hint.RemoveRange = CharSrcRange::getCharRange(InsertionLoc, InsertionLoc);
+    Hint.InsertFromRange = FromRange;
+    Hint.BeforePreviousInsertions = BeforePreviousInsertions;
+    return Hint;
+  }
+
+  /// Create a code modification hint that removes the given
+  /// source range.
+  static FixIt CreateRemoval(CharSrcRange RemoveRange) {
+    FixIt Hint;
+    Hint.RemoveRange = RemoveRange;
+    return Hint;
+  }
+  static FixIt CreateRemoval(SourceRange RemoveRange) {
+    return CreateRemoval(CharSrcRange::getTokenRange(RemoveRange));
+  }
+
+  /// Create a code modification hint that replaces the given
+  /// source range with the given code string.
+  static FixIt CreateReplacement(CharSrcRange RemoveRange, StringRef Code) {
+    FixIt Hint;
+    Hint.RemoveRange = RemoveRange;
+    Hint.CodeToInsert = std::string(Code);
+    return Hint;
+  }
+
+  static FixIt CreateReplacement(SourceRange RemoveRange, StringRef Code) {
+    return CreateReplacement(CharSrcRange::getTokenRange(RemoveRange), Code);
+  }
+};
+
 class Diagnostic final {
 
   friend DiagnosticEngine;
@@ -167,25 +237,26 @@ class Diagnostic final {
 
   DiagID diagID;
   llvm::SmallVector<DiagnosticArgument, 3> args;
+  llvm::SmallVector<FixIt, 2> fixIts;
 
   Diagnostic(DiagID diagID) : diagID(diagID) {}
 
 public:
   DiagID GetDiagID() const { return diagID; }
   llvm::ArrayRef<DiagnosticArgument> GetArgs() const { return args; }
-
+  llvm::ArrayRef<FixIt> GetFixIts() const { return fixIts; }
 };
 
 class DiagnosticEngine final {
   /// The ID of the current diagnostic that is in flight.
-  ///
-  /// This is set to std::numeric_limits<unsigned>::max() when there is no
-  /// diagnostic in flight.
-  std::optional<DiagID> CurDiagID;
+  std::optional<Diagnostic> CurDiagnostic;
+
+public:
+  DiagnosticEngine();
 
 public:
   /// Determine whethere there is already a diagnostic in flight.
-  bool IsInflightDiagnostic() const { return !CurDiagID; }
+  bool IsInflightDiagnostic() const { return !CurDiagnostic; }
 
   void SetSrcMgr(SrcMgr *SM) {}
   /// Issue the message to the client.
