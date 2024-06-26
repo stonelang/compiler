@@ -56,7 +56,6 @@ public:
   unsigned getHashValue() const { return static_cast<unsigned>(ID); }
 
 private:
-
   class SrcMgr;
 
   static FileID get(int V) {
@@ -97,7 +96,7 @@ private:
   enum : UIntTy { MacroIDBit = 1ULL << (8 * sizeof(UIntTy) - 1) };
 
 public:
-  bool isFileID() const  { return (ID & MacroIDBit) == 0; }
+  bool isFileID() const { return (ID & MacroIDBit) == 0; }
   bool isMacroID() const { return (ID & MacroIDBit) != 0; }
 
   /// Return true if this is a valid SrcLoc object.
@@ -130,9 +129,9 @@ public:
   /// Return a source location with the specified offset from this
   /// SrcLoc.
   SrcLoc getLocWithOffset(IntTy Offset) const {
-    assert(((getOffset()+Offset) & MacroIDBit) == 0 && "offset overflow");
+    assert(((getOffset() + Offset) & MacroIDBit) == 0 && "offset overflow");
     SrcLoc L;
-    L.ID = ID+Offset;
+    L.ID = ID + Offset;
     return L;
   }
 
@@ -158,10 +157,10 @@ public:
   ///
   /// This should only be passed to SrcLoc::getFromPtrEncoding, it
   /// should not be inspected directly.
-  void* getPtrEncoding() const {
+  void *getPtrEncoding() const {
     // Double cast to avoid a warning "cast to pointer from integer of different
     // size".
-    return (void*)(uintptr_t)getRawEncoding();
+    return (void *)(uintptr_t)getRawEncoding();
   }
 
   /// Turn a pointer encoding of a SrcLoc object back
@@ -223,13 +222,9 @@ public:
   bool isValid() const { return B.isValid() && E.isValid(); }
   bool isInvalid() const { return !isValid(); }
 
-  bool operator==(const SourceRange &X) const {
-    return B == X.B && E == X.E;
-  }
+  bool operator==(const SourceRange &X) const { return B == X.B && E == X.E; }
 
-  bool operator!=(const SourceRange &X) const {
-    return B != X.B || E != X.E;
-  }
+  bool operator!=(const SourceRange &X) const { return B != X.B || E != X.E; }
 
   // Returns true iff other is wholly contained within this range.
   bool fullyContains(const SourceRange &other) const {
@@ -305,8 +300,7 @@ class PresumedLoc {
 
 public:
   PresumedLoc() = default;
-  PresumedLoc(const char *FN, FileID FID, unsigned Ln, unsigned Co,
-              SrcLoc IL)
+  PresumedLoc(const char *FN, FileID FID, unsigned Ln, unsigned Co, SrcLoc IL)
       : Filename(FN), ID(FID), Line(Ln), Col(Co), IncludeLoc(IL) {}
 
   /// Return true if this object is invalid or uninitialized.
@@ -368,8 +362,7 @@ public:
   /// Creates a FullSourceLoc where isValid() returns \c false.
   FullSourceLoc() = default;
 
-  explicit FullSourceLoc(SrcLoc Loc, const SrcMgr &SM)
-      : SrcLoc(Loc), SM(&SM) {}
+  explicit FullSourceLoc(SrcLoc Loc, const SrcMgr &SM) : SrcLoc(Loc), SM(&SM) {}
 
   /// Checks whether the SrcMgr is present.
   bool hasManager() const { return SM != nullptr; }
@@ -439,7 +432,7 @@ public:
 
   /// Comparison function class, useful for sorting FullSourceLocs.
   struct BeforeThanCompare {
-    bool operator()(const FullSourceLoc& lhs, const FullSourceLoc& rhs) const {
+    bool operator()(const FullSourceLoc &lhs, const FullSourceLoc &rhs) const {
       return lhs.isBeforeInTranslationUnitThan(rhs);
     }
   };
@@ -449,14 +442,11 @@ public:
   /// This is useful for debugging.
   void dump() const;
 
-  friend bool
-  operator==(const FullSourceLoc &LHS, const FullSourceLoc &RHS) {
-    return LHS.getRawEncoding() == RHS.getRawEncoding() &&
-          LHS.SM == RHS.SM;
+  friend bool operator==(const FullSourceLoc &LHS, const FullSourceLoc &RHS) {
+    return LHS.getRawEncoding() == RHS.getRawEncoding() && LHS.SM == RHS.SM;
   }
 
-  friend bool
-  operator!=(const FullSourceLoc &LHS, const FullSourceLoc &RHS) {
+  friend bool operator!=(const FullSourceLoc &LHS, const FullSourceLoc &RHS) {
     return !(LHS == RHS);
   }
 };
@@ -465,54 +455,47 @@ public:
 
 namespace llvm {
 
-  /// Define DenseMapInfo so that FileID's can be used as keys in DenseMap and
-  /// DenseSets.
-  template <>
-  struct DenseMapInfo<clang::FileID, void> {
-    static clang::FileID getEmptyKey() {
-      return {};
-    }
+/// Define DenseMapInfo so that FileID's can be used as keys in DenseMap and
+/// DenseSets.
+template <> struct DenseMapInfo<clang::FileID, void> {
+  static clang::FileID getEmptyKey() { return {}; }
 
-    static clang::FileID getTombstoneKey() {
-      return clang::FileID::getSentinel();
-    }
+  static clang::FileID getTombstoneKey() {
+    return clang::FileID::getSentinel();
+  }
 
-    static unsigned getHashValue(clang::FileID S) {
-      return S.getHashValue();
-    }
+  static unsigned getHashValue(clang::FileID S) { return S.getHashValue(); }
 
-    static bool isEqual(clang::FileID LHS, clang::FileID RHS) {
-      return LHS == RHS;
-    }
-  };
+  static bool isEqual(clang::FileID LHS, clang::FileID RHS) {
+    return LHS == RHS;
+  }
+};
 
-  /// Define DenseMapInfo so that SrcLoc's can be used as keys in
-  /// DenseMap and DenseSet. This trait class is eqivalent to
-  /// DenseMapInfo<unsigned> which uses SrcLoc::ID is used as a key.
-  template <> struct DenseMapInfo<clang::SrcLoc, void> {
-    static clang::SrcLoc getEmptyKey() {
-      constexpr clang::SrcLoc::UIntTy Zero = 0;
-      return clang::SrcLoc::getFromRawEncoding(~Zero);
-    }
+/// Define DenseMapInfo so that SrcLoc's can be used as keys in
+/// DenseMap and DenseSet. This trait class is eqivalent to
+/// DenseMapInfo<unsigned> which uses SrcLoc::ID is used as a key.
+template <> struct DenseMapInfo<clang::SrcLoc, void> {
+  static clang::SrcLoc getEmptyKey() {
+    constexpr clang::SrcLoc::UIntTy Zero = 0;
+    return clang::SrcLoc::getFromRawEncoding(~Zero);
+  }
 
-    static clang::SrcLoc getTombstoneKey() {
-      constexpr clang::SrcLoc::UIntTy Zero = 0;
-      return clang::SrcLoc::getFromRawEncoding(~Zero - 1);
-    }
+  static clang::SrcLoc getTombstoneKey() {
+    constexpr clang::SrcLoc::UIntTy Zero = 0;
+    return clang::SrcLoc::getFromRawEncoding(~Zero - 1);
+  }
 
-    static unsigned getHashValue(clang::SrcLoc Loc) {
-      return Loc.getHashValue();
-    }
+  static unsigned getHashValue(clang::SrcLoc Loc) { return Loc.getHashValue(); }
 
-    static bool isEqual(clang::SrcLoc LHS, clang::SrcLoc RHS) {
-      return LHS == RHS;
-    }
-  };
+  static bool isEqual(clang::SrcLoc LHS, clang::SrcLoc RHS) {
+    return LHS == RHS;
+  }
+};
 
-  // Allow calling FoldingSetNodeID::Add with SrcLoc object as parameter
-  template <> struct FoldingSetTrait<clang::SrcLoc, void> {
-    static void Profile(const clang::SrcLoc &X, FoldingSetNodeID &ID);
-  };
+// Allow calling FoldingSetNodeID::Add with SrcLoc object as parameter
+template <> struct FoldingSetTrait<clang::SrcLoc, void> {
+  static void Profile(const clang::SrcLoc &X, FoldingSetNodeID &ID);
+};
 
 } // namespace llvm
 

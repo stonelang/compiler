@@ -1,10 +1,9 @@
 #ifndef LLVM_CLANG_BASIC_DIAGNOSTIC_H
 #define LLVM_CLANG_BASIC_DIAGNOSTIC_H
 
-
 #include "clang/Basic/DiagnosticOptions.h"
 #include "clang/Basic/SrcLoc.h"
- 
+
 #include "llvm/ADT/ArrayRef.h"
 #include "llvm/ADT/DenseMap.h"
 #include "llvm/ADT/IntrusiveRefCntPtr.h"
@@ -32,36 +31,31 @@ class raw_ostream;
 
 namespace clang {
 
+class StreamingDiagnostic {
+public:
 
-	class StreamingDiagnostic {
+};
+class InflightDiagnostic final : public StreamingDiagnostic {
+public:
 
+};
 
-	};
-	class InflightDiagnostic : public StreamingDiagnostic {
-
-
-	};
-
-	
-	class DiagnosticEngine final {
-		/// The ID of the current diagnostic that is in flight.
+class DiagnosticEngine final {
+  /// The ID of the current diagnostic that is in flight.
   ///
   /// This is set to std::numeric_limits<unsigned>::max() when there is no
   /// diagnostic in flight.
-  	unsigned CurDiagID;
+  unsigned CurDiagID;
 
-
-	public:
-		 /// Clear out the current diagnostic.
-  	void Clear() { CurDiagID = std::numeric_limits<unsigned>::max(); }
-  	  /// Determine whethere there is already a diagnostic in flight.
+public:
+  /// Clear out the current diagnostic.
+  void Clear() { CurDiagID = std::numeric_limits<unsigned>::max(); }
+  /// Determine whethere there is already a diagnostic in flight.
   bool IsInflightDiagnostic() const {
     return CurDiagID != std::numeric_limits<unsigned>::max();
   }
 
-  void SetSrcMgr(SrcMgr* SM){
-		
-  }
+  void SetSrcMgr(SrcMgr *SM) {}
   /// Issue the message to the client.
   ///
   /// This actually returns an instance of InflightDiagnostic which emits the
@@ -70,10 +64,9 @@ namespace clang {
   /// \param DiagID A member of the @c diag::kind enum.
   /// \param Loc Represents the source location associated with the diagnostic,
   /// which can be an invalid location if no position information is available.
-  	InflightDiagnostic Report(SrcLoc Loc, unsigned DiagID);
-  	InflightDiagnostic Report(unsigned DiagID);
+  InflightDiagnostic Diagnose(SrcLoc Loc, unsigned DiagID);
+  InflightDiagnostic Diagnose(unsigned DiagID);
+};
+} // namespace clang
 
-	};
-}
-
-#endif 
+#endif

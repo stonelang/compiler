@@ -2,14 +2,11 @@
 
 using namespace clang;
 
-
-InflightDiagnostic DiagnosticEngine::Report(SrcLoc Loc, unsigned DiagID) {
-	return InflightDiagnostic();
-
-
+InflightDiagnostic DiagnosticEngine::Diagnose(SrcLoc Loc, unsigned DiagID) {
+  return InflightDiagnostic();
 }
 
-  	InflightDiagnostic DiagnosticEngine::Report(unsigned DiagID) {
+InflightDiagnostic DiagnosticEngine::Diagnose(unsigned DiagID) {
 
-  		return InflightDiagnostic();
-  	}
+  return InflightDiagnostic();
+}

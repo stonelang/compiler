@@ -52,17 +52,15 @@ class SrcMgrAdapter {
 public:
   /// Create a new \c SourceMgr adaptor that maps to the given source
   /// manager and diagnostics engine.
-  SrcMgrAdapter(SrcMgr &SM, DiagnosticEngine &Diagnostics,
-                   unsigned ErrorDiagID, unsigned WarningDiagID,
-                   unsigned NoteDiagID,
-                   OptionalFileEntryRef DefaultFile = std::nullopt);
+  SrcMgrAdapter(SrcMgr &SM, DiagnosticEngine &Diagnostics, unsigned ErrorDiagID,
+                unsigned WarningDiagID, unsigned NoteDiagID,
+                OptionalFileEntryRef DefaultFile = std::nullopt);
 
   ~SrcMgrAdapter();
 
   /// Map a source location in the given LLVM source manager to its
   /// corresponding location in the Clang source manager.
-  SrcLoc mapLocation(const llvm::SourceMgr &LLVMSrcMgr,
-                             llvm::SMLoc Loc);
+  SrcLoc mapLocation(const llvm::SourceMgr &LLVMSrcMgr, llvm::SMLoc Loc);
 
   /// Map a source range in the given LLVM source manager to its corresponding
   /// range in the Clang source manager.

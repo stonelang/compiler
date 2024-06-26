@@ -16,16 +16,14 @@
 
 using namespace clang;
 
-void SrcMgrAdapter::handleDiag(const llvm::SMDiagnostic &Diag,
-                                  void *Context) {
+void SrcMgrAdapter::handleDiag(const llvm::SMDiagnostic &Diag, void *Context) {
   static_cast<SrcMgrAdapter *>(Context)->handleDiag(Diag);
 }
 
-SrcMgrAdapter::SrcMgrAdapter(SrcMgr &SM,
-                                   DiagnosticEngine &Diagnostics,
-                                   unsigned ErrorDiagID, unsigned WarningDiagID,
-                                   unsigned NoteDiagID,
-                                   OptionalFileEntryRef DefaultFile)
+SrcMgrAdapter::SrcMgrAdapter(SrcMgr &SM, DiagnosticEngine &Diagnostics,
+                             unsigned ErrorDiagID, unsigned WarningDiagID,
+                             unsigned NoteDiagID,
+                             OptionalFileEntryRef DefaultFile)
     : SM(SM), Diagnostics(Diagnostics), ErrorDiagID(ErrorDiagID),
       WarningDiagID(WarningDiagID), NoteDiagID(NoteDiagID),
       DefaultFile(DefaultFile) {}
@@ -33,7 +31,7 @@ SrcMgrAdapter::SrcMgrAdapter(SrcMgr &SM,
 SrcMgrAdapter::~SrcMgrAdapter() {}
 
 SrcLoc SrcMgrAdapter::mapLocation(const llvm::SourceMgr &LLVMSrcMgr,
-                                             llvm::SMLoc Loc) {
+                                  llvm::SMLoc Loc) {
   // Map invalid locations.
   if (!Loc.isValid())
     return SrcLoc();
@@ -74,12 +72,11 @@ SrcLoc SrcMgrAdapter::mapLocation(const llvm::SourceMgr &LLVMSrcMgr,
 
   // Translate the offset into the file.
   unsigned Offset = Loc.getPointer() - Buffer->getBufferStart();
-  return SM.getLocForStartOfFile(KnownBuffer->second)
-      .getLocWithOffset(Offset);
+  return SM.getLocForStartOfFile(KnownBuffer->second).getLocWithOffset(Offset);
 }
 
 SourceRange SrcMgrAdapter::mapRange(const llvm::SourceMgr &LLVMSrcMgr,
-                                       llvm::SMRange Range) {
+                                    llvm::SMRange Range) {
   if (!Range.isValid())
     return SourceRange();
 
@@ -115,9 +112,9 @@ void SrcMgrAdapter::handleDiag(const llvm::SMDiagnostic &Diag) {
     DiagID = NoteDiagID;
     break;
   }
-  //TODO: Will not work 
-  // Report the diagnostic.
-  // InflightDiagnostic Builder = Diagnostics.Report(Loc, DiagID) << Message;
+  // TODO: Will not work
+  //  Report the diagnostic.
+  //  InflightDiagnostic Builder = Diagnostics.Report(Loc, DiagID) << Message;
 
   // if (auto *LLVMSrcMgr = Diag.getSourceMgr()) {
   //   // Translate ranges.

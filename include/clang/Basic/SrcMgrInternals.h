@@ -86,7 +86,7 @@ class LineTableInfo {
   /// the mapping from string -> ID, and FilenamesByID holds the mapping of ID
   /// to string.
   llvm::StringMap<unsigned, llvm::BumpPtrAllocator> FilenameIDs;
-  std::vector<llvm::StringMapEntry<unsigned>*> FilenamesByID;
+  std::vector<llvm::StringMapEntry<unsigned> *> FilenamesByID;
 
   /// Map from FileIDs to a list of line entries (sorted by the offset
   /// at which they occur in the file).
@@ -108,10 +108,8 @@ public:
 
   unsigned getNumFilenames() const { return FilenamesByID.size(); }
 
-  void AddLineNote(FileID FID, unsigned Offset,
-                   unsigned LineNo, int FilenameID,
+  void AddLineNote(FileID FID, unsigned Offset, unsigned LineNo, int FilenameID,
                    unsigned EntryExit, sm::CharacteristicKind FileKind);
-
 
   /// Find the line entry nearest to FID that is before it.
   ///
