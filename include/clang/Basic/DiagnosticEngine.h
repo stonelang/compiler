@@ -35,6 +35,8 @@ class Identifier;
 class QualType;
 enum class TokenKind;
 class DeclName;
+class DiagnosticEngine;
+class InFlightDiagnostic;
 
 // Enumeration describing all of possible diagnostics.
 /// Each of the diagnostics described in Diagnostics.def has an entry in
@@ -145,7 +147,7 @@ class StreamingDiagnostic {
 public:
 };
 
-class InflightDiagnostic final : public StreamingDiagnostic {
+class InFlightDiagnostic final : public StreamingDiagnostic {
 public:
 };
 
@@ -156,6 +158,22 @@ enum class DiagnosticLevel {
   Warning = 3, ///< Present this diagnostic as a warning.
   Error = 4,   ///< Present this diagnostic as an error.
   Fatal = 5    ///< Present this diagnostic as a fatal error.
+};
+
+class Diagnostic final {
+
+  friend DiagnosticEngine;
+  friend InFlightDiagnostic;
+
+  DiagID diagID;
+  llvm::SmallVector<DiagnosticArgument, 3> args;
+
+  Diagnostic(DiagID diagID) : diagID(diagID) {}
+
+public:
+  DiagID GetDiagID() const { return diagID; }
+  llvm::ArrayRef<DiagnosticArgument> GetArgs() const { return args; }
+
 };
 
 class DiagnosticEngine final {
@@ -178,8 +196,8 @@ public:
   /// \param DiagID A member of the @c diag::kind enum.
   /// \param Loc Represents the source location associated with the diagnostic,
   /// which can be an invalid location if no position information is available.
-  InflightDiagnostic Diagnose(SrcLoc Loc, DiagID diagID);
-  InflightDiagnostic Diagnose(DiagID diagID);
+  InFlightDiagnostic Diagnose(SrcLoc Loc, DiagID diagID);
+  InFlightDiagnostic Diagnose(DiagID diagID);
 };
 } // namespace clang
 
