@@ -2,6 +2,7 @@
 #define LLVM_CLANG_BASIC_DIAGNOSTIC_H
 
 #include "clang/Basic/DiagnosticOptions.h"
+#include "clang/Basic/FileManager.h"
 #include "clang/Basic/SrcLoc.h"
 
 #include "llvm/ADT/ArrayRef.h"
@@ -38,6 +39,8 @@ enum class TokenKind;
 class DeclName;
 class DiagnosticEngine;
 class InFlightDiagnostic;
+class SrcMgr;
+class DiagnosticConsumer;
 
 // Enumeration describing all of possible diagnostics.
 /// Each of the diagnostics described in Diagnostics.def has an entry in
@@ -331,6 +334,18 @@ public:
   SrcLoc GetDiagLoc() { return diagLoc; }
   DiagnosticKind GetDiagKind() { return kind; }
   llvm::StringRef GetFormatString() { return formatString; }
+
+public:
+  /// Format this diagnostic into a string, substituting the
+  /// formal arguments into the %0 slots.
+  ///
+  /// The result is appended onto the \p OutStr array.
+  void FormatDiagnostic(llvm::SmallVectorImpl<char> &outString) const;
+
+  /// Format the given format-string into the output buffer using the
+  /// arguments stored in this diagnostic.
+  void FormatDiagnostic(const char *diagStart, const char *diagEnd,
+                        llvm::SmallVectorImpl<char> &outString) const;
 };
 
 class Diagnostic final : public DiagnosticInfo {
@@ -344,8 +359,14 @@ public:
 };
 
 class DiagnosticEngine final {
-  /// The ID of the current diagnostic that is in flight.
+  SrcMgr *srcMgr = nullptr;
+
+  /// The current diagnostic
   std::optional<Diagnostic> activeDiagnostic;
+
+  /// The diagnostic consumer(s) that will be responsible for actually
+  /// emitting diagnostics.
+  llvm::SmallVector<DiagnosticConsumer *, 2> consumers;
 
 public:
   DiagnosticEngine();
@@ -383,12 +404,43 @@ public:
   /// \param DiagID A member of the @c diag::kind enum.
   /// \param Loc Represents the source location associated with the diagnostic,
   /// which can be an invalid location if no position information is available.
-  InFlightDiagnostic Diagnose(SrcLoc Loc, DiagID diagID);
-  InFlightDiagnostic Diagnose(DiagID diagID);
-  InFlightDiagnostic Diagnose(SrcLoc diagLoc, const Diagnostic &diagnostic);
+  InFlightDiagnostic Diagnose(DiagID diagID, SrcLoc diagLoc = SrcLoc());
+  InFlightDiagnostic Diagnose(const Diagnostic &diagnostic,
+                              SrcLoc diagLoc = SrcLoc());
 
 public:
-  void SetSrcMgr(SrcMgr *SM) {}
+  void SetSrcMgr(SrcMgr *sm) { srcMgr = sm; }
+  SrcMgr *GetSetSrcMgr() {
+    assert(HasSrcMgr() && "Does not have a SrcMgr");
+    return srcMgr;
+  }
+  bool HasSrcMgr() { return srcMgr != nullptr; }
+};
+
+class DiagnosticConsumer {
+protected:
+  unsigned numWarnings = 0; ///< Number of warnings reported
+  unsigned numErrors = 0;   ///< Number of errors reported
+
+public:
+  DiagnosticConsumer() = default;
+  virtual ~DiagnosticConsumer();
+
+  unsigned GetNumErrors() const { return numWarnings; }
+  unsigned GetNumWarnings() const { return numWarnings; }
+  virtual void Clear() { numWarnings = numWarnings = 0; }
+
+  /// Callback to inform the diagnostic client that processing of all
+  /// source files has ended.
+  virtual bool FinishProcessing() { return false; }
+
+  /// Handle this diagnostic, reporting it to the user or
+  /// capturing it to a log as needed.
+  ///
+  /// The default implementation just keeps track of the total number of
+  /// warnings and errors.
+  virtual void HandleDiagnostic(DiagnosticLevel diagLevel,
+                                const Diagnostic &diagnostic);
 };
 } // namespace clang
 

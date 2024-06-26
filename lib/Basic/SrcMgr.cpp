@@ -314,8 +314,10 @@ LineTableInfo &SrcMgr::getLineTable() {
 SrcMgr::SrcMgr(DiagnosticEngine &Diag, FileManager &FileMgr,
                bool UserFilesAreVolatile)
     : Diag(Diag), FileMgr(FileMgr), UserFilesAreVolatile(UserFilesAreVolatile) {
-  clearIDTables();
+
   Diag.SetSrcMgr(this);
+
+  clearIDTables();
 }
 
 SrcMgr::~SrcMgr() {

@@ -4,17 +4,12 @@ using namespace clang;
 
 DiagnosticEngine::DiagnosticEngine() {}
 
-InFlightDiagnostic DiagnosticEngine::Diagnose(SrcLoc Loc, DiagID diagID) {
-  return InFlightDiagnostic(*this);
+InFlightDiagnostic DiagnosticEngine::Diagnose(DiagID diagID, SrcLoc diagLoc) {
+  return Diagnose(Diagnostic(diagID), diagLoc);
 }
 
-InFlightDiagnostic DiagnosticEngine::Diagnose(DiagID diagID) {
-
-  return InFlightDiagnostic(*this);
-}
-
-InFlightDiagnostic DiagnosticEngine::Diagnose(SrcLoc diagLoc,
-                                              const Diagnostic &diagnostic) {
+InFlightDiagnostic DiagnosticEngine::Diagnose(const Diagnostic &diagnostic,
+                                              SrcLoc diagLoc) {
   assert(!activeDiagnostic && "Already have an active diagnostic!");
   activeDiagnostic = diagnostic;
   activeDiagnostic->SetDiagLoc(diagLoc);
@@ -34,5 +29,5 @@ bool DiagnosticEngine::EmitActiveDiagnostic(bool force) {
 /// \param Force Emit the diagnostic regardless of suppression settings.
 bool DiagnosticEngine::EmitDiagnostic(const Diagnostic &diagnostic,
                                       bool force) {
-  return true; 
+  return true;
 }
