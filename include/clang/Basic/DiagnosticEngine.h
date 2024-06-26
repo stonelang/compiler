@@ -30,14 +30,82 @@ class raw_ostream;
 } // namespace llvm
 
 namespace clang {
+class Decl;
+class Identifier;
+class QualType;
+enum class TokenKind;
+class DeclName;
+
+enum class DiagnosticArgumentKind {
+  Bool,
+  String,
+  Integer,
+  Unsigned,
+  Identifier,
+  Decl,
+  QualType,
+  TokenKind
+};
+
+class DiagnosticArgument final {
+  DiagnosticArgumentKind kind;
+  union {
+    bool BoolVal;
+    int IntegerVal;
+    unsigned UnsignedVal;
+    llvm::StringRef StringVal;
+    const Identifier *IdentifierVal;
+    const Decl *DeclVal;
+    const QualType *QualTypeVal;
+    const DeclName *DeclNameVal;
+    TokenKind TokenKindVal;
+  };
+
+public:
+  DiagnosticArgument(bool val)
+      : kind(DiagnosticArgumentKind::Bool), BoolVal(val) {}
+
+  DiagnosticArgument(StringRef val)
+      : kind(DiagnosticArgumentKind::String), StringVal(val) {}
+
+  DiagnosticArgument(int val)
+      : kind(DiagnosticArgumentKind::Integer), IntegerVal(val) {}
+
+  DiagnosticArgument(unsigned val)
+      : kind(DiagnosticArgumentKind::Unsigned), UnsignedVal(val) {}
+
+  DiagnosticArgument(const Identifier *val)
+      : kind(DiagnosticArgumentKind::Identifier), IdentifierVal(val) {}
+
+  DiagnosticArgument(const Decl *val)
+      : kind(DiagnosticArgumentKind::Decl), DeclVal(val) {}
+
+  DiagnosticArgument(const QualType *val)
+      : kind(DiagnosticArgumentKind::QualType), QualTypeVal(val) {}
+
+  DiagnosticArgument(TokenKind val)
+      : kind(DiagnosticArgumentKind::TokenKind), TokenKindVal(val) {}
+
+  /// Initializes a diagnostic argument using the underlying type of the
+  /// given enum.
+  template <
+      typename EnumType,
+      typename std::enable_if<std::is_enum<EnumType>::value>::type * = nullptr>
+  DiagnosticArgument(EnumType value)
+      : DiagnosticArgument(
+            static_cast<typename std::underlying_type<EnumType>::type>(value)) {
+  }
+
+public:
+  DiagnosticArgumentKind GetKind() const { return kind; }
+};
 
 class StreamingDiagnostic {
 public:
-
 };
+
 class InflightDiagnostic final : public StreamingDiagnostic {
 public:
-
 };
 
 class DiagnosticEngine final {
