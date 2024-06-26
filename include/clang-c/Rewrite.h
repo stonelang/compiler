@@ -27,7 +27,7 @@ CINDEX_LINKAGE CXRewriter clang_CXRewriter_create(CXTranslationUnit TU);
 /**
  * Insert the specified string at the specified location in the original buffer.
  */
-CINDEX_LINKAGE void clang_CXRewriter_insertTextBefore(CXRewriter Rew, CXSourceLocation Loc,
+CINDEX_LINKAGE void clang_CXRewriter_insertTextBefore(CXRewriter Rew, CXSrcLoc Loc,
                                            const char *Insert);
 
 /**

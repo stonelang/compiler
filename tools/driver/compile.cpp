@@ -63,7 +63,7 @@ using namespace llvm::opt;
 
 static void LLVMErrorHandler(void *UserData, const char *Message,
                              bool GenCrashDiag) {
-  DiagnosticsEngine &Diags = *static_cast<DiagnosticsEngine *>(UserData);
+  DiagnosticEngine &Diags = *static_cast<DiagnosticEngine *>(UserData);
 
   Diags.Report(diag::err_fe_error_backend) << Message;
 
@@ -244,9 +244,9 @@ int cc1_main(ArrayRef<const char *> Argv, const char *Argv0, void *MainAddr) {
   // well formed diagnostic object.
   IntrusiveRefCntPtr<DiagnosticOptions> DiagOpts = new DiagnosticOptions();
   TextDiagnosticBuffer *DiagsBuffer = new TextDiagnosticBuffer;
-  DiagnosticsEngine Diags(DiagID, &*DiagOpts, DiagsBuffer);
+  DiagnosticEngine Diags(DiagID, &*DiagOpts, DiagsBuffer);
 
-  // Setup round-trip remarks for the DiagnosticsEngine used in CreateFromArgs.
+  // Setup round-trip remarks for the DiagnosticEngine used in CreateFromArgs.
   if (find(Argv, StringRef("-Rround-trip-cc1-args")) != Argv.end())
     Diags.setSeverity(diag::remark_cc1_round_trip_generated,
                       diag::Severity::Remark, {});

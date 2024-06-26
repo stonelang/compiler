@@ -1,4 +1,4 @@
-/*===-- clang-c/CXSourceLocation.h - C Index Source Location ------*- C -*-===*\
+/*===-- clang-c/CXSrcLoc.h - C Index Source Location ------*- C -*-===*\
 |*                                                                            *|
 |* Part of the LLVM Project, under the Apache License v2.0 with LLVM          *|
 |* Exceptions.                                                                *|
@@ -44,7 +44,7 @@ LLVM_CLANG_C_EXTERN_C_BEGIN
 typedef struct {
   const void *ptr_data[2];
   unsigned int_data;
-} CXSourceLocation;
+} CXSrcLoc;
 
 /**
  * Identifies a half-open character range in the source code.
@@ -61,7 +61,7 @@ typedef struct {
 /**
  * Retrieve a NULL (invalid) source location.
  */
-CINDEX_LINKAGE CXSourceLocation clang_getNullLocation(void);
+CINDEX_LINKAGE CXSrcLoc clang_getNullLocation(void);
 
 /**
  * Determine whether two source locations, which must refer into
@@ -71,19 +71,19 @@ CINDEX_LINKAGE CXSourceLocation clang_getNullLocation(void);
  * \returns non-zero if the source locations refer to the same location, zero
  * if they refer to different locations.
  */
-CINDEX_LINKAGE unsigned clang_equalLocations(CXSourceLocation loc1,
-                                             CXSourceLocation loc2);
+CINDEX_LINKAGE unsigned clang_equalLocations(CXSrcLoc loc1,
+                                             CXSrcLoc loc2);
 
 /**
  * Returns non-zero if the given source location is in a system header.
  */
-CINDEX_LINKAGE int clang_Location_isInSystemHeader(CXSourceLocation location);
+CINDEX_LINKAGE int clang_Location_isInSystemHeader(CXSrcLoc location);
 
 /**
  * Returns non-zero if the given source location is in the main file of
  * the corresponding translation unit.
  */
-CINDEX_LINKAGE int clang_Location_isFromMainFile(CXSourceLocation location);
+CINDEX_LINKAGE int clang_Location_isFromMainFile(CXSrcLoc location);
 
 /**
  * Retrieve a NULL (invalid) source range.
@@ -94,8 +94,8 @@ CINDEX_LINKAGE CXSourceRange clang_getNullRange(void);
  * Retrieve a source range given the beginning and ending source
  * locations.
  */
-CINDEX_LINKAGE CXSourceRange clang_getRange(CXSourceLocation begin,
-                                            CXSourceLocation end);
+CINDEX_LINKAGE CXSourceRange clang_getRange(CXSrcLoc begin,
+                                            CXSrcLoc end);
 
 /**
  * Determine whether two ranges are equivalent.
@@ -132,7 +132,7 @@ CINDEX_LINKAGE int clang_Range_isNull(CXSourceRange range);
  * \param offset [out] if non-NULL, will be set to the offset into the
  * buffer to which the given source location points.
  */
-CINDEX_LINKAGE void clang_getExpansionLocation(CXSourceLocation location,
+CINDEX_LINKAGE void clang_getExpansionLocation(CXSrcLoc location,
                                                CXFile *file, unsigned *line,
                                                unsigned *column,
                                                unsigned *offset);
@@ -177,7 +177,7 @@ CINDEX_LINKAGE void clang_getExpansionLocation(CXSourceLocation location,
  * \param column [out] if non-NULL, will be set to the column number of the
  * source location. For an invalid source location, zero is returned.
  */
-CINDEX_LINKAGE void clang_getPresumedLocation(CXSourceLocation location,
+CINDEX_LINKAGE void clang_getPresumedLocation(CXSrcLoc location,
                                               CXString *filename,
                                               unsigned *line, unsigned *column);
 
@@ -189,7 +189,7 @@ CINDEX_LINKAGE void clang_getPresumedLocation(CXSourceLocation location,
  * #clang_getExpansionLocation(). See that interface's documentation for
  * details.
  */
-CINDEX_LINKAGE void clang_getInstantiationLocation(CXSourceLocation location,
+CINDEX_LINKAGE void clang_getInstantiationLocation(CXSrcLoc location,
                                                    CXFile *file, unsigned *line,
                                                    unsigned *column,
                                                    unsigned *offset);
@@ -216,7 +216,7 @@ CINDEX_LINKAGE void clang_getInstantiationLocation(CXSourceLocation location,
  * \param offset [out] if non-NULL, will be set to the offset into the
  * buffer to which the given source location points.
  */
-CINDEX_LINKAGE void clang_getSpellingLocation(CXSourceLocation location,
+CINDEX_LINKAGE void clang_getSpellingLocation(CXSrcLoc location,
                                               CXFile *file, unsigned *line,
                                               unsigned *column,
                                               unsigned *offset);
@@ -244,7 +244,7 @@ CINDEX_LINKAGE void clang_getSpellingLocation(CXSourceLocation location,
  * \param offset [out] if non-NULL, will be set to the offset into the
  * buffer to which the given source location points.
  */
-CINDEX_LINKAGE void clang_getFileLocation(CXSourceLocation location,
+CINDEX_LINKAGE void clang_getFileLocation(CXSrcLoc location,
                                           CXFile *file, unsigned *line,
                                           unsigned *column, unsigned *offset);
 
@@ -252,13 +252,13 @@ CINDEX_LINKAGE void clang_getFileLocation(CXSourceLocation location,
  * Retrieve a source location representing the first character within a
  * source range.
  */
-CINDEX_LINKAGE CXSourceLocation clang_getRangeStart(CXSourceRange range);
+CINDEX_LINKAGE CXSrcLoc clang_getRangeStart(CXSourceRange range);
 
 /**
  * Retrieve a source location representing the last character within a
  * source range.
  */
-CINDEX_LINKAGE CXSourceLocation clang_getRangeEnd(CXSourceRange range);
+CINDEX_LINKAGE CXSrcLoc clang_getRangeEnd(CXSourceRange range);
 
 /**
  * Identifies an array of ranges.

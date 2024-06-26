@@ -458,7 +458,7 @@ int clang_main(int Argc, char **Argv, const llvm::ToolContext &ToolContext) {
 
   IntrusiveRefCntPtr<DiagnosticIDs> DiagID(new DiagnosticIDs());
 
-  DiagnosticsEngine Diags(DiagID, &*DiagOpts, DiagClient);
+  DiagnosticEngine Diags(DiagID, &*DiagOpts, DiagClient);
 
   if (!DiagOpts->DiagnosticSerializationFile.empty()) {
     auto SerializedConsumer =

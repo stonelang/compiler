@@ -1,11 +1,3 @@
-//===- CustomizableOptional.h - Optional with custom storage ----*- C++ -*-===//
-//
-// Part of the LLVM Project, under the Apache License v2.0 with LLVM Exceptions.
-// See https://llvm.org/LICENSE.txt for license information.
-// SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
-//
-//===----------------------------------------------------------------------===//
-
 #ifndef CLANG_BASIC_CUSTOMIZABLEOPTIONAL_H
 #define CLANG_BASIC_CUSTOMIZABLEOPTIONAL_H
 
@@ -96,14 +88,6 @@ public:
 
   template <typename U> T value_or(U &&alt) && {
     return has_value() ? std::move(operator*()) : std::forward<U>(alt);
-  }
-
-  // Allow conversion to std::optional<T>.
-  explicit operator std::optional<T> &() const & {
-    return *this ? **this : std::optional<T>();
-  }
-  explicit operator std::optional<T> &&() const && {
-    return *this ? std::move(**this) : std::optional<T>();
   }
 };
 

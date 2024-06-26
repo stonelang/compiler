@@ -14,7 +14,7 @@
 #ifndef LLVM_CLANG_C_CXDIAGNOSTIC_H
 #define LLVM_CLANG_C_CXDIAGNOSTIC_H
 
-#include "clang-c/CXSourceLocation.h"
+#include "clang-c/CXSrcLoc.h"
 #include "clang-c/CXString.h"
 #include "clang-c/ExternC.h"
 #include "clang-c/Platform.h"
@@ -173,7 +173,7 @@ enum CXDiagnosticDisplayOptions {
    *
    * This option corresponds to the clang flag \c -fshow-source-location.
    */
-  CXDiagnostic_DisplaySourceLocation = 0x01,
+  CXDiagnostic_DisplaySrcLoc = 0x01,
 
   /**
    * If displaying the source-location information of the
@@ -260,7 +260,7 @@ CINDEX_LINKAGE enum CXDiagnosticSeverity
  * This location is where Clang would print the caret ('^') when
  * displaying the diagnostic on the command line.
  */
-CINDEX_LINKAGE CXSourceLocation clang_getDiagnosticLocation(CXDiagnostic);
+CINDEX_LINKAGE CXSrcLoc clang_getDiagnosticLocation(CXDiagnostic);
 
 /**
  * Retrieve the text of the given diagnostic.

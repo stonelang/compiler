@@ -22,7 +22,7 @@ class ArgList;
 } // namespace llvm
 
 namespace clang {
-class DiagnosticsEngine;
+class DiagnosticEngine;
 
 /// Specifies which overload candidates to display when overload
 /// resolution fails.
@@ -69,7 +69,7 @@ raw_ostream& operator<<(raw_ostream& Out, DiagnosticLevelMask M);
 /// Options for controlling the compiler diagnostics engine.
 class DiagnosticOptions : public RefCountedBase<DiagnosticOptions>{
   friend bool ParseDiagnosticArgs(DiagnosticOptions &, llvm::opt::ArgList &,
-                                  clang::DiagnosticsEngine *, bool);
+                                  clang::DiagnosticEngine *, bool);
 
   friend class CompilerInvocation;
   friend class CompilerInvocationBase;

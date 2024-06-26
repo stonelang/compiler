@@ -295,9 +295,9 @@ set(CLANG_VERSION "${CLANG_VERSION_MAJOR}.${CLANG_VERSION_MINOR}.${CLANG_VERSION
 message(STATUS "Clang version: ${CLANG_VERSION}")
 
 # Configure the Version.inc file.
-configure_file(
-  ${CMAKE_CURRENT_SOURCE_DIR}/include/clang/Basic/Version.inc.in
-  ${CMAKE_CURRENT_BINARY_DIR}/include/clang/Basic/Version.inc)
+#configure_file(
+#  ${CMAKE_CURRENT_SOURCE_DIR}/include/clang/Basic/Version.inc.in
+#  ${CMAKE_CURRENT_BINARY_DIR}/include/clang/Basic/Version.inc)
 
 # Add appropriate flags for GCC
 if (LLVM_COMPILER_IS_GCC_COMPATIBLE)
@@ -445,7 +445,7 @@ option(CLANG_ENABLE_HLSL "Include HLSL build products" Off)
 # While HLSL support is experimental this should stay hidden.
 mark_as_advanced(CLANG_ENABLE_HLSL)
 
-add_subdirectory(utils/TableGen)
+#add_subdirectory(utils/TableGen)
 
 # Export CLANG_TABLEGEN_EXE for use by flang docs.
 set(CLANG_TABLEGEN_EXE "${CLANG_TABLEGEN_EXE}" CACHE INTERNAL "")
@@ -469,8 +469,8 @@ if(LLVM_ENABLE_MODULES)
 endif()
 
 add_subdirectory(lib)
-add_subdirectory(tools)
-add_subdirectory(runtime)
+#add_subdirectory(tools)
+#add_subdirectory(runtime)
 
 option(CLANG_BUILD_EXAMPLES "Build CLANG example programs by default." OFF)
 

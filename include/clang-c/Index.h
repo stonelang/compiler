@@ -20,7 +20,7 @@
 #include "clang-c/CXDiagnostic.h"
 #include "clang-c/CXErrorCode.h"
 #include "clang-c/CXFile.h"
-#include "clang-c/CXSourceLocation.h"
+#include "clang-c/CXSrcLoc.h"
 #include "clang-c/CXString.h"
 #include "clang-c/ExternC.h"
 #include "clang-c/Platform.h"
@@ -530,14 +530,14 @@ CINDEX_LINKAGE const char *clang_getFileContents(CXTranslationUnit tu,
  * Retrieves the source location associated with a given file/line/column
  * in a particular translation unit.
  */
-CINDEX_LINKAGE CXSourceLocation clang_getLocation(CXTranslationUnit tu,
+CINDEX_LINKAGE CXSrcLoc clang_getLocation(CXTranslationUnit tu,
                                                   CXFile file, unsigned line,
                                                   unsigned column);
 /**
  * Retrieves the source location associated with a given character offset
  * in a particular translation unit.
  */
-CINDEX_LINKAGE CXSourceLocation clang_getLocationForOffset(CXTranslationUnit tu,
+CINDEX_LINKAGE CXSrcLoc clang_getLocationForOffset(CXTranslationUnit tu,
                                                            CXFile file,
                                                            unsigned offset);
 
@@ -1091,15 +1091,15 @@ enum CXTUResourceUsageKind {
   CXTUResourceUsage_Identifiers = 2,
   CXTUResourceUsage_Selectors = 3,
   CXTUResourceUsage_GlobalCompletionResults = 4,
-  CXTUResourceUsage_SourceManagerContentCache = 5,
+  CXTUResourceUsage_SrcMgrContentCache = 5,
   CXTUResourceUsage_AST_SideTables = 6,
-  CXTUResourceUsage_SourceManager_Membuffer_Malloc = 7,
-  CXTUResourceUsage_SourceManager_Membuffer_MMap = 8,
+  CXTUResourceUsage_SrcMgr_Membuffer_Malloc = 7,
+  CXTUResourceUsage_SrcMgr_Membuffer_MMap = 8,
   CXTUResourceUsage_ExternalASTSource_Membuffer_Malloc = 9,
   CXTUResourceUsage_ExternalASTSource_Membuffer_MMap = 10,
   CXTUResourceUsage_Preprocessor = 11,
   CXTUResourceUsage_PreprocessingRecord = 12,
-  CXTUResourceUsage_SourceManager_DataStructures = 13,
+  CXTUResourceUsage_SrcMgr_DataStructures = 13,
   CXTUResourceUsage_Preprocessor_HeaderSearch = 14,
   CXTUResourceUsage_MEMORY_IN_BYTES_BEGIN = CXTUResourceUsage_AST,
   CXTUResourceUsage_MEMORY_IN_BYTES_END =
@@ -2760,7 +2760,7 @@ CINDEX_LINKAGE CXFile clang_getIncludedFile(CXCursor cursor);
  * \returns a cursor representing the entity at the given source location, or
  * a NULL cursor if no such entity can be found.
  */
-CINDEX_LINKAGE CXCursor clang_getCursor(CXTranslationUnit, CXSourceLocation);
+CINDEX_LINKAGE CXCursor clang_getCursor(CXTranslationUnit, CXSrcLoc);
 
 /**
  * Retrieve the physical location of the source constructor referenced
@@ -2772,7 +2772,7 @@ CINDEX_LINKAGE CXCursor clang_getCursor(CXTranslationUnit, CXSourceLocation);
  * The location of a reference is where that reference occurs within the
  * source code.
  */
-CINDEX_LINKAGE CXSourceLocation clang_getCursorLocation(CXCursor);
+CINDEX_LINKAGE CXSrcLoc clang_getCursorLocation(CXCursor);
 
 /**
  * Retrieve the physical extent of the source construct referenced by
@@ -4733,7 +4733,7 @@ typedef struct {
  * translation unit is destroyed.
  */
 CINDEX_LINKAGE CXToken *clang_getToken(CXTranslationUnit TU,
-                                       CXSourceLocation Location);
+                                       CXSrcLoc Location);
 
 /**
  * Determine the kind of the given token.
@@ -4751,7 +4751,7 @@ CINDEX_LINKAGE CXString clang_getTokenSpelling(CXTranslationUnit, CXToken);
 /**
  * Retrieve the source location of the given token.
  */
-CINDEX_LINKAGE CXSourceLocation clang_getTokenLocation(CXTranslationUnit,
+CINDEX_LINKAGE CXSrcLoc clang_getTokenLocation(CXTranslationUnit,
                                                        CXToken);
 
 /**
@@ -5675,7 +5675,7 @@ CINDEX_LINKAGE void clang_toggleCrashRecovery(unsigned isEnabled);
  * the first element refers to the location that included 'included_file'.
  */
 typedef void (*CXInclusionVisitor)(CXFile included_file,
-                                   CXSourceLocation *inclusion_stack,
+                                   CXSrcLoc *inclusion_stack,
                                    unsigned include_len,
                                    CXClientData client_data);
 
@@ -6474,10 +6474,10 @@ CINDEX_LINKAGE void clang_indexLoc_getFileLocation(CXIdxLoc loc,
                                                    unsigned *offset);
 
 /**
- * Retrieve the CXSourceLocation represented by the given CXIdxLoc.
+ * Retrieve the CXSrcLoc represented by the given CXIdxLoc.
  */
 CINDEX_LINKAGE
-CXSourceLocation clang_indexLoc_getCXSourceLocation(CXIdxLoc loc);
+CXSrcLoc clang_indexLoc_getCXSrcLoc(CXIdxLoc loc);
 
 /**
  * Visitor invoked for each field found by a traversal.
