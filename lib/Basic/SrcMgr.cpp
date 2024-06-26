@@ -124,7 +124,7 @@ ContentCache::getBufferOrNone(DiagnosticEngine &Diag, FileManager &FM,
   // the file could also have been removed during processing. Since we can't
   // really deal with this situation, just create an empty buffer.
   if (!BufferOrError) {
-    if (Diag.IsInflightDiagnostic()) {
+    if (Diag.HasActiveDiagnostic()) {
       // Diag.SetDelayedDiagnostic(diag::err_cannot_open_file,
       //                           ContentsEntry->getName(),
       //                           BufferOrError.getError().message());
@@ -148,7 +148,7 @@ ContentCache::getBufferOrNone(DiagnosticEngine &Diag, FileManager &FM,
   // ContentsEntry::getSize() could have the wrong size. Use
   // MemoryBuffer::getBufferSize() instead.
   if (Buffer->getBufferSize() >= std::numeric_limits<unsigned>::max()) {
-    if (Diag.IsInflightDiagnostic()) {
+    if (Diag.HasActiveDiagnostic()) {
       // Diag.SetDelayedDiagnostic(diag::err_file_too_large,
       //                           ContentsEntry->getName());
     } else {
@@ -164,7 +164,7 @@ ContentCache::getBufferOrNone(DiagnosticEngine &Diag, FileManager &FM,
   // have come from a stat cache).
   if (!ContentsEntry->isNamedPipe() &&
       Buffer->getBufferSize() != (size_t)ContentsEntry->getSize()) {
-    if (Diag.IsInflightDiagnostic()) {
+    if (Diag.HasActiveDiagnostic()) {
       // Diag.SetDelayedDiagnostic(diag::err_file_modified,
       //                           ContentsEntry->getName());
     } else {

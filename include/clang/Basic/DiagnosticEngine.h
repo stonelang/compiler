@@ -32,6 +32,7 @@ class raw_ostream;
 namespace clang {
 class Decl;
 class Identifier;
+class DiagnosticEngine;
 class QualType;
 enum class TokenKind;
 class DeclName;
@@ -143,21 +144,23 @@ public:
   DiagnosticArgumentKind GetKind() const { return kind; }
 };
 
-class StreamingDiagnostic {
-public:
-};
-
-class InFlightDiagnostic final : public StreamingDiagnostic {
-public:
-};
-
-enum class DiagnosticLevel {
+/// Describes the level of the diagnostic
+enum class DiagnosticLevel : uint8_t {
   None = 0,
-  Ignored = 1, ///< Do not present this diagnostic, ignore it.
-  Remark = 2,  ///< Present this diagnostic as a remark.
-  Warning = 3, ///< Present this diagnostic as a warning.
-  Error = 4,   ///< Present this diagnostic as an error.
-  Fatal = 5    ///< Present this diagnostic as a fatal error.
+  Ignore,
+  Note, ///< Lowest
+  Remark,
+  Error,
+  Fatal, ///< Hightest
+};
+
+/// Describes the kind of diagnostic.
+enum class DiagnosticKind : uint8_t {
+  Error,
+  Warning,
+  Remark,
+  Note,
+  Fatal,
 };
 
 class FixIt final {
@@ -230,35 +233,148 @@ public:
   }
 };
 
-class Diagnostic final {
+// class DiagnosticStorageAllocator {};
 
+class StreamingDiagnostic {
+
+protected:
+  DiagnosticEngine &diagEngine;
+
+  /// Status variable indicating if this diagnostic is still active.
+  ///
+  // NOTE: This field is redundant with DiagObj (IsActive iff (DiagObj ==0)),
+  // but LLVM is not currently smart enough to eliminate the null check that
+  // Emit() would end up with if we used that as our status variable.
+  mutable bool IsActive = false;
+
+  /// Flag indicating that this diagnostic is being emitted via a
+  /// call to ForceEmit.
+  mutable bool IsForceEmit = false;
+
+protected:
+  StreamingDiagnostic(DiagnosticEngine &diagEngine) : diagEngine(diagEngine) {}
+
+public:
+};
+
+class InFlightDiagnostic final : public StreamingDiagnostic {
+public:
+  InFlightDiagnostic(DiagnosticEngine &diagEngine)
+      : StreamingDiagnostic(diagEngine) {}
+};
+
+// class InflightDiagnosticInfo final {
+
+//   const DiagnosticEngine &diagEngine;
+
+// public:
+//   InflightDiagnosticInfo(const DiagnosticEngine &diagEngine)
+//       : diagEngine(diagEngine) {}
+
+// public:
+//   void FormatDiagnostic(llvm::SmallVectorImpl<char> &outString) const;
+
+//   /// Format the given format-string into the output buffer using the
+//   /// arguments stored in this diagnostic.
+//   void FormatDiagnostic(const char *diagStartString, const char
+//   *diagEndString,
+//                         llvm::SmallVectorImpl<char> &outString) const;
+// };
+
+// class CurrentDiagnostic {
+
+// public:
+// };
+
+// class DiagnosticList final {
+
+// public:
+//   /// Given a diagnostic ID, return a description of the issue.
+//   llvm::StringRef GetDescription(DiagID diagID) const;
+//   /// Used to report a diagnostic that is finally fully formed.
+//   ///
+//   /// \returns \c true if the diagnostic was emitted, \c false if it was
+//   /// suppressed.
+//   bool ProcessDiagnostic(DiagnosticEngine &diag) const;
+
+//   /// Used to emit a diagnostic that is finally fully formed,
+//   /// ignoring suppression.
+//   void EmitDiagnostic(DiagnosticEngine &diag, DiagnosticLevel level) const;
+// };
+
+// class DiagnosticState {};
+
+// class DiagnosticConsumerInfo {
+// public:
+
+// };
+
+class DiagnosticInfo {
+protected:
   friend DiagnosticEngine;
   friend InFlightDiagnostic;
 
   DiagID diagID;
+  SrcLoc diagLoc;
+  DiagnosticKind kind;
+  llvm::StringRef formatString;
   llvm::SmallVector<DiagnosticArgument, 3> args;
   llvm::SmallVector<FixIt, 2> fixIts;
 
-  Diagnostic(DiagID diagID) : diagID(diagID) {}
+protected:
+  DiagnosticInfo(DiagID diagID) : diagID(diagID) {}
 
 public:
   DiagID GetDiagID() const { return diagID; }
   llvm::ArrayRef<DiagnosticArgument> GetArgs() const { return args; }
   llvm::ArrayRef<FixIt> GetFixIts() const { return fixIts; }
+  SrcLoc GetDiagLoc() { return diagLoc; }
+  DiagnosticKind GetDiagKind() { return kind; }
+  llvm::StringRef GetFormatString() { return formatString; }
+};
+
+class Diagnostic final : public DiagnosticInfo {
+public:
+  Diagnostic(DiagID diagID) : DiagnosticInfo(diagID) {}
+
+public:
+  // Avoid copying the fix-it text more than necessary.
+  void AddFixIt(FixIt &&fixIt) { fixIts.push_back(std::move(fixIt)); }
+  void SetDiagLoc(SrcLoc loc) { diagLoc = loc; }
 };
 
 class DiagnosticEngine final {
   /// The ID of the current diagnostic that is in flight.
-  std::optional<Diagnostic> CurDiagnostic;
+  std::optional<Diagnostic> activeDiagnostic;
 
 public:
   DiagnosticEngine();
 
 public:
   /// Determine whethere there is already a diagnostic in flight.
-  bool IsInflightDiagnostic() const { return !CurDiagnostic; }
+  bool HasActiveDiagnostic() const { return activeDiagnostic.has_value(); }
+  Diagnostic &GetActiveDiagnostic() { return *activeDiagnostic; }
+  /// Flush the active diagnostic.
+  void FlushActiveDiagnostic();
 
-  void SetSrcMgr(SrcMgr *SM) {}
+  /// Used to report a diagnostic that is finally fully formed.
+  ///
+  /// \returns true if the diagnostic was emitted, false if it was suppressed.
+  bool ProcessDiagnostic() {
+    // return Diags->ProcessDiag(*this);
+  }
+
+  /// Emit the current diagnostic and clear the diagnostic state.
+  ///
+  /// \param Force Emit the diagnostic regardless of suppression settings.
+  bool EmitActiveDiagnostic(bool force = false);
+
+  /// Emit the current diagnostic and clear the diagnostic state.
+  ///
+  /// \param Force Emit the diagnostic regardless of suppression settings.
+  bool EmitDiagnostic(const Diagnostic &diagnostic, bool force = false);
+
+public:
   /// Issue the message to the client.
   ///
   /// This actually returns an instance of InflightDiagnostic which emits the
@@ -269,6 +385,10 @@ public:
   /// which can be an invalid location if no position information is available.
   InFlightDiagnostic Diagnose(SrcLoc Loc, DiagID diagID);
   InFlightDiagnostic Diagnose(DiagID diagID);
+  InFlightDiagnostic Diagnose(SrcLoc diagLoc, const Diagnostic &diagnostic);
+
+public:
+  void SetSrcMgr(SrcMgr *SM) {}
 };
 } // namespace clang
 

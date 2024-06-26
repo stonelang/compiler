@@ -1204,8 +1204,7 @@ public:
   CharSrcRange getExpansionRange(SourceRange Range) const {
     SrcLoc Begin = getExpansionRange(Range.getBegin()).getBegin();
     CharSrcRange End = getExpansionRange(Range.getEnd());
-    return CharSrcRange(SourceRange(Begin, End.getEnd()),
-                           End.isTokenRange());
+    return CharSrcRange(SourceRange(Begin, End.getEnd()), End.isTokenRange());
   }
 
   /// Given a CharSrcRange object, return the range of
