@@ -500,21 +500,6 @@ class DiagnosticBuilder final {
   /// call to ForceEmit.
   mutable bool forceFlush = false;
 
-public:
-  DiagnosticBuilder(DiagnosticEngine &diagEngine)
-      : diagEngine(diagEngine), isActive(true) {}
-
-  /// Emits the diagnostic.
-  ~DiagnosticBuilder() {
-    if (isActive) {
-      Flush();
-    }
-  }
-
-public:
-  DiagnosticEngine &GetDiags() { return diagEngine; }
-
-private:
   /// Force the diagnostic builder to emit the diagnostic now.
   ///
   /// Once this function has been called, the DiagnosticBuilder object
@@ -536,29 +521,21 @@ private:
   Diagnostic &GetActiveDiagnostic() { return diagEngine.GetActiveDiagnostic(); }
 
 public:
-  template <typename T>
-  const DiagnosticBuilder &operator<<(const T &val) const {
-    assert(isActive && "Clients must not add to cleared diagnostic!");
-    const DiagnosticBuilder &self = *this;
-    self << val;
-    return *this;
-  }
-
-  // It is necessary to limit this to rvalue reference to avoid calling this
-  // function with a bitfield lvalue argument since non-const reference to
-  // bitfield is not allowed.
-  template <typename T,
-            typename = std::enable_if_t<!std::is_lvalue_reference<T>::value>>
-  const DiagnosticBuilder &operator<<(T &&val) const {
-    assert(isActive && "Clients must not add to cleared diagnostic!");
-    const DiagnosticBuilder &self = *this;
-    self << std::move(val);
-    return *this;
-  }
+  DiagnosticBuilder(DiagnosticEngine &diagEngine)
+      : diagEngine(diagEngine), isActive(true) {}
 
   DiagnosticBuilder &operator=(const DiagnosticBuilder &) = delete;
 
+  /// Emits the diagnostic.
+  ~DiagnosticBuilder() {
+    if (isActive) {
+      Flush();
+    }
+  }
+
 public:
+  DiagnosticEngine &GetDiags() { return diagEngine; }
+
   DiagnosticBuilder AddArg(bool val) {
     GetActiveDiagnostic().AddArg(DiagnosticArgument(val));
     return *this;
@@ -633,7 +610,6 @@ public:
     return AddReplacementFixIt(CharSrcRange::getTokenRange(RemoveRange), Code);
   }
 };
-
 
 class DiagnosticConsumer {
 protected:
