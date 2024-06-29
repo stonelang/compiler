@@ -605,53 +605,35 @@ public:
         FixIt::CreateInsertion(insertionLoc, code, beforePreviousInsertions));
     return *this;
   }
+
+  DiagnosticBuilder
+  AddInsertionFromRangeFixit(SrcLoc InsertionLoc, CharSrcRange FromRange,
+                             bool BeforePreviousInsertions = false) {
+    GetActiveDiagnostic().AddFixIt(FixIt::CreateInsertionFromRange(
+        InsertionLoc, FromRange, BeforePreviousInsertions));
+    return *this;
+  }
+
+  DiagnosticBuilder AddRemovalFixIt(CharSrcRange RemoveRange) {
+    GetActiveDiagnostic().AddFixIt(FixIt::CreateRemoval(RemoveRange));
+    return *this;
+  }
+  DiagnosticBuilder AddRemovalFixIt(SrcRange RemoveRange) {
+    return AddRemovalFixIt(CharSrcRange::getTokenRange(RemoveRange));
+  }
+
+  DiagnosticBuilder AddReplacementFixIt(CharSrcRange RemoveRange,
+                                        StringRef Code) {
+
+    GetActiveDiagnostic().AddFixIt(FixIt::CreateReplacement(RemoveRange, Code));
+    return *this;
+  }
+
+  DiagnosticBuilder AddReplacementFixIt(SrcRange RemoveRange, StringRef Code) {
+    return AddReplacementFixIt(CharSrcRange::getTokenRange(RemoveRange), Code);
+  }
 };
 
-// inline DiagnosticBuilder &operator<<(DiagnosticBuilder &db,
-//                                      llvm::StringRef val) {
-
-//   db.GetDiags().GetActiveDiagnostic().AddArg(DiagnosticArgument(val));
-//   return db;
-// }
-
-// inline DiagnosticBuilder &operator<<(DiagnosticBuilder &db, SrcLoc L) {
-//   // db.AddSrcRange(CharSrcRange::getTokenRange(L));
-//   return db;
-// }
-
-// inline DiagnosticBuilder &operator<<(DiagnosticBuilder &db, SrcRange R) {
-//   // db.AddSrcRange(CharSrcRange::getTokenRange(R));
-//   return db;
-// }
-
-// inline DiagnosticBuilder &operator<<(DiagnosticBuilder &db,
-//                                      ArrayRef<SrcRange> Ranges) {
-//   // for (SrcRange R : Ranges)
-//   //   db.AddSrcRange(CharSrcRange::getTokenRange(R));
-
-//   return db;
-// }
-
-// inline DiagnosticBuilder &operator<<(DiagnosticBuilder &db,
-//                                       CharSrcRange &R) {
-//   // db.AddSrcRange(R);
-//   return db;
-// }
-
-// inline DiagnosticBuilder &operator<<(DiagnosticBuilder &db,
-//                                       FixIt Hint) {
-//   // db.AddFixIt(Hint);
-//   db.GetDiags().GetActiveDiagnostic().AddFixIt(std::move(Hint));
-//   return db;
-// }
-
-// inline DiagnosticBuilder &operator<<(DiagnosticBuilder &db,
-//                                      llvm::ArrayRef<FixIt> Hints) {
-//   // for (const FixIt &Hint : Hints)
-//   //   db.AddFixIt(Hint);
-
-//   return db;
-// }
 
 class DiagnosticConsumer {
 protected:
