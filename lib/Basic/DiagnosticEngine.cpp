@@ -4,16 +4,16 @@ using namespace clang;
 
 DiagnosticEngine::DiagnosticEngine() {}
 
-InFlightDiagnostic DiagnosticEngine::Diagnose(DiagID diagID, SrcLoc diagLoc) {
+DiagnosticBuilder DiagnosticEngine::Diagnose(DiagID diagID, SrcLoc diagLoc) {
   return Diagnose(Diagnostic(diagID), diagLoc);
 }
 
-InFlightDiagnostic DiagnosticEngine::Diagnose(const Diagnostic &diagnostic,
-                                              SrcLoc diagLoc) {
+DiagnosticBuilder DiagnosticEngine::Diagnose(const Diagnostic &diagnostic,
+                                             SrcLoc diagLoc) {
   assert(!activeDiagnostic && "Already have an active diagnostic!");
   activeDiagnostic = diagnostic;
   activeDiagnostic->SetDiagLoc(diagLoc);
-  return InFlightDiagnostic(*this);
+  return DiagnosticBuilder(*this);
 }
 
 /// Emit the current diagnostic and clear the diagnostic state.

@@ -64,7 +64,7 @@ public:
 
   /// Map a source range in the given LLVM source manager to its corresponding
   /// range in the Clang source manager.
-  SourceRange mapRange(const llvm::SourceMgr &LLVMSrcMgr, llvm::SMRange Range);
+  SrcRange mapRange(const llvm::SourceMgr &LLVMSrcMgr, llvm::SMRange Range);
 
   /// Handle the given diagnostic from an LLVM source manager.
   void handleDiag(const llvm::SMDiagnostic &Diag);

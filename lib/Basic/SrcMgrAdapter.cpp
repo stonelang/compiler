@@ -75,14 +75,14 @@ SrcLoc SrcMgrAdapter::mapLocation(const llvm::SourceMgr &LLVMSrcMgr,
   return SM.getLocForStartOfFile(KnownBuffer->second).getLocWithOffset(Offset);
 }
 
-SourceRange SrcMgrAdapter::mapRange(const llvm::SourceMgr &LLVMSrcMgr,
-                                    llvm::SMRange Range) {
+SrcRange SrcMgrAdapter::mapRange(const llvm::SourceMgr &LLVMSrcMgr,
+                                 llvm::SMRange Range) {
   if (!Range.isValid())
-    return SourceRange();
+    return SrcRange();
 
   SrcLoc Start = mapLocation(LLVMSrcMgr, Range.Start);
   SrcLoc End = mapLocation(LLVMSrcMgr, Range.End);
-  return SourceRange(Start, End);
+  return SrcRange(Start, End);
 }
 
 void SrcMgrAdapter::handleDiag(const llvm::SMDiagnostic &Diag) {
@@ -120,13 +120,13 @@ void SrcMgrAdapter::handleDiag(const llvm::SMDiagnostic &Diag) {
   //   // Translate ranges.
   //   SrcLoc StartOfLine = Loc.getLocWithOffset(-Diag.getColumnNo());
   //   for (auto Range : Diag.getRanges()) {
-  //     Builder << SourceRange(StartOfLine.getLocWithOffset(Range.first),
+  //     Builder << SrcRange(StartOfLine.getLocWithOffset(Range.first),
   //                            StartOfLine.getLocWithOffset(Range.second));
   //   }
 
   //   // Translate Fix-Its.
   //   for (const llvm::SMFixIt &FixIt : Diag.getFixIts()) {
-  //     CharSourceRange Range(mapRange(*LLVMSrcMgr, FixIt.getRange()), false);
+  //     CharSrcRange Range(mapRange(*LLVMSrcMgr, FixIt.getRange()), false);
   //     Builder << FixItHint::CreateReplacement(Range, FixIt.getText());
   //   }
   // }

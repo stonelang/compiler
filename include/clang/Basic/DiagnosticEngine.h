@@ -43,7 +43,7 @@ class QualType;
 enum class TokenKind;
 class DeclName;
 class DiagnosticEngine;
-class InFlightDiagnostic;
+class DiagnosticBuilder;
 class SrcMgr;
 class DiagnosticConsumer;
 
@@ -82,7 +82,7 @@ enum class FixItID : unsigned;
 
 /// Represents a fix-it defined  with a format string and optional
 /// DiagnosticArguments. The template parameters allow the
-/// fixIt... methods on InFlightDiagnostic to infer their own
+/// fixIt... methods on DiagnosticBuilder to infer their own
 /// template params.
 template <typename... ArgTypes> struct StructuredFixIt {
   FixItID ID;
@@ -225,7 +225,7 @@ public:
     Hint.RemoveRange = RemoveRange;
     return Hint;
   }
-  static FixIt CreateRemoval(SourceRange RemoveRange) {
+  static FixIt CreateRemoval(SrcRange RemoveRange) {
     return CreateRemoval(CharSrcRange::getTokenRange(RemoveRange));
   }
 
@@ -238,7 +238,7 @@ public:
     return Hint;
   }
 
-  static FixIt CreateReplacement(SourceRange RemoveRange, StringRef Code) {
+  static FixIt CreateReplacement(SrcRange RemoveRange, StringRef Code) {
     return CreateReplacement(CharSrcRange::getTokenRange(RemoveRange), Code);
   }
 };
@@ -292,7 +292,7 @@ public:
 class DiagnosticInfo {
 protected:
   friend DiagnosticEngine;
-  friend InFlightDiagnostic;
+  friend DiagnosticBuilder;
 
   DiagID diagID;
   SrcLoc diagLoc;
@@ -332,10 +332,11 @@ public:
 public:
   // Avoid copying the fix-it text more than necessary.
   void AddFixIt(FixIt &&fixIt) { fixIts.push_back(std::move(fixIt)); }
+  void AddArg(DiagnosticArgument &&arg) { args.push_back(std::move(arg)); }
 
-  void AddDiagnosticArgument(const DiagnosticArgument *arg) {
-    args.push_back(arg);
-  }
+  // void AddDiagnosticArgument(const DiagnosticArgument *arg) {
+  //   args.push_back(arg);
+  // }
   void SetDiagLoc(SrcLoc loc) { diagLoc = loc; }
 };
 
@@ -399,9 +400,9 @@ public:
   /// \param DiagID A member of the @c diag::kind enum.
   /// \param Loc Represents the source location associated with the diagnostic,
   /// which can be an invalid location if no position information is available.
-  InFlightDiagnostic Diagnose(DiagID diagID, SrcLoc diagLoc = SrcLoc());
-  InFlightDiagnostic Diagnose(const Diagnostic &diagnostic,
-                              SrcLoc diagLoc = SrcLoc());
+  DiagnosticBuilder Diagnose(DiagID diagID, SrcLoc diagLoc = SrcLoc());
+  DiagnosticBuilder Diagnose(const Diagnostic &diagnostic,
+                             SrcLoc diagLoc = SrcLoc());
 
 public:
   void SetSrcMgr(SrcMgr *sm) { srcMgr = sm; }
@@ -484,7 +485,7 @@ public:
   }
 };
 
-class InFlightDiagnostic final {
+class DiagnosticBuilder final {
 
   DiagnosticEngine &diagEngine;
 
@@ -500,11 +501,11 @@ class InFlightDiagnostic final {
   mutable bool forceFlush = false;
 
 public:
-  InFlightDiagnostic(DiagnosticEngine &diagEngine)
+  DiagnosticBuilder(DiagnosticEngine &diagEngine)
       : diagEngine(diagEngine), isActive(true) {}
 
   /// Emits the diagnostic.
-  ~InFlightDiagnostic() {
+  ~DiagnosticBuilder() {
     if (isActive) {
       Flush();
     }
@@ -516,14 +517,14 @@ public:
 private:
   /// Force the diagnostic builder to emit the diagnostic now.
   ///
-  /// Once this function has been called, the InFlightDiagnostic object
+  /// Once this function has been called, the DiagnosticBuilder object
   /// should not be used again before it is destroyed.
   ///
   /// \returns true if a diagnostic was emitted, false if the
   /// diagnostic was suppressed.
   bool Flush() {
     // If this diagnostic is inactive, then its soul was stolen by the copy ctor
-    // (or by a subclass, as in InFlightDiagnostic).
+    // (or by a subclass, as in DiagnosticBuilder).
     if (!isActive) {
       return false;
     }
@@ -532,11 +533,13 @@ private:
     return diagEngine.EmitActiveDiagnostic(forceFlush);
   }
 
+  Diagnostic &GetActiveDiagnostic() { return diagEngine.GetActiveDiagnostic(); }
+
 public:
   template <typename T>
-  const InFlightDiagnostic &operator<<(const T &val) const {
+  const DiagnosticBuilder &operator<<(const T &val) const {
     assert(isActive && "Clients must not add to cleared diagnostic!");
-    const InFlightDiagnostic &self = *this;
+    const DiagnosticBuilder &self = *this;
     self << val;
     return *this;
   }
@@ -546,23 +549,109 @@ public:
   // bitfield is not allowed.
   template <typename T,
             typename = std::enable_if_t<!std::is_lvalue_reference<T>::value>>
-  const InFlightDiagnostic &operator<<(T &&val) const {
+  const DiagnosticBuilder &operator<<(T &&val) const {
     assert(isActive && "Clients must not add to cleared diagnostic!");
-    const InFlightDiagnostic &self = *this;
+    const DiagnosticBuilder &self = *this;
     self << std::move(val);
     return *this;
   }
 
-  InFlightDiagnostic &operator=(const InFlightDiagnostic &) = delete;
+  DiagnosticBuilder &operator=(const DiagnosticBuilder &) = delete;
+
+public:
+  DiagnosticBuilder AddArg(bool val) {
+    GetActiveDiagnostic().AddArg(DiagnosticArgument(val));
+    return *this;
+  }
+  DiagnosticBuilder AddArg(int val) {
+    GetActiveDiagnostic().AddArg(DiagnosticArgument(val));
+    return *this;
+  }
+  DiagnosticBuilder AddArg(unsigned val) {
+    GetActiveDiagnostic().AddArg(DiagnosticArgument(val));
+    return *this;
+  }
+  DiagnosticBuilder AddArg(llvm::StringRef val) {
+    GetActiveDiagnostic().AddArg(DiagnosticArgument(val));
+    return *this;
+  }
+
+  DiagnosticBuilder AddArg(Identifier *val) {
+    GetActiveDiagnostic().AddArg(DiagnosticArgument(val));
+    return *this;
+  }
+
+  DiagnosticBuilder AddArg(Decl *val) {
+    GetActiveDiagnostic().AddArg(DiagnosticArgument(val));
+    return *this;
+  }
+  DiagnosticBuilder AddArg(QualType *val) {
+    GetActiveDiagnostic().AddArg(DiagnosticArgument(val));
+    return *this;
+  }
+  DiagnosticBuilder AddArg(DeclName *val) {
+    GetActiveDiagnostic().AddArg(DiagnosticArgument(val));
+    return *this;
+  }
+
+  DiagnosticBuilder AddArg(TokenKind val) {
+    GetActiveDiagnostic().AddArg(DiagnosticArgument(val));
+    return *this;
+  }
+
+  DiagnosticBuilder AddInsertionFixIt(SrcLoc insertionLoc, llvm::StringRef code,
+                                      bool beforePreviousInsertions = false) {
+    GetActiveDiagnostic().AddFixIt(
+        FixIt::CreateInsertion(insertionLoc, code, beforePreviousInsertions));
+    return *this;
+  }
 };
 
-InFlightDiagnostic &operator<<(InFlightDiagnostic &inFlight,
-                               llvm::StringRef val) {
+// inline DiagnosticBuilder &operator<<(DiagnosticBuilder &db,
+//                                      llvm::StringRef val) {
 
-  inFlight.GetDiags().GetActiveDiagnostic().AddDiagnosticArgument(
-      new (inFlight.GetDiags()) DiagnosticArgument(val));
-  return inFlight;
-}
+//   db.GetDiags().GetActiveDiagnostic().AddArg(DiagnosticArgument(val));
+//   return db;
+// }
+
+// inline DiagnosticBuilder &operator<<(DiagnosticBuilder &db, SrcLoc L) {
+//   // db.AddSrcRange(CharSrcRange::getTokenRange(L));
+//   return db;
+// }
+
+// inline DiagnosticBuilder &operator<<(DiagnosticBuilder &db, SrcRange R) {
+//   // db.AddSrcRange(CharSrcRange::getTokenRange(R));
+//   return db;
+// }
+
+// inline DiagnosticBuilder &operator<<(DiagnosticBuilder &db,
+//                                      ArrayRef<SrcRange> Ranges) {
+//   // for (SrcRange R : Ranges)
+//   //   db.AddSrcRange(CharSrcRange::getTokenRange(R));
+
+//   return db;
+// }
+
+// inline DiagnosticBuilder &operator<<(DiagnosticBuilder &db,
+//                                       CharSrcRange &R) {
+//   // db.AddSrcRange(R);
+//   return db;
+// }
+
+// inline DiagnosticBuilder &operator<<(DiagnosticBuilder &db,
+//                                       FixIt Hint) {
+//   // db.AddFixIt(Hint);
+//   db.GetDiags().GetActiveDiagnostic().AddFixIt(std::move(Hint));
+//   return db;
+// }
+
+// inline DiagnosticBuilder &operator<<(DiagnosticBuilder &db,
+//                                      llvm::ArrayRef<FixIt> Hints) {
+//   // for (const FixIt &Hint : Hints)
+//   //   db.AddFixIt(Hint);
+
+//   return db;
+// }
 
 class DiagnosticConsumer {
 protected:

@@ -965,7 +965,7 @@ SrcLoc SrcMgr::getTopMacroCallerLoc(SrcLoc Loc) const {
 /// tokens covered by the expansion in the ultimate file.
 CharSrcRange SrcMgr::getExpansionRange(SrcLoc Loc) const {
   if (Loc.isFileID())
-    return CharSrcRange(SourceRange(Loc, Loc), true);
+    return CharSrcRange(SrcRange(Loc, Loc), true);
 
   CharSrcRange Res = getImmediateExpansionRange(Loc);
 

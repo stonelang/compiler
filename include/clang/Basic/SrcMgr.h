@@ -389,9 +389,8 @@ public:
   bool isExpansionTokenRange() const { return ExpansionIsTokenRange; }
 
   CharSrcRange getExpansionLocRange() const {
-    return CharSrcRange(
-        SourceRange(getExpansionLocStart(), getExpansionLocEnd()),
-        isExpansionTokenRange());
+    return CharSrcRange(SrcRange(getExpansionLocStart(), getExpansionLocEnd()),
+                        isExpansionTokenRange());
   }
 
   bool isMacroArgExpansion() const {
@@ -1199,12 +1198,12 @@ public:
   /// tokens covered by the expansion in the ultimate file.
   CharSrcRange getExpansionRange(SrcLoc Loc) const;
 
-  /// Given a SourceRange object, return the range of
+  /// Given a SrcRange object, return the range of
   /// tokens or characters covered by the expansion in the ultimate file.
-  CharSrcRange getExpansionRange(SourceRange Range) const {
+  CharSrcRange getExpansionRange(SrcRange Range) const {
     SrcLoc Begin = getExpansionRange(Range.getBegin()).getBegin();
     CharSrcRange End = getExpansionRange(Range.getEnd());
-    return CharSrcRange(SourceRange(Begin, End.getEnd()), End.isTokenRange());
+    return CharSrcRange(SrcRange(Begin, End.getEnd()), End.isTokenRange());
   }
 
   /// Given a CharSrcRange object, return the range of
@@ -1928,13 +1927,13 @@ public:
 };
 
 /// Compare two non-overlapping source ranges.
-template <> class BeforeThanCompare<SourceRange> {
+template <> class BeforeThanCompare<SrcRange> {
   SrcMgr &SM;
 
 public:
   explicit BeforeThanCompare(SrcMgr &SM) : SM(SM) {}
 
-  bool operator()(SourceRange LHS, SourceRange RHS) const {
+  bool operator()(SrcRange LHS, SrcRange RHS) const {
     return SM.isBeforeInTranslationUnit(LHS.getBegin(), RHS.getBegin());
   }
 };
