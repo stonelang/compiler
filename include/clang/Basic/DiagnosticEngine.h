@@ -1,8 +1,10 @@
 #ifndef LLVM_CLANG_BASIC_DIAGNOSTIC_H
 #define LLVM_CLANG_BASIC_DIAGNOSTIC_H
 
+#include "clang/Basic/DiagnosticAllocation.h"
 #include "clang/Basic/DiagnosticOptions.h"
 #include "clang/Basic/FileManager.h"
+#include "clang/Basic/Memory.h"
 #include "clang/Basic/SrcLoc.h"
 
 #include "llvm/ADT/ArrayRef.h"
@@ -10,8 +12,14 @@
 #include "llvm/ADT/IntrusiveRefCntPtr.h"
 #include "llvm/ADT/SmallVector.h"
 #include "llvm/ADT/StringRef.h"
+#include "llvm/ADT/SetVector.h"
 #include "llvm/ADT/iterator_range.h"
+#include "llvm/Support/Casting.h"
+#include "llvm/Support/Allocator.h"
 #include "llvm/Support/Compiler.h"
+
+
+
 
 #include <cassert>
 #include <cstdint>
@@ -94,7 +102,8 @@ enum class DiagnosticArgumentKind {
   TokenKind
 };
 
-class DiagnosticArgument final {
+class DiagnosticArgument final
+    : public DiagnosticAllocation<DiagnosticArgument> {
   DiagnosticArgumentKind kind;
   union {
     bool BoolVal;
@@ -243,6 +252,8 @@ class StreamingDiagnostic {
 protected:
   DiagnosticEngine &diagEngine;
 
+  llvm::SmallVector<const DiagnosticArgument *> args;
+
   /// Status variable indicating if this diagnostic is still active.
   ///
   // NOTE: This field is redundant with DiagObj (IsActive iff (DiagObj ==0)),
@@ -257,8 +268,31 @@ protected:
 protected:
   StreamingDiagnostic(DiagnosticEngine &diagEngine) : diagEngine(diagEngine) {}
 
+protected:
+  void AddDiagnosticArgument(const DiagnosticArgument *arg);
+
+public:
 public:
 };
+
+StreamingDiagnostic &operator<<(StreamingDiagnostic &streamingDiag, bool val) {
+  // streamingDiag.AddDiagnosticArgument(new
+  // (DiagnosticEngine)DiagnosticArgument(val);
+  return streamingDiag;
+}
+
+StreamingDiagnostic &operator<<(StreamingDiagnostic &streamingDiag,
+                                llvm::StringRef val) {
+  // streamingDiag.AddDiagnosticArgument(new
+  // (DiagnosticEngine)DiagnosticArgument(val);
+  return streamingDiag;
+}
+
+StreamingDiagnostic &operator<<(StreamingDiagnostic &streamingDiag, int val) {
+  // streamingDiag.AddDiagnosticArgument(new
+  // (DiagnosticEngine)DiagnosticArgument(val);
+  return streamingDiag;
+}
 
 class InFlightDiagnostic final : public StreamingDiagnostic {
 public:
@@ -368,8 +402,29 @@ class DiagnosticEngine final {
   /// emitting diagnostics.
   llvm::SmallVector<DiagnosticConsumer *, 2> consumers;
 
+  mutable llvm::BumpPtrAllocator allocator;
+
 public:
   DiagnosticEngine();
+  DiagnosticEngine(const DiagnosticEngine &) = delete;
+  DiagnosticEngine &operator=(const DiagnosticEngine &) = delete;
+
+public:
+  void *AllocateMemory(unsigned long bytes, unsigned alignment = 8,
+                       bool useMalloc = false) const {
+    if (bytes == 0) {
+      return nullptr;
+    }
+    if (useMalloc) {
+      return clang::AlignedAlloc(bytes, alignment);
+    }
+    return GetAllocator().Allocate(bytes, alignment);
+  }
+
+  void Deallocate(void *Ptr) const {}
+
+  llvm::BumpPtrAllocator &GetAllocator() const { return allocator; }
+  size_t GetTotalMemUsed() const { return GetAllocator().getTotalMemory(); }
 
 public:
   /// Determine whethere there is already a diagnostic in flight.
@@ -415,6 +470,80 @@ public:
     return srcMgr;
   }
   bool HasSrcMgr() { return srcMgr != nullptr; }
+
+public:
+  template <typename T> T *Allocate() const {
+    T *res = (T *)AllocateMemory(sizeof(T), alignof(T));
+    new (res) T();
+    return res;
+  }
+
+  template <typename T>
+  MutableArrayRef<T> AllocateUninitialized(unsigned NumElts) const {
+    T *Data = (T *)AllocateMemory(sizeof(T) * NumElts, alignof(T));
+    return {Data, NumElts};
+  }
+
+  template <typename T> MutableArrayRef<T> Allocate(unsigned numElts) const {
+    T *res = (T *)AllocateMemory(sizeof(T) * numElts, alignof(T));
+    for (unsigned i = 0; i != numElts; ++i)
+      new (res + i) T();
+    return {res, numElts};
+  }
+
+  /// Allocate a copy of the specified object.
+  template <typename T>
+  typename std::remove_reference<T>::type *AllocateObjectCopy(T &&t) const {
+    // This function cannot be named AllocateCopy because it would always win
+    // overload resolution over the AllocateCopy(ArrayRef<T>).
+    using TNoRef = typename std::remove_reference<T>::type;
+    TNoRef *res =
+        (TNoRef *)AllocateMemory(sizeof(TNoRef), alignof(TNoRef));
+    new (res) TNoRef(std::forward<T>(t));
+    return res;
+  }
+
+  template <typename T, typename It> T *AllocateCopy(It start, It end) const {
+    T *res = (T *)AllocateMemory(sizeof(T) * (end - start), alignof(T));
+    for (unsigned i = 0; start != end; ++start, ++i)
+      new (res + i) T(*start);
+    return res;
+  }
+
+  template <typename T, size_t N>
+  MutableArrayRef<T> AllocateCopy(T (&array)[N]) const {
+    return MutableArrayRef<T>(AllocateCopy<T>(array, array + N), N);
+  }
+
+  template <typename T>
+  MutableArrayRef<T> AllocateCopy(ArrayRef<T> array) const {
+    return MutableArrayRef<T>(
+        AllocateCopy<T>(array.begin(), array.end()), array.size());
+  }
+
+  template <typename T>
+  ArrayRef<T> AllocateCopy(const SmallVectorImpl<T> &vec) const {
+    return AllocateCopy(ArrayRef<T>(vec));
+  }
+
+  template <typename T>
+  MutableArrayRef<T> AllocateCopy(SmallVectorImpl<T> &vec) const {
+    return AllocateCopy(MutableArrayRef<T>(vec));
+  }
+
+  StringRef AllocateCopy(StringRef Str) const {
+    ArrayRef<char> Result =
+        AllocateCopy(llvm::ArrayRef(Str.data(), Str.size()));
+    return StringRef(Result.data(), Result.size());
+  }
+
+  template <typename T, typename Vector, typename Set>
+  MutableArrayRef<T>
+  AllocateCopy(llvm::SetVector<T, Vector, Set> setVector) const {
+    return MutableArrayRef<T>(
+        AllocateCopy<T>(setVector.begin(), setVector.end()),
+        setVector.size());
+  }
 };
 
 class DiagnosticConsumer {

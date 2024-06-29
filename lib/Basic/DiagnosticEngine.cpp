@@ -31,3 +31,9 @@ bool DiagnosticEngine::EmitDiagnostic(const Diagnostic &diagnostic,
                                       bool force) {
   return true;
 }
+
+void *clang::AllocateInDiagnosticEngine(size_t bytes,
+                                        const DiagnosticEngine &diagEngine,
+                                        unsigned alignment) {
+  return diagEngine.AllocateMemory(bytes, alignment);
+}
