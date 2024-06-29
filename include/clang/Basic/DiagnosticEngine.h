@@ -10,16 +10,13 @@
 #include "llvm/ADT/ArrayRef.h"
 #include "llvm/ADT/DenseMap.h"
 #include "llvm/ADT/IntrusiveRefCntPtr.h"
+#include "llvm/ADT/SetVector.h"
 #include "llvm/ADT/SmallVector.h"
 #include "llvm/ADT/StringRef.h"
-#include "llvm/ADT/SetVector.h"
 #include "llvm/ADT/iterator_range.h"
-#include "llvm/Support/Casting.h"
 #include "llvm/Support/Allocator.h"
+#include "llvm/Support/Casting.h"
 #include "llvm/Support/Compiler.h"
-
-
-
 
 #include <cassert>
 #include <cstdint>
@@ -102,7 +99,8 @@ enum class DiagnosticArgumentKind {
   TokenKind
 };
 
-class DiagnosticArgument final
+constexpr size_t DiagnosticArgumentInBits = 3;
+class alignas(1 << DiagnosticArgumentInBits) DiagnosticArgument final
     : public DiagnosticAllocation<DiagnosticArgument> {
   DiagnosticArgumentKind kind;
   union {
@@ -245,61 +243,6 @@ public:
   }
 };
 
-// class DiagnosticStorageAllocator {};
-
-class StreamingDiagnostic {
-
-protected:
-  DiagnosticEngine &diagEngine;
-
-  llvm::SmallVector<const DiagnosticArgument *> args;
-
-  /// Status variable indicating if this diagnostic is still active.
-  ///
-  // NOTE: This field is redundant with DiagObj (IsActive iff (DiagObj ==0)),
-  // but LLVM is not currently smart enough to eliminate the null check that
-  // Emit() would end up with if we used that as our status variable.
-  mutable bool IsActive = false;
-
-  /// Flag indicating that this diagnostic is being emitted via a
-  /// call to ForceEmit.
-  mutable bool IsForceEmit = false;
-
-protected:
-  StreamingDiagnostic(DiagnosticEngine &diagEngine) : diagEngine(diagEngine) {}
-
-protected:
-  void AddDiagnosticArgument(const DiagnosticArgument *arg);
-
-public:
-public:
-};
-
-StreamingDiagnostic &operator<<(StreamingDiagnostic &streamingDiag, bool val) {
-  // streamingDiag.AddDiagnosticArgument(new
-  // (DiagnosticEngine)DiagnosticArgument(val);
-  return streamingDiag;
-}
-
-StreamingDiagnostic &operator<<(StreamingDiagnostic &streamingDiag,
-                                llvm::StringRef val) {
-  // streamingDiag.AddDiagnosticArgument(new
-  // (DiagnosticEngine)DiagnosticArgument(val);
-  return streamingDiag;
-}
-
-StreamingDiagnostic &operator<<(StreamingDiagnostic &streamingDiag, int val) {
-  // streamingDiag.AddDiagnosticArgument(new
-  // (DiagnosticEngine)DiagnosticArgument(val);
-  return streamingDiag;
-}
-
-class InFlightDiagnostic final : public StreamingDiagnostic {
-public:
-  InFlightDiagnostic(DiagnosticEngine &diagEngine)
-      : StreamingDiagnostic(diagEngine) {}
-};
-
 // class InflightDiagnosticInfo final {
 
 //   const DiagnosticEngine &diagEngine;
@@ -389,6 +332,10 @@ public:
 public:
   // Avoid copying the fix-it text more than necessary.
   void AddFixIt(FixIt &&fixIt) { fixIts.push_back(std::move(fixIt)); }
+
+  void AddDiagnosticArgument(const DiagnosticArgument *arg) {
+    args.push_back(arg);
+  }
   void SetDiagLoc(SrcLoc loc) { diagLoc = loc; }
 };
 
@@ -402,7 +349,7 @@ class DiagnosticEngine final {
   /// emitting diagnostics.
   llvm::SmallVector<DiagnosticConsumer *, 2> consumers;
 
-  mutable llvm::BumpPtrAllocator allocator;
+  mutable llvm::BumpPtrAllocator bumpAllocator;
 
 public:
   DiagnosticEngine();
@@ -410,20 +357,13 @@ public:
   DiagnosticEngine &operator=(const DiagnosticEngine &) = delete;
 
 public:
-  void *AllocateMemory(unsigned long bytes, unsigned alignment = 8,
-                       bool useMalloc = false) const {
-    if (bytes == 0) {
-      return nullptr;
-    }
-    if (useMalloc) {
-      return clang::AlignedAlloc(bytes, alignment);
-    }
-    return GetAllocator().Allocate(bytes, alignment);
+  void *AllocateMemory(size_t bytes, unsigned alignment = 8) const {
+    return bumpAllocator.Allocate(bytes, alignment);
   }
 
   void Deallocate(void *Ptr) const {}
 
-  llvm::BumpPtrAllocator &GetAllocator() const { return allocator; }
+  llvm::BumpPtrAllocator &GetAllocator() const { return bumpAllocator; }
   size_t GetTotalMemUsed() const { return GetAllocator().getTotalMemory(); }
 
 public:
@@ -497,8 +437,7 @@ public:
     // This function cannot be named AllocateCopy because it would always win
     // overload resolution over the AllocateCopy(ArrayRef<T>).
     using TNoRef = typename std::remove_reference<T>::type;
-    TNoRef *res =
-        (TNoRef *)AllocateMemory(sizeof(TNoRef), alignof(TNoRef));
+    TNoRef *res = (TNoRef *)AllocateMemory(sizeof(TNoRef), alignof(TNoRef));
     new (res) TNoRef(std::forward<T>(t));
     return res;
   }
@@ -517,8 +456,8 @@ public:
 
   template <typename T>
   MutableArrayRef<T> AllocateCopy(ArrayRef<T> array) const {
-    return MutableArrayRef<T>(
-        AllocateCopy<T>(array.begin(), array.end()), array.size());
+    return MutableArrayRef<T>(AllocateCopy<T>(array.begin(), array.end()),
+                              array.size());
   }
 
   template <typename T>
@@ -541,10 +480,89 @@ public:
   MutableArrayRef<T>
   AllocateCopy(llvm::SetVector<T, Vector, Set> setVector) const {
     return MutableArrayRef<T>(
-        AllocateCopy<T>(setVector.begin(), setVector.end()),
-        setVector.size());
+        AllocateCopy<T>(setVector.begin(), setVector.end()), setVector.size());
   }
 };
+
+class InFlightDiagnostic final {
+
+  DiagnosticEngine &diagEngine;
+
+  /// Status variable indicating if this diagnostic is still active.
+  ///
+  // NOTE: This field is redundant with DiagObj (IsActive iff (DiagObj ==0)),
+  // but LLVM is not currently smart enough to eliminate the null check that
+  // Emit() would end up with if we used that as our status variable.
+  mutable bool isActive = false;
+
+  /// Flag indicating that this diagnostic is being emitted via a
+  /// call to ForceEmit.
+  mutable bool forceFlush = false;
+
+public:
+  InFlightDiagnostic(DiagnosticEngine &diagEngine)
+      : diagEngine(diagEngine), isActive(true) {}
+
+  /// Emits the diagnostic.
+  ~InFlightDiagnostic() {
+    if (isActive) {
+      Flush();
+    }
+  }
+
+public:
+  DiagnosticEngine &GetDiags() { return diagEngine; }
+
+private:
+  /// Force the diagnostic builder to emit the diagnostic now.
+  ///
+  /// Once this function has been called, the InFlightDiagnostic object
+  /// should not be used again before it is destroyed.
+  ///
+  /// \returns true if a diagnostic was emitted, false if the
+  /// diagnostic was suppressed.
+  bool Flush() {
+    // If this diagnostic is inactive, then its soul was stolen by the copy ctor
+    // (or by a subclass, as in InFlightDiagnostic).
+    if (!isActive) {
+      return false;
+    }
+
+    // Process the diagnostic.
+    return diagEngine.EmitActiveDiagnostic(forceFlush);
+  }
+
+public:
+  template <typename T>
+  const InFlightDiagnostic &operator<<(const T &val) const {
+    assert(isActive && "Clients must not add to cleared diagnostic!");
+    const InFlightDiagnostic &self = *this;
+    self << val;
+    return *this;
+  }
+
+  // It is necessary to limit this to rvalue reference to avoid calling this
+  // function with a bitfield lvalue argument since non-const reference to
+  // bitfield is not allowed.
+  template <typename T,
+            typename = std::enable_if_t<!std::is_lvalue_reference<T>::value>>
+  const InFlightDiagnostic &operator<<(T &&val) const {
+    assert(isActive && "Clients must not add to cleared diagnostic!");
+    const InFlightDiagnostic &self = *this;
+    self << std::move(val);
+    return *this;
+  }
+
+  InFlightDiagnostic &operator=(const InFlightDiagnostic &) = delete;
+};
+
+InFlightDiagnostic &operator<<(InFlightDiagnostic &inFlight,
+                               llvm::StringRef val) {
+
+  inFlight.GetDiags().GetActiveDiagnostic().AddDiagnosticArgument(
+      new (inFlight.GetDiags()) DiagnosticArgument(val));
+  return inFlight;
+}
 
 class DiagnosticConsumer {
 protected:
