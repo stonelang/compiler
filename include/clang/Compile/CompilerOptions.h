@@ -1,9 +1,9 @@
-#ifndef LLVM_CLANG_FRONTEND_FRONTENDOPTIONS_H
-#define LLVM_CLANG_FRONTEND_FRONTENDOPTIONS_H
+#ifndef LLVM_CLANG_COMPILE_COMPILEROPTIONS_H
+#define LLVM_CLANG_COMPILE_COMPILEROPTIONS_H
 
 namespace clang {
 
-enum class FrontendAction {
+enum class CompilerActionKind {
   None = 0,
   PrintVersion,
   PrintHelp,
@@ -24,14 +24,10 @@ enum class FrontendAction {
 
 };
 
-class FrontendInputFile final {
-public:
-};
-
-class FrontendOptions final {
+class CompilerOptions final {
 
 public:
-  FrontendAction mainAction = FrontendAction::None;
+  CompilerActionKind mainActionKind = CompilerActionKind::None;
 };
 
 } // namespace clang

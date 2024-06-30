@@ -29,6 +29,13 @@ bool DiagnosticEngine::EmitActiveDiagnostic(bool force) {
 /// \param Force Emit the diagnostic regardless of suppression settings.
 bool DiagnosticEngine::EmitDiagnostic(const Diagnostic &diagnostic,
                                       bool force) {
+
+  // assert(GetDiagnosticConsumer() && "DiagnosticConsumer not set!");
+
+  ForEachConsumer([&](DiagnosticConsumer *consumer) {
+    // consumer->ProcessDiagnostic();
+  });
+
   return true;
 }
 

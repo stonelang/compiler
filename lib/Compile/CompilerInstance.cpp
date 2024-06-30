@@ -2,5 +2,5 @@
 
 using namespace clang;
 
-CompilerInstance::CompilerInstance(const FrontendInstance &frontend)
-    : frontend(frontend) {}
+CompilerInstance::CompilerInstance(const CompilerInvocation &invocation)
+    : invocation(invocation) {}

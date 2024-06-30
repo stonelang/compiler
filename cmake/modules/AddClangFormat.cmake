@@ -1,14 +1,12 @@
 set(stone_include_files
 	${CMAKE_CURRENT_SOURCE_DIR}/include/clang/Basic/*.h
 	${CMAKE_CURRENT_SOURCE_DIR}/include/clang/Compile/*.h
-	${CMAKE_CURRENT_SOURCE_DIR}/include/clang/Frontend/*.h
 	
 	
 )
 set(stone_lib_files
 	${CMAKE_CURRENT_SOURCE_DIR}/lib/Basic/*.cpp
 	${CMAKE_CURRENT_SOURCE_DIR}/lib/Compile/*.cpp
-	${CMAKE_CURRENT_SOURCE_DIR}/lib/Frontend/*.cpp
 )
 set(stone_tools_files
 	${CMAKE_CURRENT_SOURCE_DIR}/tools/driver/*.cpp  

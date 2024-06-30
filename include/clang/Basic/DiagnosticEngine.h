@@ -243,52 +243,6 @@ public:
   }
 };
 
-// class InflightDiagnosticInfo final {
-
-//   const DiagnosticEngine &diagEngine;
-
-// public:
-//   InflightDiagnosticInfo(const DiagnosticEngine &diagEngine)
-//       : diagEngine(diagEngine) {}
-
-// public:
-//   void FormatDiagnostic(llvm::SmallVectorImpl<char> &outString) const;
-
-//   /// Format the given format-string into the output buffer using the
-//   /// arguments stored in this diagnostic.
-//   void FormatDiagnostic(const char *diagStartString, const char
-//   *diagEndString,
-//                         llvm::SmallVectorImpl<char> &outString) const;
-// };
-
-// class CurrentDiagnostic {
-
-// public:
-// };
-
-// class DiagnosticList final {
-
-// public:
-//   /// Given a diagnostic ID, return a description of the issue.
-//   llvm::StringRef GetDescription(DiagID diagID) const;
-//   /// Used to report a diagnostic that is finally fully formed.
-//   ///
-//   /// \returns \c true if the diagnostic was emitted, \c false if it was
-//   /// suppressed.
-//   bool ProcessDiagnostic(DiagnosticEngine &diag) const;
-
-//   /// Used to emit a diagnostic that is finally fully formed,
-//   /// ignoring suppression.
-//   void EmitDiagnostic(DiagnosticEngine &diag, DiagnosticLevel level) const;
-// };
-
-// class DiagnosticState {};
-
-// class DiagnosticConsumerInfo {
-// public:
-
-// };
-
 class DiagnosticInfo {
 protected:
   friend DiagnosticEngine;
@@ -350,6 +304,13 @@ class DiagnosticEngine final {
   /// emitting diagnostics.
   llvm::SmallVector<DiagnosticConsumer *, 2> consumers;
 
+  /// Tracks diagnostic behaviors and state
+  // DiagnosticState state;
+
+  /// All diagnostics that have are no longer active but have not yet
+  /// been emitted due to an open transaction.
+  llvm::SmallVector<Diagnostic, 4> waitingDiagnostics;
+
   mutable llvm::BumpPtrAllocator bumpAllocator;
 
 public:
@@ -377,9 +338,7 @@ public:
   /// Used to report a diagnostic that is finally fully formed.
   ///
   /// \returns true if the diagnostic was emitted, false if it was suppressed.
-  bool ProcessDiagnostic() {
-    // return Diags->ProcessDiag(*this);
-  }
+  bool ProcessDiagnostic();
 
   /// Emit the current diagnostic and clear the diagnostic state.
   ///
@@ -411,6 +370,23 @@ public:
     return srcMgr;
   }
   bool HasSrcMgr() { return srcMgr != nullptr; }
+
+  /// Add an additional DiagnosticConsumer to receive diagnostics.
+  void AddConsumer(DiagnosticConsumer *consumer) {
+    consumers.push_back(consumer);
+  }
+
+  /// Remove a specific DiagnosticConsumer.
+  void RemoveConsumer(DiagnosticConsumer *consumer) {
+    consumers.erase(std::remove(consumers.begin(), consumers.end(), consumer));
+  }
+
+  void ForEachConsumer(std::function<void(DiagnosticConsumer *)> notify) {
+    for (auto consumer : consumers) {
+      notify(consumer);
+    }
+  }
+  bool HasConsumers() { return consumers.size() > 0; }
 
 public:
   template <typename T> T *Allocate() const {
@@ -576,6 +552,7 @@ public:
     return *this;
   }
 
+public:
   DiagnosticBuilder AddInsertionFixIt(SrcLoc insertionLoc, llvm::StringRef code,
                                       bool beforePreviousInsertions = false) {
     GetActiveDiagnostic().AddFixIt(
@@ -620,6 +597,7 @@ public:
   DiagnosticConsumer() = default;
   virtual ~DiagnosticConsumer();
 
+public:
   unsigned GetNumErrors() const { return numWarnings; }
   unsigned GetNumWarnings() const { return numWarnings; }
   virtual void Clear() { numWarnings = numWarnings = 0; }
@@ -636,6 +614,81 @@ public:
   virtual void HandleDiagnostic(DiagnosticLevel diagLevel,
                                 const Diagnostic &diagnostic);
 };
+
+class DiagnosticEmitter {
+protected:
+  // const LangOptions &LangOpts;
+  // DiagnosticOptions& DiagOpts;
+
+  /// The location of the previous diagnostic if known.
+  ///
+  /// This will be invalid in cases where there is no (known) previous
+  /// diagnostic location, or that location itself is invalid or comes from
+  /// a different source manager than SM.
+  SrcLoc lastLoc;
+
+  /// The level of the last diagnostic emitted.
+  ///
+  /// The level of the last diagnostic emitted. Used to detect level changes
+  /// which change the amount of information displayed.
+  DiagnosticLevel LastLevel = DiagnosticLevel::Ignore;
+
+  // DiagnosticEmitter(const LangOptions &LangOpts,
+  //                    DiagnosticOptions *DiagOpts);
+
+  virtual ~DiagnosticEmitter();
+
+  // virtual void EmitDiagnosticMessage(FullSourceLoc Loc, PresumedLoc PLoc,
+  //                                    DiagnosticsEngine::Level Level,
+  //                                    StringRef Message,
+  //                                    ArrayRef<CharSourceRange> Ranges,
+  //                                    DiagOrStoredDiag Info) = 0;
+
+  // virtual void EmitDiagnosticLoc(FullSourceLoc Loc, PresumedLoc PLoc,
+  //                                DiagnosticsEngine::Level Level,
+  //                                ArrayRef<CharSourceRange> Ranges) = 0;
+
+  // virtual void EmitCodeContext(FullSourceLoc Loc,
+  //                              DiagnosticsEngine::Level Level,
+  //                              SmallVectorImpl<CharSourceRange> &Ranges,
+  //                              ArrayRef<FixItHint> Hints) = 0;
+
+  // virtual void EmitImportLocation(FullSourceLoc Loc, PresumedLoc PLoc,
+  //                                 StringRef ModuleName) = 0;
+
+  // virtual void BeginDiagnostic(DiagOrStoredDiag D,
+  //                              DiagnosticsEngine::Level Level) {}
+  // virtual void EndDiagnostic(DiagOrStoredDiag D,
+  //                            DiagnosticsEngine::Level Level) {}
+
+private:
+  // void emitBasicNote(StringRef Message);
+
+  // void emitCaret(FullSourceLoc Loc, DiagnosticsEngine::Level Level,
+  //                ArrayRef<CharSourceRange> Ranges, ArrayRef<FixItHint>
+  //                Hints);
+
+public:
+  /// Emit a diagnostic.
+  ///
+  /// This is the primary entry point for emitting diagnostic messages.
+  /// It handles formatting and rendering the message as well as any ancillary
+  /// information needed based on macros whose expansions impact the
+  /// diagnostic.
+  ///
+  /// \param Loc The location for this caret.
+  /// \param Level The level of the diagnostic to be emitted.
+  /// \param Message The diagnostic message to emit.
+  /// \param Ranges The underlined ranges for this code snippet.
+  /// \param FixItHints The FixIt hints active for this diagnostic.
+  // void EmitDiagnostic(FullSourceLoc Loc, DiagnosticsEngine::Level Level,
+  //                     StringRef Message, ArrayRef<CharSourceRange> Ranges,
+  //                     ArrayRef<FixItHint> FixItHints,
+  //                     DiagOrStoredDiag D = (Diagnostic *)nullptr);
+
+  // void EmitStoredDiagnostic(StoredDiagnostic &Diag);
+};
+
 } // namespace clang
 
 #endif

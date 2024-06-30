@@ -1,39 +1,27 @@
 #include "clang/Compile/Compile.h"
+#include "clang/Compile/CompilerConsumer.h"
 #include "clang/Compile/CompilerInstance.h"
-#include "clang/Frontend/FrontendInstance.h"
+#include "clang/Compile/CompilerInvocation.h"
+
+#include "llvm/ADT/DenseMap.h"
+#include "llvm/ADT/IntrusiveRefCntPtr.h"
+#include "llvm/ADT/SetVector.h"
+#include "llvm/ADT/SmallVector.h"
+#include "llvm/ADT/StringRef.h"
+#include "llvm/ADT/iterator_range.h"
 
 #include <memory>
+
 using namespace clang;
 
-int clang::Compile() {
+int clang::Compile(llvm::ArrayRef<const char *> args, const char *arg0,
+                   void *mainAddr, CompilerConsumer *consumer) {
 
-  FrontendInstance frontend;
-  frontend.ParseCommandLine();
+  CompilerInvocation invocation;
+  invocation.ParseCommandLine();
 
-  CompilerInstance compiler(frontend);
-  // compiler.ExecuteAction(frontend.GetMainAction());
+  CompilerInstance instance(invocation);
+  instance.SetConsumer(consumer);
 
   return 0;
 }
-
-// void CompilerInstance::ExecuteAction(FrontendAction requested) {
-
-// }
-
-void CompilerInstance::ExecutePrintHelpAction() {}
-
-void CompilerInstance::ExecutePrintVersionAction() {}
-
-void CompilerInstance::ExecuteParseAction() {}
-
-void CompilerInstance::ExecutePrintASTAction() {}
-
-void CompilerInstance::ExecuteTypeCheckAction() {}
-
-void CompilerInstance::ExecuteEmitASTAction() {}
-
-void CompilerInstance::ExecuteEmitBitCodeAction() {}
-
-void CompilerInstance::ExecuteEmitObjectAction() {}
-
-void CompilerInstance::ExecuteEmitAssemblyAction() {}
